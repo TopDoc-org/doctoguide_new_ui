@@ -1,0 +1,73 @@
+<div class="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-sand-50 px-4 py-8">
+  <!-- soft, cool tints -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <div class="absolute -left-20 top-0 h-80 w-80 rounded-full bg-grass-200/40 blur-3xl motion-safe:animate-blob"></div>
+    <div class="absolute right-[-5rem] bottom-0 h-80 w-80 rounded-full bg-amber-100/50 blur-3xl motion-safe:animate-blob" style="animation-delay:-6s"></div>
+  </div>
+
+  <div class="relative w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl shadow-stone-900/5 ring-1 ring-sand-200 sm:p-7">
+    <div class="flex items-center gap-2">
+      <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-grass-600 to-grass-500 text-white shadow-sm">
+        <ds-icon name="storefront" [size]="22" />
+      </span>
+      <div>
+        <h1 class="font-grotesk text-xl font-bold leading-tight tracking-tight text-stone-900">Partner Portal</h1>
+        <p class="text-xs text-stone-900/55">Campaign leads &amp; offers</p>
+      </div>
+    </div>
+
+    <!-- session timed out -->
+    <div *ngIf="sessionExpired" role="alert"
+      class="mt-3 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+      <ds-icon name="schedule" [size]="18" class="text-amber-600" />
+      <span><span class="font-semibold">Your session timed out.</span> Please log in again to continue.</span>
+    </div>
+
+    <p class="mt-3 flex items-start gap-1 rounded-xl bg-grass-50 px-2.5 py-2 text-xs text-stone-900/70">
+      <ds-icon name="verified_user" [size]="14" class="text-grass-600" />
+      Clinic-admin access only. Use your KnocDoc Pro admin login, or create a new clinic account below.
+    </p>
+
+    <!-- choose credential type -->
+    <div class="mt-4 grid grid-cols-2 gap-1 rounded-xl bg-grass-50 p-1" role="tablist" aria-label="Sign-in method">
+      <button type="button" role="tab" [attr.aria-selected]="mode === 'password'" (click)="setMode('password')"
+        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500"
+        [ngClass]="mode === 'password' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">Password</button>
+      <button type="button" role="tab" [attr.aria-selected]="mode === 'pin'" (click)="setMode('pin')"
+        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500"
+        [ngClass]="mode === 'pin' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">PIN</button>
+    </div>
+    <p class="mt-1.5 text-xs text-stone-900/50">{{ mode === 'password' ? 'For KnocDoc Pro admins.' : 'For clinic accounts created here.' }}</p>
+
+    <label for="partner-mobile" class="mt-4 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Mobile number</label>
+    <input id="partner-mobile" [(ngModel)]="mobile" (keyup.enter)="submit()" type="tel" inputmode="tel"
+      autocomplete="username" placeholder="Registered mobile" [attr.aria-invalid]="!!error"
+      class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+
+    <ng-container *ngIf="mode === 'password'">
+      <label for="partner-password" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Password</label>
+      <input id="partner-password" [(ngModel)]="password" (keyup.enter)="submit()" type="password"
+        autocomplete="current-password" placeholder="Password" [attr.aria-invalid]="!!error"
+        class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+    </ng-container>
+
+    <ng-container *ngIf="mode === 'pin'">
+      <label for="partner-pin" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">PIN</label>
+      <input id="partner-pin" [(ngModel)]="pin" (keyup.enter)="submit()" type="password"
+        autocomplete="current-password" placeholder="PIN" [attr.aria-invalid]="!!error"
+        class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+    </ng-container>
+
+    <p *ngIf="error" role="alert" class="mt-2 text-xs text-red-600">{{ error }}</p>
+
+    <button (click)="submit()" [disabled]="loading"
+      class="mt-5 min-h-[48px] w-full rounded-xl bg-gradient-to-r from-grass-600 to-grass-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-stone-900/20 transition-all duration-150 hover:from-grass-700 hover:to-grass-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+      {{ loading ? 'Signing in…' : 'Sign in' }}
+    </button>
+
+    <p class="mt-4 text-center text-sm text-stone-900/60">
+      New clinic?
+      <a routerLink="/partner/signup" class="font-semibold text-grass-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">Create an account</a>
+    </p>
+  </div>
+</div>

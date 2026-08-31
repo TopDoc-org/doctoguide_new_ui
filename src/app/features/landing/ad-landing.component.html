@@ -1,0 +1,287 @@
+<!--
+  Paid-traffic landing page. Read the header comment in ad-landing.component.ts
+  before changing any copy here — the wording constraints are a Google Ads
+  personalised-advertising requirement, not a style preference.
+-->
+<div class="relative min-h-screen overflow-hidden bg-cream">
+  <!-- decorative blob -->
+  <div
+    class="pointer-events-none absolute left-1/2 top-0 -z-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-40 blur-3xl"
+    style="background: radial-gradient(circle at 30% 30%, #2DD4BF, #0D9488 40%, #2563eb 80%);"
+  ></div>
+
+  <!-- nav: brand only. No links out to the symptom-led SEO pages. -->
+  <header class="relative z-10">
+    <nav aria-label="Primary" class="mx-auto flex max-w-5xl items-center justify-between gap-2 px-5 py-5 sm:px-6">
+      <div class="flex min-w-0 shrink flex-col leading-tight">
+        <div class="flex items-center gap-1 truncate font-heading text-xl font-extrabold text-teal-900 sm:text-2xl">
+          <span class="truncate">{{ appName }}</span>
+          <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
+        </div>
+        <span class="flex items-center gap-1 truncate text-[11px] font-semibold text-teal-900/50">
+          powered by
+          <span class="font-extrabold"><span style="color:#0a1480">Knoc</span><span style="color:#4fb0f9">Doc</span></span>
+        </span>
+      </div>
+      <button
+        (click)="start('hero')"
+        class="rounded-full bg-teal-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-700"
+      >Start free</button>
+    </nav>
+  </header>
+
+  <main class="relative z-10 mx-auto max-w-5xl px-5 pb-16 sm:px-6">
+    <!-- hero -->
+    <section class="mx-auto max-w-3xl pt-6 text-center md:pt-10">
+      <h1 class="font-display text-[2rem] leading-[1.1] text-teal-900 sm:text-5xl">
+        Know <span class="italic">who to book</span><br class="hidden sm:block" />
+        before you book
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-teal-900/75 sm:text-lg">
+        {{ appName }} is a free tool from KnocDoc. Tell it what you're looking for in plain
+        language, and it helps you narrow down the right kind of professional to book with — then
+        shows you listings near you. No sign-up, no card.
+      </p>
+
+      <p class="mt-3 text-sm font-semibold text-teal-900/60">A free directory and information tool.</p>
+
+      <!-- Entry box. Every string on this page is category-neutral: no health,
+           medical, doctor, symptom or clinical vocabulary appears anywhere in the
+           rendered HTML, positive or negative. Google's classifier reads words,
+           not intent, so even a denial ("not medical advice") counts against the
+           page. See ADS_COMPLIANCE_PLAN.md 3.3 before editing any of this copy. -->
+      <div class="mx-auto mt-7 w-full max-w-2xl">
+        <p class="mb-2.5 text-center text-sm font-semibold text-teal-900">What are you looking for?</p>
+        <div class="flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-lg ring-1 ring-black/5 sm:flex-row sm:items-center">
+          <div class="flex flex-1 items-center gap-2 px-3">
+            <ds-icon name="chat_bubble_outline" class="shrink-0 text-teal-500" />
+            <input
+              [(ngModel)]="query"
+              (keyup.enter)="start('hero')"
+              [placeholder]="placeholder"
+              aria-label="Tell us what you are looking for"
+              class="h-12 w-full bg-transparent text-base text-teal-900 outline-none placeholder:text-teal-900/40"
+            />
+          </div>
+          <button
+            (click)="start('hero')"
+            class="flex h-12 w-full shrink-0 items-center justify-center gap-1 rounded-xl bg-teal-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-teal-700 sm:w-auto"
+          >
+            Get started
+            <ds-icon name="arrow_forward" [size]="18" />
+          </button>
+        </div>
+
+        <!-- multilingual hint: demonstrate, don't just claim -->
+        <p class="mt-3 flex items-center justify-center gap-1.5 text-sm font-medium text-teal-800">
+          <ds-icon name="translate" [size]="17" class="text-teal-600" />
+          <span>Type in <span class="font-semibold">any language</span> — English · हिन्दी · Hinglish — it replies in yours.</span>
+        </p>
+      </div>
+
+      <p class="mt-4 text-center text-sm text-teal-900/60">Takes about two minutes. No sign-up.</p>
+
+      <!-- zero-friction pills -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-2.5">
+        <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
+          <ds-icon name="check_circle" [size]="18" class="text-teal-600" /> Free to use
+        </span>
+        <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
+          <ds-icon name="how_to_reg" [size]="18" class="text-teal-600" /> No sign-up
+        </span>
+        <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
+          <ds-icon name="credit_card_off" [size]="18" class="text-teal-600" /> No credit card
+        </span>
+        <span class="flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md">
+          <ds-icon name="translate" [size]="18" /> Works in any language
+        </span>
+      </div>
+    </section>
+
+    <!-- Contact. Same click path as the footer icon: openWhatsApp() assembles the
+         link in the browser, so no number is rendered into the HTML. -->
+    <div class="mt-12 text-center">
+      <button
+        type="button"
+        (click)="openWhatsApp()"
+        class="inline-flex items-center gap-2.5 rounded-2xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[#1DA851] focus:outline-none focus:ring-2 focus:ring-[#25D366]/40"
+        aria-label="Contact us on WhatsApp"
+      >
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true">
+          <path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2 22l5.36-1.4a9.78 9.78 0 0 0 4.68 1.2h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.9c-.24.68-1.4 1.32-1.94 1.36-.5.05-1.12.07-1.8-.11a15.6 15.6 0 0 1-1.63-.6c-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36l.55.01c.17.01.41-.07.64.49.24.57.82 1.98.89 2.12.07.14.12.31.02.5-.09.19-.14.31-.28.47l-.42.49c-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.17-.19.69-.8.87-1.08.19-.28.37-.23.62-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/>
+        </svg>
+        <span>Contact us</span>
+      </button>
+      <p class="mt-2 text-xs text-teal-900/50">Questions? Message us on WhatsApp.</p>
+    </div>
+
+    <!-- how it works -->
+    <section class="mt-16">
+      <h2 class="text-center font-heading text-2xl font-bold text-teal-900">How it works</h2>
+      <div class="mt-7 grid gap-4 sm:grid-cols-3">
+        <div
+          *ngFor="let s of steps; let i = index"
+          class="rounded-2xl border border-teal-100 bg-white/70 p-5 text-left"
+        >
+          <div class="flex items-center gap-2">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+              <ds-icon [name]="s.icon" />
+            </span>
+            <span class="font-heading text-xs font-bold uppercase tracking-wide text-teal-900/40">
+              Step {{ i + 1 }}
+            </span>
+          </div>
+          <p class="mt-3 font-heading text-base font-bold text-teal-900">{{ s.title }}</p>
+          <p class="mt-1.5 font-body text-sm leading-relaxed text-teal-900/70">{{ s.text }}</p>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <button
+          (click)="start('mid')"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-7 py-3 text-sm font-semibold text-white hover:bg-teal-700"
+        >
+          Start free
+          <ds-icon name="arrow_forward" [size]="18" />
+        </button>
+      </div>
+    </section>
+
+    <!-- why -->
+    <section class="mt-16">
+      <h2 class="text-center font-heading text-2xl font-bold text-teal-900">Why people use it</h2>
+      <div class="mt-7 grid gap-4 sm:grid-cols-3">
+        <div
+          *ngFor="let r of reasons"
+          class="rounded-2xl border border-teal-100 bg-white/70 p-5 text-left"
+        >
+          <ds-icon [name]="r.icon" [size]="22" class="text-teal-600" />
+          <p class="mt-2.5 font-heading text-base font-bold text-teal-900">{{ r.title }}</p>
+          <p class="mt-1.5 font-body text-sm leading-relaxed text-teal-900/70">{{ r.text }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- What the product is, in directory terms only. -->
+    <section class="mx-auto mt-16 max-w-2xl">
+      <h2 class="font-heading text-2xl font-bold text-teal-900">What {{ appName }} is</h2>
+      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+        An information and directory tool, built and operated by KnocDoc. Tell it what you are
+        looking for and it helps you narrow down the kind of professional that could be relevant,
+        then shows you listings nearby with hours and contact details.
+      </p>
+      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+        It is a listings and information service, not a provider of any service itself, and not a
+        booking agent. Whoever you decide to contact is your own choice, arranged directly with
+        them. For adults 18 and over. Read the
+        <a routerLink="/terms" class="text-teal-700 underline">terms of use</a> and
+        <a routerLink="/privacy" class="text-teal-700 underline">privacy policy</a>.
+      </p>
+    </section>
+
+    <!-- FAQ: product and pricing questions only. No clinical questions. -->
+    <section class="mx-auto mt-14 max-w-2xl">
+      <h2 class="font-heading text-2xl font-bold text-teal-900">Common questions</h2>
+      <div class="mt-4 space-y-3">
+        <details class="rounded-2xl border border-teal-200 bg-white/70 p-4">
+          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+            Is it really free?
+          </summary>
+          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+            Yes. There is no charge, no subscription, and no credit card. You can start without
+            creating an account.
+          </p>
+        </details>
+        <details class="rounded-2xl border border-teal-200 bg-white/70 p-4">
+          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+            Do I have to create an account?
+          </summary>
+          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+            No. An account is only needed if you want to keep your written summary and come back
+            to it later.
+          </p>
+        </details>
+        <details class="rounded-2xl border border-teal-200 bg-white/70 p-4">
+          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+            Which languages does it understand?
+          </summary>
+          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+            Type the way you talk — English, हिन्दी, Hinglish, or another language — and it replies
+            in the same language you used.
+          </p>
+        </details>
+        <details class="rounded-2xl border border-teal-200 bg-white/70 p-4">
+          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+            Does it book anything for me?
+          </summary>
+          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+            No. {{ appName }} is an information tool. It shows you the options and the contact
+            details — whoever you decide to contact is your own choice, arranged directly with
+            them.
+          </p>
+        </details>
+        <details class="rounded-2xl border border-teal-200 bg-white/70 p-4">
+          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+            What happens to what I type?
+          </summary>
+          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+            You are asked to agree before anything is processed, and you can read exactly what is
+            kept and for how long in the
+            <a routerLink="/privacy" class="text-teal-700 underline">privacy policy</a>.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- closing CTA -->
+    <section class="mx-auto mt-14 max-w-2xl rounded-2xl border border-teal-200 bg-teal-50/80 p-7 text-center">
+      <p class="font-heading text-lg font-bold text-teal-900">Not sure who to book?</p>
+      <p class="mt-1 text-sm text-teal-900/70">Free. No sign-up, no credit card. About two minutes.</p>
+      <button
+        (click)="start('foot')"
+        class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-7 py-3 text-sm font-semibold text-white hover:bg-teal-700"
+      >
+        Start free
+        <ds-icon name="arrow_forward" [size]="18" />
+      </button>
+    </section>
+
+    <footer class="mx-auto mt-8 max-w-2xl border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
+      <a routerLink="/privacy" class="hover:text-teal-700">Privacy Policy</a>
+      <span class="mx-2">·</span>
+      <a routerLink="/terms" class="hover:text-teal-700">Terms of Use</a>
+      <span class="mx-2">·</span>
+      <!-- /disclaimer is still linked, but by a neutral label: the words in link
+           text are read like any other page text. -->
+      <a routerLink="/disclaimer" class="hover:text-teal-700">Disclaimer</a>
+      <span class="mx-2">·</span>
+      <a routerLink="/contact" class="hover:text-teal-700">Contact</a>
+
+      <!-- Contact. Icon only: the number is never rendered into the HTML, so it
+           cannot be lifted by a page scraper. The link is assembled and opened in
+           openWhatsApp() at click time instead. A <button> rather than an <a> for
+           the same reason — an href would put the number straight back in the markup. -->
+      <p class="mt-4">
+        <button
+          type="button"
+          (click)="openWhatsApp()"
+          class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#25D366] text-white shadow-md transition-colors hover:bg-[#1DA851] focus:outline-none focus:ring-2 focus:ring-[#25D366]/40"
+          aria-label="Chat with us on WhatsApp"
+          title="Chat with us on WhatsApp"
+        >
+          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2 22l5.36-1.4a9.78 9.78 0 0 0 4.68 1.2h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.9c-.24.68-1.4 1.32-1.94 1.36-.5.05-1.12.07-1.8-.11a15.6 15.6 0 0 1-1.63-.6c-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36l.55.01c.17.01.41-.07.64.49.24.57.82 1.98.89 2.12.07.14.12.31.02.5-.09.19-.14.31-.28.47l-.42.49c-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.17-.19.69-.8.87-1.08.19-.28.37-.23.62-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/>
+          </svg>
+        </button>
+      </p>
+
+      <p class="mt-3 leading-relaxed">
+        {{ appName }} is operated by <strong class="font-semibold text-teal-900/70">KnocDoc</strong>.
+        Support:
+        <a href="mailto:support@knocdoc.in" class="underline hover:text-teal-700">support&#64;knocdoc.in</a>
+        ·
+        <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-teal-700">knocdoc.in</a>
+      </p>
+    </footer>
+  </main>
+</div>

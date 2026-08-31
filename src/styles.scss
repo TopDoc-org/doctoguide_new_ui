@@ -1,0 +1,253 @@
+/* DoctoGuide 2.0 — global styles + design tokens.
+   Token architecture copied from DocTribe 2.0; colour VALUES are DoctoGuide's
+   existing teal/cream/sand palette, converted from hex to RGB channels so the
+   `rgb(var(--x) / <alpha-value>)` bridge in tailwind.config.js works. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Self-hosted fonts ----------------------------------------------------
+   Self-hosted, not <link>ed from fonts.googleapis.com like the v1 app did:
+   the Capacitor APK must render text (including Hindi) with no network. */
+
+/* Clash Display — editorial display face, headings only. No Devanagari coverage. */
+@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-600.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
+@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }
+
+/* Noto Sans Devanagari — the chat is multilingual (Hindi / Hinglish) and neither
+   Clash Display nor the system sans stack covers Devanagari.
+
+   ONE file, not three: Google serves the Devanagari subset as a VARIABLE font,
+   and the woff2 URL is byte-identical for weights 400/500/600. `font-weight:
+   400 600` declares that range so the browser interpolates instead of us
+   shipping the same 121 KB three times.
+
+   The unicode-range confines it to Devanagari codepoints, so it never displaces
+   the Latin faces and is downloaded only when Hindi text actually appears.
+   Range copied verbatim from Google's own css2 response (v30). */
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  src: url('/fonts/noto-sans-devanagari.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-stretch: 100%;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0,
+                 U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
+}
+
+/* ---- Design tokens (RGB channels, for Tailwind's alpha modifier) ----------
+   Light is the ONLY theme the v1 app had, so the light block reproduces its
+   hexes exactly — that is a parity requirement, not a preference. The dark
+   block exists so the architecture is complete, but no UI flips data-theme. */
+:root,
+:root[data-theme='light'] {
+  /* brand teal — exact hexes from the v1 tailwind.config.js */
+  --teal-50:  240 253 250;  /* #F0FDFA */
+  --teal-100: 230 250 245;  /* #E6FAF5 */
+  --teal-200: 217 245 237;  /* #D9F5ED */
+  --teal-300:  94 234 212;  /* #5EEAD4 — v1 had no 300; Tailwind's deep-merge
+                               meant it silently resolved to the stock shade,
+                               so this preserves what markup actually rendered */
+  --teal-400:  45 212 191;  /* #2DD4BF */
+  --teal-500:  20 184 166;  /* #14B8A6 */
+  --teal-600:  13 148 136;  /* #0D9488 */
+  --teal-700:  15 118 110;  /* #0F766E */
+  --teal-800:  14  77  71;  /* #0E4D47 */
+  --teal-900:  10  51  47;  /* #0A332F */
+
+  /* console green — partner + admin + owner */
+  --grass-50:  240 250 243; --grass-100: 220 243 227; --grass-200: 182 231 198;
+  --grass-300: 134 214 163; --grass-400:  79 190 124; --grass-500:  28 158  91;
+  --grass-600:  23 128  73; --grass-700:  19 106  61; --grass-800:  15  83  49;
+  --grass-900:  10  58  34;
+
+  /* warm neutrals */
+  --sand-50:  250 249 242;  /* #FAF9F2 */
+  --sand-100: 244 242 232;  /* #F4F2E8 */
+  --sand-200: 234 231 216;  /* #EAE7D8 */
+  --cream:    250 250 242;  /* #FAFAF2 */
+
+  /* DocTribe reserves `accent` for a warm orange. DoctoGuide has no orange —
+     its accent IS teal, so this points at the brand mid-tone. */
+  --accent-warm: 13 148 136;
+
+  /* Status colours, promoted to tokens so ds-* components agree with the
+     stock-Tailwind shades the ported console markup already uses. */
+  --success:  22 163  74;  /* green-600 */
+  --warning: 217 119   6;  /* amber-600 */
+  --danger:  220  38  38;  /* red-600   */
+  --info:     37  99 235;  /* blue-600  */
+
+  /* semantic surfaces */
+  --bg:          250 250 242;  /* cream — v1's --color-bg #FAFAF2 */
+  --surface:     255 255 255;
+  --surface-2:   244 242 232;  /* sand-100 */
+  --border:        0   0   0;  /* pure black; consumed at .05 below, which is
+                                  exactly the `border-black/5` v1 used everywhere */
+  --text:         30  58  54;  /* #1E3A36 — v1 --color-text-body */
+  --text-strong:  12  31  29;  /* #0C1F1D — v1 --color-text-dark (headings) */
+  --text-muted:  125 155 150;  /* #7D9B96 */
+  --prose-head:   19  78  74;  /* #134E4A — the literal .seo-prose used */
+
+  --glass-bg:     rgba(255, 255, 255, .72);
+  --glass-border: rgba(0, 0, 0, .06);
+  --mesh: radial-gradient(60% 55% at 12% 0%, rgba(20,184,166,.07) 0%, transparent 60%),
+          radial-gradient(52% 44% at 100% 0%, rgba(13,148,136,.05) 0%, transparent 62%);
+
+  --elev-1: 0 1px 2px rgba(10,51,47,.05), 0 4px 12px rgba(10,51,47,.06);
+  --elev-2: 0 10px 30px rgba(10,51,47,.10);
+  --elev-3: 0 18px 42px rgba(10,51,47,.14);
+  --elev-glow: 0 0 0 1px rgba(20,184,166,.22), 0 10px 30px rgba(20,184,166,.16);
+}
+
+:root[data-theme='dark'] {
+  --teal-300: 153 246 228; --teal-400: 94 234 212;
+  --accent-warm: 45 212 191;
+
+  --bg:            6  26  24;
+  --surface:      10  51  47;  /* teal-900 */
+  --surface-2:    14  77  71;  /* teal-800 */
+  --border:      217 245 237;  /* teal-200, at low alpha → hairline on dark */
+  --text:        240 253 250;
+  --text-strong: 255 255 255;
+  --text-muted:  125 155 150;
+  --prose-head:  217 245 237;
+
+  --glass-bg:     rgba(10, 51, 47, .55);
+  --glass-border: rgba(217, 245, 237, .14);
+  --mesh: radial-gradient(60% 60% at 15% 0%, rgba(20,184,166,.10) 0%, transparent 60%),
+          radial-gradient(50% 50% at 100% 10%, rgba(13,148,136,.10) 0%, transparent 60%);
+
+  --elev-1: 0 1px 2px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.30);
+  --elev-2: 0 10px 30px rgba(0,0,0,.50);
+  --elev-3: 0 18px 42px rgba(0,0,0,.60);
+  --elev-glow: 0 0 0 1px rgba(20,184,166,.28), 0 10px 30px rgba(20,184,166,.22);
+}
+
+/* Default hairline border. .05 reproduces v1's ubiquitous `border-black/5`. */
+* { border-color: rgb(var(--border) / .05); }
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: rgb(var(--bg));
+  color: rgb(var(--text));
+  font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue',
+               Arial, 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+  /* 16px, NOT DocTribe's 15px: dropping a pixel would shrink every page in the
+     app relative to the v1 baseline. Revisit only after parity is signed off. */
+  font-size: 16px;
+  line-height: 1.5;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .24s cubic-bezier(.2,0,0,1), color .24s cubic-bezier(.2,0,0,1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Clash Display', 'Noto Sans Devanagari', -apple-system, system-ui,
+               'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: rgb(var(--text-strong));
+}
+
+::selection { background: rgb(var(--teal-500) / .3); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--text-muted) / .3); border-radius: 9999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--text-muted) / .5); background-clip: content-box; }
+
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--glass-border);
+  }
+  .mesh-bg { background-image: var(--mesh); }
+  .focus-ring { @apply outline-none ring-2 ring-teal-500/70 ring-offset-2 ring-offset-transparent; }
+
+  /* Consistent page rhythm — mobile-first. */
+  .page        { @apply w-full mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-8; }
+  .page-narrow { @apply w-full mx-auto max-w-3xl px-4 sm:px-6 py-5 sm:py-7 lg:py-8; }
+  .page-wide   { @apply w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-8; }
+
+  /* Smooth interactive surfaces */
+  .tap   { @apply transition-all duration-150 ease-standard active:scale-[.97]; }
+  .press { @apply transition-transform duration-100 active:scale-95; }
+}
+
+/* NOTE: DocTribe sets `html { scroll-behavior: smooth }`. Deliberately omitted —
+   triage-shell scrolls the thread programmatically on a setTimeout after each
+   render pass, and smooth scrolling turns those instant jumps into animations
+   that race the next message. */
+html { -webkit-text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Global keyboard focus ring on every interactive control. */
+:where(a, button, [role='tab'], [role='button'], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--teal-500));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+:where(a, button, [role='tab'], [role='button']):focus:not(:focus-visible) { outline: none; }
+
+a, button, [role='tab'], [role='button'], label, select, summary { touch-action: manipulation; }
+a[href], button:not(:disabled), [role='tab'], [role='button'], label[for], summary { cursor: pointer; }
+
+.skip-link {
+  position: fixed; top: 0; left: 0; z-index: 2000;
+  transform: translateY(-120%);
+  background: rgb(var(--surface)); color: rgb(var(--text));
+  padding: 10px 16px; border-radius: 0 0 12px 0; box-shadow: var(--elev-3);
+  transition: transform .15s ease;
+}
+.skip-link:focus { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Prose styling for the public SEO/content pages.
+
+   These live here, not in seo-page-layout.component.ts, on purpose. That
+   component renders its body through <ng-content>, and with Angular's default
+   emulated encapsulation projected nodes carry the *parent* component's
+   _ngcontent attribute — so a `.seo-prose h2` rule scoped to the layout
+   component never matched any of the projected headings. Every heading, list,
+   and table on the SEO pages was rendering unstyled.
+
+   Do not scope this. Every numeric value below is unchanged from v1; only the
+   colour source moved from literal hex to token, which resolves identically
+   in light mode (e.g. rgb(var(--teal-600) / .25) == rgba(13,148,136,.25)).
+   --------------------------------------------------------------------------- */
+.seo-prose :is(h2, h3) { font-family: theme('fontFamily.heading'); color: rgb(var(--prose-head)); }
+.seo-prose h2 { font-weight: 700; font-size: 1.25rem; margin: 2rem 0 .5rem; }
+.seo-prose h3 { font-weight: 600; font-size: 1.05rem; margin: 1.25rem 0 .3rem; }
+.seo-prose p  { margin-bottom: .8rem; }
+.seo-prose ul { list-style: disc;    padding-left: 1.25rem; margin-bottom: .8rem; }
+.seo-prose ol { list-style: decimal; padding-left: 1.25rem; margin-bottom: .8rem; }
+.seo-prose li { margin-bottom: .35rem; }
+.seo-prose a  { color: rgb(var(--teal-600)); text-decoration: underline; }
+.seo-prose strong { color: rgb(var(--prose-head)); }
+
+.seo-prose table { width: 100%; border-collapse: collapse; margin: .8rem 0 1.2rem; font-size: .9rem; }
+.seo-prose :is(th, td) { border: 1px solid rgb(var(--teal-600) / .25); padding: .5rem .75rem; text-align: left; vertical-align: top; }
+.seo-prose th { background: rgb(var(--teal-600) / .08); font-weight: 600; color: rgb(var(--prose-head)); }
+
+.seo-prose details { border: 1px solid rgb(var(--teal-600) / .25); border-radius: 1rem; background: rgb(var(--surface) / .7); padding: 1rem; margin-bottom: .75rem; }
+.seo-prose summary { cursor: pointer; font-family: theme('fontFamily.heading'); font-weight: 600; color: rgb(var(--prose-head)); }
+.seo-prose details p { margin: .5rem 0 0; }
+
+/* Breadcrumb nav sits inside the prose slot but must not inherit list styling. */
+.seo-prose nav[aria-label='Breadcrumb'] a { color: rgb(var(--teal-600)); }

@@ -1,0 +1,131 @@
+<!-- header -->
+<div class="flex items-end justify-between gap-2">
+  <div>
+    <h1 class="font-grotesk text-xl font-bold tracking-tight text-stone-900 sm:text-2xl">Leads</h1>
+    <p class="mt-0.5 text-sm text-stone-900/55">Everyone who shared their details after a consult.</p>
+  </div>
+</div>
+
+<!-- filter + export -->
+<div class="mt-3 flex flex-wrap items-end gap-3 rounded-2xl bg-white/80 p-4 ring-1 ring-black/5 backdrop-blur-sm">
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">From</label>
+    <input id="leads-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">To</label>
+    <input id="leads-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-campaign" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Campaign</label>
+    <select id="leads-campaign" [(ngModel)]="campaign" (ngModelChange)="load(1)"
+      class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
+      <option value="">All campaigns</option>
+      <option *ngFor="let c of campaignOptions" [value]="c">{{ c }}</option>
+    </select>
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-specialty" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Specialty</label>
+    <select id="leads-specialty" [(ngModel)]="specialty" (ngModelChange)="load(1)"
+      class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
+      <option value="">All specialties</option>
+      <option *ngFor="let s of specialtyOptions" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-district" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">District</label>
+    <select id="leads-district" [(ngModel)]="district" (ngModelChange)="load(1)"
+      class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
+      <option value="">All districts</option>
+      <option *ngFor="let d of districtOptions" [value]="d">{{ d }}</option>
+    </select>
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="leads-sort" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Sort</label>
+    <select id="leads-sort" [(ngModel)]="sort" (ngModelChange)="load(1)"
+      class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
+      <option value="createdAt:desc">Newest first</option>
+      <option value="createdAt:asc">Oldest first</option>
+      <option value="name:asc">Name A–Z</option>
+      <option value="name:desc">Name Z–A</option>
+    </select>
+  </div>
+  <button (click)="load(1)" [disabled]="loading"
+    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-stone-900/20 transition-colors duration-150 hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    {{ loading ? 'Loading…' : 'Apply' }}
+  </button>
+  <button (click)="exportCsv()" [disabled]="exporting" aria-label="Export leads as CSV"
+    class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors duration-150 hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+    <ds-icon name="download" [size]="16" />
+    {{ exporting ? 'Exporting…' : 'Export CSV' }}
+  </button>
+</div>
+
+<p *ngIf="error" role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+
+<!-- mobile: stacked cards -->
+<div class="mt-4 space-y-2 sm:hidden">
+  <div *ngFor="let l of leads" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+    <div class="flex items-start justify-between gap-2">
+      <p class="font-heading font-semibold text-stone-900">{{ l.name }}</p>
+      <span class="shrink-0 text-xs text-stone-900/45">{{ l.createdAt | date:'mediumDate' }}</span>
+    </div>
+    <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
+      <ds-icon name="call" [size]="14" />{{ l.mobile }}
+    </a>
+    <p class="mt-1 text-xs text-stone-900/60">{{ l.city || '—' }}<span *ngIf="l.district"> · {{ l.district }}</span> · {{ l.specialty || 'No specialty' }}</p>
+    <p *ngIf="l.campaign" class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
+      <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+    </p>
+  </div>
+  <p *ngIf="!leads.length && !loading" class="rounded-2xl bg-white p-6 text-center text-sm text-stone-900/50 ring-1 ring-black/5">
+    No leads in this range yet.
+  </p>
+</div>
+
+<!-- desktop: table -->
+<div class="mt-4 hidden overflow-x-auto rounded-2xl bg-white ring-1 ring-black/5 sm:block">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-black/5 bg-grass-50/40 text-xs font-semibold uppercase tracking-wide text-stone-900/55">
+      <tr>
+        <th scope="col" class="px-4 py-3">Name</th>
+        <th scope="col" class="px-4 py-3">Mobile</th>
+        <th scope="col" class="px-4 py-3">City</th>
+        <th scope="col" class="px-4 py-3">District</th>
+        <th scope="col" class="px-4 py-3">Specialty</th>
+        <th scope="col" class="px-4 py-3">Campaign</th>
+        <th scope="col" class="px-4 py-3">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of leads" class="border-b border-black/5 transition-colors last:border-0 hover:bg-grass-50/40">
+        <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
+        <td class="px-4 py-3 tabular-nums text-stone-900/80">{{ l.mobile }}</td>
+        <td class="px-4 py-3 text-stone-900/80">{{ l.city || '—' }}</td>
+        <td class="px-4 py-3 text-stone-900/80">{{ l.district || '—' }}</td>
+        <td class="px-4 py-3 text-stone-900/80">{{ l.specialty || '—' }}</td>
+        <td class="px-4 py-3">
+          <span *ngIf="l.campaign" class="inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-xs font-medium text-grass-700">
+            <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+          </span>
+          <span *ngIf="!l.campaign" class="text-stone-900/40">—</span>
+        </td>
+        <td class="px-4 py-3 text-stone-900/60">{{ l.createdAt | date:'medium' }}</td>
+      </tr>
+      <tr *ngIf="!leads.length && !loading">
+        <td colspan="7" class="px-4 py-8 text-center text-stone-900/50">No leads in this range yet.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- pagination -->
+<div *ngIf="total > pageSize" class="mt-3 flex items-center justify-between text-sm text-stone-900/70">
+  <span>Page {{ page }} of {{ totalPages }} · {{ total }} leads</span>
+  <div class="flex gap-2">
+    <button (click)="prev()" [disabled]="page <= 1"
+      class="min-h-[44px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Previous</button>
+    <button (click)="next()" [disabled]="page >= totalPages"
+      class="min-h-[44px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
+  </div>
+</div>

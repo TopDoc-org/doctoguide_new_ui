@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /triage
+Disallow: /partner
+Disallow: /admin
+Disallow: /owner
+
+Sitemap: https://doctoguide.knocdoc.in/sitemap.xml

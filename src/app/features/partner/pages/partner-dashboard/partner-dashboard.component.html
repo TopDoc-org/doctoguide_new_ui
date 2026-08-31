@@ -1,0 +1,205 @@
+<!-- ============ HERO ============ -->
+<section class="rounded-3xl bg-sand-100 p-5 ring-1 ring-sand-200 sm:p-7">
+  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
+    <span class="h-px w-6 bg-grass-500"></span>Campaign performance
+  </p>
+  <h1 class="mt-2 font-grotesk text-4xl font-bold leading-[0.95] tracking-tight text-stone-900 sm:text-5xl">
+    See which campaign <span class="text-grass-600">performs best.</span>
+  </h1>
+  <p class="mt-2 max-w-xl text-sm text-stone-500">Share a tracked link, watch clicks turn into leads, and feature the right offers — all in one place.</p>
+
+  <!-- campaign-link builder -->
+  <div class="mt-5 rounded-2xl bg-white p-4 ring-1 ring-sand-200" *ngIf="clinicId">
+    <p class="flex items-center gap-1.5 font-grotesk text-sm font-bold tracking-tight text-stone-900">
+      <ds-icon name="link" [size]="17" class="text-grass-600" />Build a tracked campaign link
+    </p>
+    <p class="mt-0.5 text-xs text-stone-500">Add a campaign number so each ad is tracked separately.</p>
+
+    <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <input [(ngModel)]="campaignCode" (ngModelChange)="buildLink()" placeholder="Campaign no. / name" aria-label="Campaign number or name"
+        class="min-h-[42px] rounded-xl border border-sand-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <input [(ngModel)]="campaignSource" (ngModelChange)="buildLink()" placeholder="Source (e.g. meta)" aria-label="Source"
+        class="min-h-[42px] rounded-xl border border-sand-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <input [(ngModel)]="campaignMedium" (ngModelChange)="buildLink()" placeholder="Medium (e.g. cpc)" aria-label="Medium"
+        class="min-h-[42px] rounded-xl border border-sand-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+    </div>
+
+    <div class="mt-2 flex flex-col gap-2 sm:flex-row">
+      <input type="text" [value]="campaignUrl" readonly aria-label="Your campaign link"
+        class="min-h-[42px] flex-1 truncate rounded-xl border border-sand-200 bg-sand-50 px-3 py-2 text-sm text-stone-700 outline-none" />
+      <button (click)="copyLink()"
+        class="flex min-h-[42px] items-center justify-center gap-1 rounded-xl bg-grass-600 px-4 py-2 font-grotesk text-sm font-bold text-white transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2">
+        <ds-icon [name]="copied ? 'check' : 'content_copy'" [size]="16" />
+        {{ copied ? 'Copied' : 'Copy link' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- active offers for this campaign -->
+  <div class="mt-3 rounded-2xl bg-white p-4 ring-1 ring-sand-200" *ngIf="clinicId">
+    <p class="flex items-center gap-1.5 font-grotesk text-sm font-bold tracking-tight text-stone-900">
+      <ds-icon name="local_offer" [size]="17" class="text-grass-600" />Active offers
+    </p>
+    <p class="mt-0.5 text-xs text-stone-500">
+      {{ hasCampaignCode ? 'Pick the offers to feature for this campaign.' : 'Enter a campaign no. / name above to attach offers.' }}
+    </p>
+
+    <ul class="mt-3 space-y-1.5" [class.opacity-50]="!hasCampaignCode">
+      <li *ngFor="let o of visibleOfferItems">
+        <label class="flex cursor-pointer items-start gap-3 rounded-xl bg-sand-50 px-3 py-2 ring-1 ring-sand-200 transition-colors hover:bg-sand-100"
+          [class.cursor-not-allowed]="!hasCampaignCode">
+          <input type="checkbox" [checked]="isOfferChecked(o)" (change)="toggleOffer(o)"
+            [disabled]="!hasCampaignCode || savingOfferKey === o.title"
+            class="mt-0.5 h-5 w-5 shrink-0 rounded accent-grass-600 disabled:opacity-50" />
+          <span class="min-w-0 flex-1">
+            <span class="flex flex-wrap items-center gap-1.5">
+              <span class="font-medium text-stone-900">{{ o.title }}</span>
+              <span *ngIf="isTemplate(o)" class="rounded-full bg-sand-200 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-stone-600">Template</span>
+              <span *ngIf="!isTemplate(o)" class="rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                [ngClass]="o.active ? 'bg-grass-100 text-grass-700' : 'bg-sand-200 text-stone-500'">{{ o.active ? 'Active' : 'Inactive' }}</span>
+            </span>
+            <span *ngIf="o.discountText" class="mt-0.5 block text-xs text-amber-700">{{ o.discountText }}</span>
+          </span>
+          <svg *ngIf="savingOfferKey === o.title" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-grass-500 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" /><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" /></svg>
+        </label>
+      </li>
+      <li *ngIf="!activeOfferItems.length" class="text-xs text-stone-400">No offers yet.</li>
+    </ul>
+
+    <button *ngIf="activeOfferItems.length > 2" (click)="offersExpanded = !offersExpanded" type="button"
+      class="mt-2 flex w-full items-center justify-center gap-1 rounded-xl py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+      <ds-icon name="expand_more" [size]="18" class="transition-transform" [class.rotate-180]="offersExpanded" />
+      {{ offersExpanded ? 'Show less' : 'Show ' + hiddenOfferCount + ' more' }}
+    </button>
+  </div>
+</section>
+
+<!-- ============ FILTER BAR ============ -->
+<div class="mt-4 flex flex-wrap items-end gap-3 rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+  <div class="flex-1 sm:flex-none">
+    <label for="dash-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
+    <input id="dash-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="dash-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
+    <input id="dash-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+  </div>
+  <div *ngIf="campaignOptions.length" class="flex-1 sm:flex-none">
+    <label for="dash-campaign" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Campaign</label>
+    <select id="dash-campaign" [(ngModel)]="selectedCampaign" (ngModelChange)="load()"
+      class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto">
+      <option value="">All campaigns</option>
+      <option *ngFor="let c of campaignOptions" [value]="c">{{ c }}</option>
+    </select>
+  </div>
+  <button (click)="load()" [disabled]="loading"
+    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    {{ loading ? 'Loading…' : 'Apply' }}
+  </button>
+</div>
+
+<p *ngIf="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
+
+<ng-container *ngIf="metrics as m">
+  <!-- KPI CARDS -->
+  <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200 transition-transform duration-200 motion-safe:hover:-translate-y-0.5">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Clicks</p>
+        <span class="grid h-8 w-8 place-items-center rounded-xl bg-grass-100 text-grass-700"><ds-icon name="ads_click" [size]="17" /></span>
+      </div>
+      <p class="mt-2 font-grotesk text-4xl font-bold tabular-nums text-stone-900">{{ m.clicks | number }}</p>
+    </div>
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200 transition-transform duration-200 motion-safe:hover:-translate-y-0.5">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Leads</p>
+        <span class="grid h-8 w-8 place-items-center rounded-xl bg-grass-100 text-grass-700"><ds-icon name="group_add" [size]="17" /></span>
+      </div>
+      <p class="mt-2 font-grotesk text-4xl font-bold tabular-nums text-stone-900">{{ m.leads | number }}</p>
+    </div>
+    <div class="rounded-2xl bg-grass-600 p-5 text-white shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-0.5">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-white/80">Conversion</p>
+        <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/15 text-white"><ds-icon name="trending_up" [size]="17" /></span>
+      </div>
+      <p class="mt-2 font-grotesk text-4xl font-bold tabular-nums">{{ conversionRate }}%</p>
+      <p class="text-xs text-white/75">{{ m.conversions | number }} proceeded</p>
+    </div>
+  </div>
+
+  <!-- TREND CHART -->
+  <div class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+    <div class="flex items-center justify-between">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Clicks &amp; leads over time</p>
+      <div class="flex items-center gap-3 text-xs text-stone-500">
+        <span class="flex items-center gap-1"><span class="inline-block h-2.5 w-2.5 rounded-sm bg-grass-500"></span>Clicks</span>
+        <span class="flex items-center gap-1"><span class="inline-block h-2.5 w-2.5 rounded-sm bg-amber-400"></span>Leads</span>
+      </div>
+    </div>
+
+    <div *ngIf="m.series?.length; else noSeries" role="img"
+      [attr.aria-label]="'Clicks and leads from ' + from + ' to ' + to + ': ' + m.clicks + ' clicks, ' + m.leads + ' leads'"
+      class="mt-4 flex h-44 items-end gap-1 overflow-x-auto rounded-xl bg-sand-50 p-2">
+      <div *ngFor="let p of m.series" class="flex min-w-[16px] flex-1 flex-col items-center justify-end gap-0.5"
+        [title]="p.date + ': ' + p.clicks + ' clicks, ' + p.leads + ' leads'">
+        <div class="flex w-full items-end justify-center gap-0.5" style="height:100%">
+          <div class="w-1/2 rounded-t bg-grass-500 motion-safe:transition-[height] motion-safe:duration-500" [style.height.%]="barPct(p.clicks)"></div>
+          <div class="w-1/2 rounded-t bg-amber-400 motion-safe:transition-[height] motion-safe:duration-500" [style.height.%]="barPct(p.leads)"></div>
+        </div>
+        <span class="text-[9px] text-stone-400">{{ p.date | slice:5 }}</span>
+      </div>
+    </div>
+    <table *ngIf="m.series?.length" class="sr-only">
+      <caption>Clicks and leads by date</caption>
+      <thead><tr><th>Date</th><th>Clicks</th><th>Leads</th></tr></thead>
+      <tbody><tr *ngFor="let p of m.series"><td>{{ p.date }}</td><td>{{ p.clicks }}</td><td>{{ p.leads }}</td></tr></tbody>
+    </table>
+    <ng-template #noSeries><p class="mt-4 text-sm text-stone-400">No activity in this range yet.</p></ng-template>
+  </div>
+
+  <!-- PERFORMANCE BY CAMPAIGN -->
+  <div *ngIf="m.byCampaign?.length" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+    <div class="flex items-center justify-between">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Performance by campaign</p>
+      <span class="hidden text-xs text-stone-400 sm:inline">Tap a campaign to see its leads</span>
+    </div>
+
+    <ul class="mt-3 space-y-2">
+      <li *ngFor="let c of m.byCampaign; let i = index" [routerLink]="['/partner/campaigns']" [queryParams]="{ c: c.campaign }"
+        tabindex="0" (keyup.enter)="goToCampaign(c.campaign)"
+        class="group flex cursor-pointer items-center gap-3 rounded-xl border border-sand-200 bg-sand-50 p-3 transition-all duration-150 hover:border-grass-400 hover:bg-white hover:shadow-sm motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-grass-100 font-grotesk text-sm font-bold text-grass-700">{{ i + 1 }}</span>
+        <div class="min-w-0 flex-1">
+          <p class="flex items-center gap-1.5 truncate font-semibold text-stone-900">
+            <ds-icon name="campaign" [size]="15" class="text-grass-600" />{{ c.campaign }}
+          </p>
+          <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-sand-200">
+            <div class="h-full rounded-full bg-grass-500" [style.width.%]="c.clicks ? (c.leads / c.clicks * 100) : 0"></div>
+          </div>
+        </div>
+        <div class="hidden shrink-0 text-right sm:block">
+          <p class="text-[11px] uppercase tracking-wide text-stone-400">Clicks · Leads</p>
+          <p class="font-grotesk text-sm font-bold tabular-nums text-stone-900">{{ c.clicks | number }} · {{ c.leads | number }}</p>
+        </div>
+        <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold tabular-nums text-amber-700">{{ c.clicks ? ((c.leads / c.clicks * 100) | number:'1.0-1') : 0 }}%</span>
+        <ds-icon name="chevron_right" [size]="18" class="shrink-0 text-stone-300 transition-transform duration-150 group-hover:translate-x-0.5" />
+      </li>
+    </ul>
+  </div>
+
+  <!-- TOP SPECIALTIES -->
+  <div *ngIf="m.topSpecialties?.length" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+    <p class="font-grotesk font-bold tracking-tight text-stone-900">Top requested specialties</p>
+    <ul class="mt-3 space-y-2.5">
+      <li *ngFor="let s of m.topSpecialties">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-stone-700">{{ s.specialty }}</span>
+          <span class="font-grotesk font-bold tabular-nums text-stone-900">{{ s.count }}</span>
+        </div>
+        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+          <div class="h-full rounded-full bg-grass-500" [style.width.%]="specialtyPct(s.count)"></div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</ng-container>

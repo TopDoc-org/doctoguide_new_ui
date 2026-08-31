@@ -1,0 +1,112 @@
+import { Component, Input } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../design-system/icon/icon.component';
+
+// Shared chrome for the public SEO/content pages: header, hero (H1 + lede),
+// prose content slot, CTA into /triage, cross-links, and the legal footer.
+// These pages are prerendered, so everything here must render without JS.
+@Component({
+  selector: 'app-seo-page-layout',
+  standalone: true,
+  imports: [RouterLink, CommonModule, IconComponent],
+  template: `
+    <div class="min-h-screen bg-cream">
+      <header class="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
+        <a routerLink="/" class="flex items-center gap-1 font-heading text-xl font-extrabold text-teal-900">
+          <span class="truncate">{{ appName }}</span>
+          <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
+        </a>
+        <a
+          routerLink="/triage"
+          class="rounded-full bg-teal-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-700"
+        >Get started</a>
+      </header>
+
+      <main class="mx-auto max-w-3xl px-6 pb-20">
+        <h1 class="font-display text-3xl leading-tight text-teal-900 sm:text-4xl">{{ heading }}</h1>
+        <p class="mt-3 text-[15px] leading-relaxed text-teal-900/70">{{ lede }}</p>
+
+        <div class="seo-prose mt-8 text-[15px] leading-relaxed text-teal-900/80">
+          <ng-content></ng-content>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-12 rounded-2xl border border-teal-200 bg-teal-50/80 p-6 text-center">
+          <p class="font-heading text-lg font-bold text-teal-900">{{ ctaTitle }}</p>
+          <p class="mt-1 text-sm text-teal-900/70">Free. No sign-up, no credit card. Ready in seconds.</p>
+          <a
+            routerLink="/triage"
+            class="mt-4 inline-flex items-center gap-1 rounded-xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-700"
+          >
+            {{ ctaLabel }}
+            <ds-icon name="arrow_forward" [size]="18" />
+          </a>
+        </div>
+
+        <!-- cross-links -->
+        <nav class="mt-12 border-t border-black/5 pt-6">
+          <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Explore DoctoGuide</p>
+          <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            <li *ngFor="let l of links">
+              <a [routerLink]="l.path" class="text-teal-700 underline hover:text-teal-900">{{ l.label }}</a>
+            </li>
+          </ul>
+        </nav>
+
+        <p class="mt-10 text-xs text-teal-900/50">
+          {{ appName }} is an AI health-information assistant, not a licensed physician. It does not
+          provide medical advice, diagnosis, treatment, or prescriptions. In an emergency, call your
+          local emergency number.
+        </p>
+
+        <footer class="mt-6 border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
+          <a routerLink="/privacy" class="hover:text-teal-700">Privacy Policy</a>
+          <span class="mx-2">·</span>
+          <a routerLink="/terms" class="hover:text-teal-700">Terms of Use</a>
+          <span class="mx-2">·</span>
+          <a routerLink="/disclaimer" class="hover:text-teal-700">Medical Disclaimer</a>
+          <span class="mx-2">·</span>
+          <a routerLink="/contact" class="hover:text-teal-700">Contact</a>
+
+          <!-- Who operates the site and how to reach them, on every public page. -->
+          <p class="mt-3 leading-relaxed">
+            {{ appName }} is operated by
+            <strong class="font-semibold text-teal-900/70">KnocDoc</strong>. Support:
+            <a href="mailto:support@knocdoc.in" class="underline hover:text-teal-700">support&#64;knocdoc.in</a>
+            ·
+            <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-teal-700">knocdoc.in</a>
+          </p>
+        </footer>
+      </main>
+    </div>
+  `,
+  // Prose styles for the projected content live in src/styles.scss, not here.
+  // <ng-content> nodes carry the parent component's _ngcontent attribute, so
+  // emulated-encapsulation rules written in this component never match them.
+})
+export class SeoPageLayoutComponent {
+  appName = environment.appName;
+  @Input() heading = '';
+  @Input() lede = '';
+  @Input() ctaTitle = 'Try DoctoGuide now';
+  @Input() ctaLabel = 'Get started';
+
+  // Cross-links between the public SEO pages (crawl path + UX).
+  links = [
+    { path: '/', label: 'Home' },
+    { path: '/ai-doctor', label: 'AI Health Assistant' },
+    { path: '/symptom-checker', label: 'Symptom Checker' },
+    { path: '/which-specialist-to-see', label: 'Which Specialist to See' },
+    { path: '/health-topics', label: 'Health Topics' },
+    { path: '/find-doctors', label: 'Find a Doctor Near You' },
+    { path: '/health-guide', label: 'Online Health Guide' },
+    { path: '/how-it-works', label: 'How It Works' },
+    { path: '/medical-safety', label: 'Medical Safety' },
+    { path: '/about', label: 'About DoctoGuide' },
+    { path: '/pricing', label: 'Pricing' },
+    { path: '/emergency-numbers', label: 'Emergency Numbers by Country' },
+    { path: '/contact', label: 'Contact' },
+  ];
+}

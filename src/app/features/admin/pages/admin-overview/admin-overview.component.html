@@ -1,0 +1,134 @@
+<!-- hero -->
+<div class="mb-5">
+  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
+    <span class="h-px w-6 bg-grass-500"></span>Platform analytics
+  </p>
+  <h1 class="mt-2 font-grotesk text-4xl font-bold leading-[0.95] tracking-tight text-stone-900 sm:text-5xl">
+    All clinics,<br class="sm:hidden" /> one <span class="text-grass-600">clear view.</span>
+  </h1>
+  <p class="mt-2 max-w-xl text-sm text-stone-500">Leads, conversions and campaign performance across every partner clinic.</p>
+</div>
+
+<!-- date range -->
+<div class="flex flex-wrap items-end gap-3 rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+  <div class="flex-1 sm:flex-none">
+    <label for="ov-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
+    <input id="ov-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+  </div>
+  <div class="flex-1 sm:flex-none">
+    <label for="ov-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
+    <input id="ov-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+  </div>
+  <button (click)="load()" [disabled]="loading"
+    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    {{ loading ? 'Loading…' : 'Apply' }}
+  </button>
+</div>
+
+<p *ngIf="error" role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+
+<ng-container *ngIf="data as d">
+  <!-- KPI cards -->
+  <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Total clicks</p>
+      <p class="mt-1 font-grotesk text-4xl font-bold tabular-nums text-stone-900">{{ d.clicks | number }}</p>
+    </div>
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Total leads</p>
+      <p class="mt-1 font-grotesk text-4xl font-bold tabular-nums text-stone-900">{{ d.leads | number }}</p>
+    </div>
+    <div class="rounded-2xl bg-grass-600 p-5 text-white shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wide text-white/80">Conversion</p>
+      <p class="mt-1 font-grotesk text-4xl font-bold tabular-nums">{{ conversionRate }}%</p>
+      <p class="text-xs text-white/70">{{ d.conversions | number }} proceeded</p>
+    </div>
+  </div>
+
+  <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <!-- leads by clinic -->
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by clinic</p>
+      <ul *ngIf="d.byClinic?.length; else noClinic" class="mt-3 space-y-2.5">
+        <li *ngFor="let c of d.byClinic">
+          <div class="flex items-center justify-between text-sm">
+            <span class="truncate text-stone-700">{{ c.clinicName }}</span>
+            <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+          </div>
+          <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+            <div class="h-full rounded-full bg-grass-500 motion-safe:transition-[width] motion-safe:duration-300" [style.width.%]="clinicPct(c.leads)"></div>
+          </div>
+        </li>
+      </ul>
+      <ng-template #noClinic><p class="mt-3 text-sm text-stone-400">No clinic activity in this range.</p></ng-template>
+    </div>
+
+    <!-- leads by state -->
+    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by state</p>
+      <ul *ngIf="d.byState?.length; else noState" class="mt-3 space-y-2.5">
+        <li *ngFor="let s of d.byState">
+          <div class="flex items-center justify-between text-sm">
+            <span class="truncate text-stone-700">{{ s.state || '—' }}</span>
+            <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ s.leads | number }}</span>
+          </div>
+          <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+            <div class="h-full rounded-full bg-amber-400 motion-safe:transition-[width] motion-safe:duration-300" [style.width.%]="statePct(s.leads)"></div>
+          </div>
+        </li>
+      </ul>
+      <ng-template #noState><p class="mt-3 text-sm text-stone-400">No state data in this range.</p></ng-template>
+    </div>
+  </div>
+
+  <!-- leads by campaign -->
+  <div *ngIf="d.byCampaign?.length" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+    <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by campaign</p>
+    <ul class="mt-3 space-y-2.5">
+      <li *ngFor="let c of d.byCampaign">
+        <div class="flex items-center justify-between text-sm">
+          <span class="truncate text-stone-700">{{ c.campaign }}</span>
+          <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+        </div>
+        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+          <div class="h-full rounded-full bg-grass-500 motion-safe:transition-[width] motion-safe:duration-300" [style.width.%]="campaignPct(c.leads)"></div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- specialty distribution -->
+  <div *ngIf="d.topSpecialties?.length; else noSpec" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+    <div class="flex items-center justify-between">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Demand by specialty</p>
+      <span class="text-xs text-stone-400">{{ specialtyTotal | number }} total</span>
+    </div>
+    <ul role="img" aria-label="Lead demand distribution by specialty" class="mt-3 space-y-2.5">
+      <li *ngFor="let s of d.topSpecialties">
+        <div class="flex items-center justify-between text-sm">
+          <span class="truncate text-stone-700">{{ s.specialty }}</span>
+          <span class="ml-2 shrink-0 text-stone-900">
+            <span class="font-grotesk font-bold tabular-nums">{{ s.count | number }}</span>
+            <span class="ml-1 text-xs text-stone-400">({{ specialtyShare(s.count) }}%)</span>
+          </span>
+        </div>
+        <div class="mt-1 h-2.5 w-full overflow-hidden rounded-full bg-sand-100">
+          <div class="h-full rounded-full bg-grass-500 motion-safe:transition-[width] motion-safe:duration-300" [style.width.%]="specialtyPct(s.count)"></div>
+        </div>
+      </li>
+    </ul>
+    <table class="sr-only">
+      <caption>Lead count and share by specialty</caption>
+      <thead><tr><th>Specialty</th><th>Leads</th><th>Share</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let s of d.topSpecialties"><td>{{ s.specialty }}</td><td>{{ s.count }}</td><td>{{ specialtyShare(s.count) }}%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #noSpec>
+    <div class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Demand by specialty</p>
+      <p class="mt-2 text-sm text-stone-400">No specialty data in this range yet.</p>
+    </div>
+  </ng-template>
+</ng-container>

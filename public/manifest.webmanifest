@@ -1,0 +1,30 @@
+{
+  "name": "DoctoGuide by KnocDoc",
+  "short_name": "DoctoGuide",
+  "description": "Free AI health assistant & symptom checker. Informational health guidance, the right specialist to see, and doctors near you. Not medical advice.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdfaf3",
+  "theme_color": "#0d9488",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "favicon.ico?v=3",
+      "sizes": "64x64 48x48 32x32 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/icons/doctoguide-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/doctoguide-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

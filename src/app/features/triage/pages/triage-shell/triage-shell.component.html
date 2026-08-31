@@ -1,0 +1,980 @@
+<!--
+  Account menu. Was mat-sidenav; the mat-sidenav-container / -content wrapper is
+  gone entirely because it only existed to give Material a layout context.
+  [(opened)] -> [(open)] is one-for-one: the #drawer template ref was never read
+  from TS, only the showDrawer boolean.
+
+  These rows are ACTIONS, not navigations. v1 used <a mat-list-item> with no
+  href, which is an a11y bug (not focusable, not activatable by keyboard);
+  plain <button> fixes it with no behaviour change.
+-->
+<ds-drawer
+  [(open)]="showDrawer"
+  [heading]="state.isLoggedIn ? (state.userName || 'My account') : 'Welcome'"
+  ariaLabel="Account menu">
+  <nav class="p-2">
+    <p *ngIf="state.isLoggedIn && state.userMobile" class="truncate px-3 pb-2 text-xs text-teal-900/50">
+      +91 {{ state.userMobile }}
+    </p>
+    <ng-container *ngIf="state.isLoggedIn; else loggedOutMenu">
+      <button type="button" (click)="openProfile()"
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
+        <ds-icon name="person" class="text-teal-600" /> Profile
+      </button>
+      <button type="button" (click)="openChangePin()"
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
+        <ds-icon name="password" class="text-teal-600" /> Change PIN
+      </button>
+      <button type="button" (click)="showDrawer = false; showHistory = true"
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
+        <ds-icon name="history" class="text-teal-600" /> My consults
+      </button>
+      <div class="my-1 border-t border-black/5"></div>
+      <button type="button" (click)="onLoggedOut()"
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-red-600 hover:bg-red-50">
+        <ds-icon name="logout" class="text-red-600" /> Log out
+      </button>
+    </ng-container>
+    <ng-template #loggedOutMenu>
+      <button type="button" (click)="showDrawer = false; openAccount()"
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
+        <ds-icon name="login" class="text-teal-600" /> Log in
+      </button>
+    </ng-template>
+  </nav>
+</ds-drawer>
+
+  <div class="flex h-[100dvh] flex-col bg-cream">
+  <!-- emergency banner -->
+  <div class="bg-red-600 px-4 py-2 text-center text-xs font-medium text-white">
+    <span>{{ emergencySentence }}</span>
+  </div>
+
+  <!-- header -->
+  <header class="flex items-center justify-between gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+    <div class="flex min-w-0 items-center gap-1">
+      <button (click)="openDrawer()" aria-label="Open menu"
+        class="flex shrink-0 items-center rounded-lg p-1.5 text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+        <ds-icon name="menu" [size]="22" />
+      </button>
+      <a (click)="goHome()" aria-label="Go to home" role="link" tabindex="0" (keydown.enter)="goHome()"
+        class="flex min-w-0 shrink cursor-pointer flex-col leading-tight hover:opacity-80">
+        <span class="flex items-center gap-1 truncate font-heading text-base font-bold text-teal-900 sm:text-lg">
+          <span class="truncate">{{ appName }}</span>
+          <ds-icon name="auto_awesome" [size]="15" class="shrink-0 text-teal-500" />
+        </span>
+        <span class="flex items-center gap-1 truncate text-[10px] font-medium text-teal-900/50">
+          powered by
+          <span class="font-extrabold"><span style="color:#0a1480">Knoc</span><span style="color:#4fb0f9">Doc</span></span>
+        </span>
+      </a>
+    </div>
+    <!-- actions: icon-only on mobile, icon+label from sm -->
+    <div class="flex shrink-0 items-center gap-1 sm:gap-3">
+      <button (click)="openAccount()" [attr.aria-label]="state.isLoggedIn ? 'My consults' : 'Log in'"
+        class="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+        <ds-icon [name]="state.isLoggedIn ? 'history' : 'login'" [size]="18" />
+        <span class="hidden sm:inline">{{ state.isLoggedIn ? 'My consults' : 'Log in' }}</span>
+      </button>
+      <button (click)="restart()" aria-label="Start a new chat"
+        class="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-teal-600 px-3 py-1.5 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+        <ds-icon name="add_comment" [size]="18" />
+        New chat
+      </button>
+      <button *ngIf="state.isLoggedIn" (click)="onLoggedOut()" aria-label="Log out"
+        class="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+        <ds-icon name="logout" [size]="18" />
+        <span class="hidden sm:inline">Log out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- previous (unsaved) chat banner -->
+  <div *ngIf="hasPrevChat" class="border-b border-amber-200 bg-amber-50 px-4 py-2">
+    <div class="mx-auto flex max-w-2xl items-center justify-between gap-2">
+      <p class="flex min-w-0 items-center gap-1.5 text-sm text-amber-800">
+        <ds-icon name="history" [size]="18" class="shrink-0" />
+        <span class="truncate">You have a previous chat from before.</span>
+      </p>
+      <div class="flex shrink-0 items-center gap-1">
+        <button (click)="loadPreviousChat()"
+          class="rounded-full bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-700">
+          Load it
+        </button>
+        <button (click)="dismissPreviousChat()" type="button" aria-label="Dismiss previous chat"
+          class="grid h-11 w-11 shrink-0 place-items-center rounded text-amber-700/60 hover:text-amber-800">
+          <ds-icon name="close" [size]="18" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- triage progress -->
+  <div *ngIf="!report && !emergency && progress > 0" class="border-b border-black/5 bg-white px-4 pb-2 pt-2">
+    <div class="mx-auto max-w-2xl">
+      <div class="mb-1 flex justify-between text-[11px] text-teal-900/60">
+        <span>Building your health report…</span>
+        <span>~{{ stepsLeft }} step{{ stepsLeft === 1 ? '' : 's' }} left</span>
+      </div>
+      <div class="h-1.5 w-full rounded-full bg-teal-100">
+        <div class="h-1.5 rounded-full bg-teal-600 transition-all duration-500" [style.width.%]="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- conversation -->
+  <main class="flex-1 overflow-y-auto px-4 py-5">
+    <div class="mx-auto max-w-2xl space-y-4">
+      <!-- chat bubbles -->
+      <div *ngFor="let m of messages" class="flex" [ngClass]="m.role === 'user' ? 'justify-end' : 'justify-start'">
+        <div
+          class="max-w-[80%] whitespace-pre-line rounded-2xl px-4 py-2.5 text-[15px] animate-fade-up"
+          [ngClass]="m.role === 'user'
+            ? 'bg-teal-600 text-white rounded-br-sm'
+            : 'bg-white text-teal-900 ring-1 ring-black/5 rounded-bl-sm'"
+        >
+          {{ m.text }}
+        </div>
+      </div>
+
+      <!-- tap-to-answer chips for the current question. Backend only sends these
+           when every option is a complete answer, so tapping never costs the
+           report any detail. The composer stays open regardless — the hint says
+           so. Hidden while the age/sex card is up so the two never stack. -->
+      <div
+        *ngIf="answerOptions.length && !loading && !needAgeSex && !consultComplete && !emergency"
+        class="animate-fade-up"
+        role="group"
+        aria-label="Answer choices"
+      >
+        <div class="flex flex-wrap gap-2">
+          <button
+            *ngFor="let opt of answerOptions"
+            type="button"
+            (click)="pickOption(opt)"
+            [disabled]="loading"
+            class="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-teal-900/80 hover:border-teal-600 hover:bg-teal-50 hover:text-teal-900 disabled:opacity-50"
+          >
+            {{ opt }}
+          </button>
+        </div>
+        <p class="mt-2 text-xs text-teal-900/60">or type your own answer below</p>
+      </div>
+
+      <!-- typing / thinking indicator (normal chat turns) -->
+      <div *ngIf="loading && !generatingReport" class="flex justify-start">
+        <div class="flex items-center gap-1.5 rounded-2xl rounded-bl-sm bg-white px-4 py-3 ring-1 ring-black/5">
+          <span class="mr-1 text-xs text-teal-900/50">AI is thinking</span>
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:0ms"></span>
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:150ms"></span>
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:300ms"></span>
+        </div>
+      </div>
+
+      <!-- prominent "creating your report" state (final leg of triage) -->
+      <div *ngIf="generatingReport" class="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-6 text-center shadow-sm ring-1 ring-teal-100 animate-fade-up">
+        <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-teal-200 border-t-teal-600"></div>
+        <p class="font-heading text-lg font-bold text-teal-900">Creating your health report…</p>
+        <p class="mt-1 text-sm text-teal-900/70">Analysing your answers and preparing a personalised summary. This takes a few seconds.</p>
+        <div class="mt-4 flex items-center justify-center gap-1.5">
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:0ms"></span>
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:150ms"></span>
+          <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:300ms"></span>
+        </div>
+      </div>
+
+      <!-- consent gate (before first AI reply) -->
+      <div *ngIf="showConsent" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+        <p class="text-[15px] font-medium text-teal-900">Before I reply, please confirm — it's fast, safe and free.</p>
+        <label class="mt-3 flex items-start gap-2 text-sm text-teal-900/80">
+          <input type="checkbox" [(ngModel)]="consentChecked" class="mt-1" />
+          <span>
+            I confirm I am 18 or older. I agree to the <a routerLink="/terms" target="_blank" class="font-medium text-teal-700 underline">Terms of Use</a>
+            and will discuss all output with a doctor. {{ appName }} is an AI health-information assistant,
+            not a licensed physician, and does not practise medicine or provide medical advice.
+            The health information I share is processed to generate my summary as described in the
+            <a routerLink="/privacy" target="_blank" class="font-medium text-teal-700 underline">Privacy Policy</a>.
+          </span>
+        </label>
+        <button
+          (click)="agreeConsent()" [disabled]="!consentChecked"
+          class="mt-3 w-full rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
+        >Agree &amp; continue</button>
+      </div>
+
+      <!-- age/sex quick input (shown until age provided) -->
+      <div *ngIf="needAgeSex && !loading" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+
+        <!-- logged-in: who is the consult for? -->
+        <ng-container *ngIf="askConsultFor && consultFor === null">
+          <p class="mb-3 text-sm text-teal-900/80">Who is this consultation for?</p>
+          <div class="flex gap-2">
+            <button (click)="chooseSelf()" class="flex-1 rounded-lg border border-black/10 py-2 text-sm text-teal-900/70 hover:border-teal-600">Myself</button>
+            <button (click)="chooseOther()" class="flex-1 rounded-lg border border-black/10 py-2 text-sm text-teal-900/70 hover:border-teal-600">Someone else</button>
+          </div>
+        </ng-container>
+
+        <!-- self + saved details: confirm or edit -->
+        <ng-container *ngIf="consultFor === 'self' && !editingDetails">
+          <p class="mb-1 text-sm text-teal-900/80">Are these details still correct?</p>
+          <p class="mb-3 text-sm font-medium text-teal-900">
+            {{ age }} yrs
+            <span *ngIf="sex"> · {{ sex | titlecase }}</span>
+            <span *ngIf="!sex && profileGender"> · {{ profileGender | titlecase }}</span>
+          </p>
+          <div class="flex gap-2">
+            <button (click)="confirmSelf()" class="flex-1 rounded-lg bg-teal-600 py-2 text-sm font-semibold text-white hover:bg-teal-700">Yes, that's me</button>
+            <button (click)="editSelf()" class="rounded-lg border border-black/10 px-4 py-2 text-sm text-teal-900/70">Edit</button>
+          </div>
+          <p *ngIf="ageError" class="mt-2 text-xs text-red-600">{{ ageError }}</p>
+        </ng-container>
+
+        <!-- raw inputs: editing self, someone else, or an anonymous user -->
+        <ng-container *ngIf="editingDetails || !askConsultFor">
+          <div class="mb-3 flex gap-2">
+            <button (click)="sex = 'female'" class="flex-1 rounded-lg border py-2 text-sm"
+              [ngClass]="sex === 'female' ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-black/10 text-teal-900/70'">Female</button>
+            <button (click)="sex = 'male'" class="flex-1 rounded-lg border py-2 text-sm"
+              [ngClass]="sex === 'male' ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-black/10 text-teal-900/70'">Male</button>
+          </div>
+          <div class="flex gap-2">
+            <input type="number" min="18" [(ngModel)]="age" placeholder="Age (18+)"
+              class="flex-1 rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-teal-600" />
+            <button (click)="submitDetails()" class="rounded-lg bg-teal-600 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-700">Submit</button>
+          </div>
+          <p *ngIf="ageError" class="mt-2 text-xs text-red-600">{{ ageError }}</p>
+        </ng-container>
+      </div>
+
+      <!-- emergency card -->
+      <div *ngIf="emergency" class="rounded-2xl border-2 border-red-500 bg-red-50 p-5 text-center">
+        <ds-icon name="emergency" [size]="32" class="text-red-600" />
+        <p class="mt-2 font-heading text-lg font-bold text-red-700">Seek urgent care now</p>
+        <p class="mt-1 text-sm text-red-700/80">
+          Call {{ emergencyNumbersText }} now, or go to the nearest emergency room.
+        </p>
+        <!-- One button per DISTINCT number: countries where the all-emergencies
+             and ambulance lines are the same used to get two identical buttons. -->
+        <div *ngIf="countryName" class="mt-3 flex justify-center gap-2">
+          <a
+            *ngFor="let n of emergencyDialNumbers; let first = first"
+            [href]="'tel:' + n"
+            [class]="first
+              ? 'rounded-full bg-red-600 px-5 py-2 text-sm font-semibold text-white'
+              : 'rounded-full border border-red-600 px-5 py-2 text-sm font-semibold text-red-700'"
+          >Call {{ n }}</a>
+        </div>
+        <button (click)="continueWithReport()" class="mt-3 text-sm font-medium text-red-700/70 underline underline-offset-2 hover:text-red-800">
+          Not an emergency? Continue with my report
+        </button>
+      </div>
+
+      <!-- report card -->
+      <!-- hidden while amending: the old report disappears until the updated one lands -->
+      <div #reportTop *ngIf="report && !amending" class="scroll-mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 animate-fade-up">
+        <!-- header -->
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="font-display text-2xl font-semibold text-teal-900">Your Health Summary</h2>
+            <p class="text-xs text-teal-900/50">{{ report.generatedAt | date:'medium' }}</p>
+          </div>
+          <button (click)="shareReport()" class="flex items-center gap-1 text-sm text-teal-700 hover:text-teal-900">
+            <ds-icon name="ios_share" [size]="16" /> Share
+          </button>
+        </div>
+
+        <!-- 1. Urgency first: the most important thing must be visible immediately,
+             with wording driven by the triage level rather than the differential. -->
+        <div *ngIf="report.urgency as urg"
+             class="mt-3 flex items-start gap-2 rounded-xl p-3"
+             [ngClass]="{
+               'bg-red-50 ring-1 ring-red-200': urg.level === 'emergency',
+               'bg-amber-50 ring-1 ring-amber-200': urg.level === 'urgent',
+               'bg-teal-50 ring-1 ring-teal-200': urg.level === 'routine'
+             }">
+          <ds-icon [name]="urg.level === 'routine' ? 'event_available' : 'priority_high'" [ngClass]="{ 'text-red-600': urg.level === 'emergency', 'text-amber-600': urg.level === 'urgent', 'text-teal-600': urg.level === 'routine' }" />
+          <div>
+            <p class="font-heading font-semibold"
+               [ngClass]="{
+                 'text-red-800': urg.level === 'emergency',
+                 'text-amber-800': urg.level === 'urgent',
+                 'text-teal-900': urg.level === 'routine'
+               }">{{ urgencyHeadline }}</p>
+            <p class="mt-0.5 text-sm text-teal-900/75">{{ urg.reason }}</p>
+          </div>
+        </div>
+
+        <p class="mt-3 text-[15px] text-teal-900/80">{{ report.summary }}</p>
+
+        <!-- 3. Why we're being cautious -->
+        <div *ngIf="report.whyConcerned" class="mt-3 rounded-xl border-l-2 border-teal-300 bg-teal-50/60 py-2 pl-3">
+          <p class="font-heading text-sm font-semibold text-teal-900">Why we're being cautious</p>
+          <p class="mt-1 text-sm text-teal-900/80">{{ report.whyConcerned }}</p>
+        </div>
+
+        <!-- 4. What you've told us — only what the patient actually said -->
+        <div *ngIf="report.whatYouToldUs?.length" class="mt-3">
+          <p class="font-heading text-sm font-semibold text-teal-900">What you've told us</p>
+          <ul class="mt-1 space-y-1">
+            <li *ngFor="let b of report.whatYouToldUs" class="flex gap-2 text-sm text-teal-900/80">
+              <span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-400"></span>{{ b }}
+            </li>
+          </ul>
+        </div>
+        <p class="mt-2 text-sm italic text-teal-900/60">A doctor can give you personalised guidance — and peace of mind.</p>
+
+        <!-- continue to a licensed doctor -->
+        <div class="mt-4 rounded-xl bg-teal-50 p-4">
+          <p class="font-heading font-semibold text-teal-900">Continue with {{ specialistLabel }}</p>
+          <p *ngIf="selectedSpecialty" class="mt-0.5 text-xs text-teal-900/60">
+            Recommended specialist for your symptoms: <span class="font-semibold text-teal-700">{{ selectedSpecialty }}</span>
+          </p>
+          <p *ngIf="multiSpecialist" class="mt-0.5 text-xs text-teal-900/60">
+            Also recommended:
+            <ng-container *ngFor="let o of otherSpecialists; let last = last">
+              <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-teal-700 underline">{{ o.specialty }}</button><span *ngIf="!last">, </span>
+            </ng-container>
+          </p>
+          <ul class="mt-2 space-y-1.5">
+            <li *ngFor="let b of ['Find ' + specialistLabel + ' near you','A doctor reviews your concerns and next steps','Get a referral or tests advised, if needed','Your summary is ready to share with any doctor']"
+              class="flex items-start gap-2 text-sm text-teal-900/80">
+              <ds-icon name="check_circle" [size]="16" class="text-teal-600" />{{ b }}
+            </li>
+          </ul>
+          <button (click)="connectDoctor()" class="mt-3 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700">
+            {{ urgencyCta }} →
+          </button>
+        </div>
+
+        <!-- Assessment & Plan -->
+        <button (click)="reportOpen.causes = !reportOpen.causes" class="mt-4 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
+          <span class="font-heading font-semibold text-teal-900">Summary &amp; things to discuss</span>
+          <ds-icon [name]="reportOpen.causes ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+        </button>
+        <div *ngIf="reportOpen.causes" class="mt-2 space-y-3">
+          <p *ngIf="report.assessmentIntro" class="text-sm text-teal-900/70">{{ report.assessmentIntro }}</p>
+
+          <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Possible areas to discuss with a doctor</p>
+          <div class="space-y-2">
+            <div *ngFor="let c of report.possibleCauses; let i = index" class="rounded-lg bg-teal-50 px-3 py-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-teal-900">{{ i + 1 }}. {{ c.cause }}</span>
+                <span class="text-xs uppercase text-teal-600">{{ c.likelihood }}</span>
+              </div>
+              <p *ngIf="c.note" class="mt-0.5 text-xs text-teal-900/70">{{ c.note }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="report.plan">
+            <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Topics a doctor may explore</p>
+
+            <div *ngIf="report.plan.labs?.length" class="mt-2">
+              <p class="text-sm font-semibold text-teal-900">Tests a doctor might discuss</p>
+              <ul class="mt-1 space-y-1">
+                <li *ngFor="let l of report.plan.labs" class="flex items-start gap-2 text-sm text-teal-900/80">
+                  <ds-icon name="science" [size]="14" class="text-teal-600" />
+                  <span><b>{{ l.name }}</b><span *ngIf="l.why"> — {{ l.why }}</span></span>
+                </li>
+              </ul>
+            </div>
+
+            <div *ngIf="report.plan.imaging?.length" class="mt-2">
+              <p class="text-sm font-semibold text-teal-900">Imaging a doctor might discuss</p>
+              <ul class="mt-1 space-y-1">
+                <li *ngFor="let im of report.plan.imaging" class="flex items-start gap-2 text-sm text-teal-900/80">
+                  <ds-icon name="biotech" [size]="14" class="text-teal-600" />
+                  <span><b>{{ im.name }}</b><span *ngIf="im.why"> — {{ im.why }}</span></span>
+                </li>
+              </ul>
+            </div>
+
+            <div *ngIf="report.plan.management?.length" class="mt-2">
+              <p class="text-sm font-semibold text-teal-900">Self-care &amp; home remedies you can try</p>
+              <ul class="mt-1 space-y-1">
+                <li *ngFor="let m of report.plan.management" class="flex items-start gap-2 text-sm text-teal-900/80">
+                  <ds-icon name="healing" [size]="14" class="text-teal-600" />{{ m }}
+                </li>
+              </ul>
+            </div>
+
+            <div *ngIf="report.plan.referral" class="mt-2">
+              <p class="text-sm font-semibold text-teal-900">Referral</p>
+              <p class="mt-0.5 text-sm text-teal-900/80">{{ report.plan.referral }}</p>
+            </div>
+
+            <div *ngIf="report.plan.whenToSeekUrgent" class="mt-2 rounded-lg border border-red-300 bg-red-50 p-2">
+              <p class="text-sm font-semibold text-red-700">When to seek urgent care</p>
+              <p class="mt-0.5 text-sm text-red-700/90">{{ report.plan.whenToSeekUrgent }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOAP -->
+        <button (click)="reportOpen.soap = !reportOpen.soap" class="mt-3 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
+          <span class="font-heading font-semibold text-teal-900">Clinical SOAP note (for your doctor)</span>
+          <ds-icon [name]="reportOpen.soap ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+        </button>
+        <div *ngIf="reportOpen.soap" class="mt-2 space-y-3 text-sm text-teal-900/80">
+          <div *ngFor="let s of [
+            {label:'Subjective', val: report.soap.subjective},
+            {label:'Objective', val: report.soap.objective},
+            {label:'Assessment', val: report.soap.assessment},
+            {label:'Plan', val: report.soap.plan}]">
+            <p class="font-semibold text-teal-900">{{ s.label }}</p>
+            <ul class="mt-0.5 space-y-0.5">
+              <li *ngFor="let line of toBullets(s.val)" class="flex items-start gap-2">
+                <span class="text-teal-600">•</span>{{ line }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 7. Information that could change the assessment -->
+        <div *ngIf="report.missingInfo?.length" class="mt-3 rounded-xl bg-black/[0.02] p-3">
+          <p class="font-heading text-sm font-semibold text-teal-900">Information that could change the assessment</p>
+          <p class="mt-0.5 text-xs text-teal-900/55">Not assessed through chat — a clinician would check these.</p>
+          <ul class="mt-2 space-y-1">
+            <li *ngFor="let m of report.missingInfo" class="flex gap-2 text-sm text-teal-900/75">
+              <ds-icon name="remove" [size]="14" class="text-teal-900/30" />{{ m }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- AI confidence accordion (collapsed by default; absent on older reports) -->
+        <ng-container *ngIf="report.confidence as conf">
+          <button (click)="reportOpen.confidence = !reportOpen.confidence" class="mt-3 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
+            <span class="font-heading font-semibold text-teal-900">Assessment completeness</span>
+            <span class="flex items-center gap-2">
+              <span class="rounded-full px-2.5 py-0.5 text-xs font-bold"
+                    [ngClass]="{
+                      'bg-red-100 text-red-700': conf.level === 'low',
+                      'bg-amber-100 text-amber-700': conf.level === 'moderate',
+                      'bg-teal-100 text-teal-700': conf.level === 'high'
+                    }">{{ completenessLabel }}</span>
+              <ds-icon [name]="reportOpen.confidence ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+            </span>
+          </button>
+          <div *ngIf="reportOpen.confidence" class="mt-2">
+            <p class="mb-2 text-xs text-teal-900/60">This reflects how much information was available during the conversation. It is not the probability that a diagnosis is correct.</p>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-black/5">
+              <div class="h-full rounded-full"
+                   [ngClass]="{
+                     'bg-red-400': conf.level === 'low',
+                     'bg-amber-400': conf.level === 'moderate',
+                     'bg-teal-500': conf.level === 'high'
+                   }"
+                   [style.width.%]="conf.score"></div>
+            </div>
+            <ul *ngIf="conf.factors?.length" class="mt-2 space-y-0.5">
+              <li *ngFor="let f of conf.factors" class="flex items-start gap-2 text-sm text-teal-900/80">
+                <span class="text-teal-600">•</span>{{ f }}
+              </li>
+            </ul>
+            <div *ngIf="conf.missing?.length" class="mt-2">
+              <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">What could change this assessment</p>
+              <ul class="mt-1 space-y-0.5">
+                <li *ngFor="let m of conf.missing" class="flex items-start gap-2 text-sm text-teal-900/80">
+                  <span class="text-teal-600">•</span>{{ m }}
+                </li>
+              </ul>
+            </div>
+            <p class="mt-2 text-xs text-teal-900/50">This reflects the AI's own estimate of how well the interview supports this summary — not diagnostic certainty.</p>
+          </div>
+        </ng-container>
+
+        <!-- suggested specialist(s) + downloads -->
+        <div *ngIf="!multiSpecialist" class="mt-4 rounded-lg bg-teal-900 px-4 py-3 text-white">
+          <p class="text-sm">Suggested specialist</p>
+          <p class="font-heading text-lg font-bold">{{ selectedSpecialty || report.suggestedSpecialty }}</p>
+        </div>
+        <!-- multiple specialists: selectable cards, primary preselected -->
+        <div *ngIf="multiSpecialist" class="mt-4 rounded-lg bg-teal-900 px-4 py-3 text-white">
+          <p class="text-sm">Suggested specialists</p>
+          <p class="mt-0.5 text-xs text-white/70">Based on your symptoms, either can help. Pick one to continue:</p>
+          <div class="mt-2 space-y-2">
+            <button *ngFor="let s of specialists" (click)="selectSpecialist(s.specialty)"
+              class="block w-full rounded-xl border-2 p-3 text-left transition-colors"
+              [ngClass]="s.specialty === selectedSpecialty ? 'border-teal-300 bg-white text-teal-900' : 'border-white/30 bg-transparent text-white hover:border-white/60'">
+              <span class="flex items-center gap-2">
+                <ds-icon [name]="s.specialty === selectedSpecialty ? 'radio_button_checked' : 'radio_button_unchecked'" [size]="18" [ngClass]="s.specialty === selectedSpecialty ? 'text-teal-600' : 'text-white/60'" />
+                <span class="font-heading font-bold">{{ s.specialty }}</span>
+                <span *ngIf="s.primary" class="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">Primary</span>
+              </span>
+              <span *ngIf="s.why" class="mt-1 block pl-6 text-xs"
+                [ngClass]="s.specialty === selectedSpecialty ? 'text-teal-900/70' : 'text-white/70'">{{ s.why }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+          <button (click)="downloadPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+            <ds-icon name="download" [size]="18" /> Download report (PDF)
+          </button>
+          <button (click)="downloadSoapPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+            <ds-icon name="description" [size]="18" /> Download SOAP note (PDF)
+          </button>
+        </div>
+
+        <!-- prominent closing call-to-action -->
+        <div class="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-center">
+          <ds-icon name="medical_services" [size]="26" class="text-teal-600" />
+          <p class="font-heading font-bold text-teal-900">This is not a diagnosis</p>
+          <p class="mt-1 text-sm text-teal-900/70">These are possibilities to discuss with a doctor. A licensed {{ selectedSpecialty || report.suggestedSpecialty }} can examine you, discuss your symptoms, and advise the right next steps for you.</p>
+          <button (click)="connectDoctor()" class="mt-3 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold text-white hover:bg-teal-700">
+            {{ urgencyCta }} →
+          </button>
+        </div>
+
+        <!-- report feedback (anonymous, tied to session) -->
+        <div class="mt-4 border-t border-black/5 pt-4">
+          <ng-container *ngIf="!state.feedbackSubmitted; else feedbackThanks">
+            <p class="font-heading font-semibold text-teal-900">Share your feedback</p>
+            <p class="mt-1 text-sm text-teal-900/70">How helpful was this health summary?</p>
+            <div class="mt-2 flex items-center gap-1">
+              <button *ngFor="let n of [1,2,3,4,5]" type="button" (click)="setFeedbackRating(n)" [attr.aria-label]="n + ' star'" class="leading-none">
+                <ds-icon [name]="n <= feedbackRating ? 'star' : 'star_border'" [size]="30" class="text-amber-500" />
+              </button>
+            </div>
+            <textarea [(ngModel)]="feedbackText" rows="2" placeholder="Anything we can improve? (optional)"
+              class="mt-3 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600"></textarea>
+            <button (click)="submitFeedback()" [disabled]="feedbackRating < 1"
+              class="mt-2 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60">
+              Submit feedback
+            </button>
+          </ng-container>
+          <ng-template #feedbackThanks>
+            <p class="flex items-center gap-1.5 text-sm font-medium text-teal-700">
+              <ds-icon name="check_circle" [size]="18" /> Thanks for helping us improve.
+            </p>
+          </ng-template>
+        </div>
+
+        <!-- Growth ask: deliberately quiet, and placed after the report and the
+             feedback prompt so it never competes with the health information. -->
+        <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-black/5 pt-4 text-sm text-teal-900/60">
+          <span>We're a small team. Following us helps more people find us.</span>
+          <a
+            [href]="instagramUrl"
+            target="_blank"
+            rel="noopener"
+            (click)="trackInstagramFollow()"
+            class="inline-flex items-center gap-1.5 font-medium text-teal-700 hover:text-teal-800 hover:underline"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+            </svg>
+            {{ instagramHandle }}
+          </a>
+        </div>
+      </div>
+
+      <div #scrollAnchor></div>
+    </div>
+  </main>
+
+  <!-- composer (chat) — hidden once the report is ready -->
+  <footer *ngIf="!consultComplete" class="border-t border-black/5 bg-white px-3 py-2 sm:px-4 sm:py-3" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+    <div class="mx-auto flex max-w-2xl items-end gap-2">
+      <textarea #composer [(ngModel)]="input" (input)="autoGrow(composer)" (keydown.enter)="onEnter($event)"
+        [disabled]="emergency" rows="1" [placeholder]="composerPlaceholder"
+        class="max-h-40 flex-1 resize-none overflow-y-auto rounded-2xl border border-black/10 px-4 py-3 text-base leading-snug outline-none focus:border-teal-600 disabled:bg-gray-100"></textarea>
+      <button (click)="submitInput()" [disabled]="emergency || loading"
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50">
+        <ds-icon name="send" [size]="22" />
+      </button>
+    </div>
+    <p class="mx-auto mt-1.5 max-w-2xl text-center text-[10px] text-teal-900/40">
+      AI assistant, not a licensed physician. Not medical advice, diagnosis, or prescriptions.
+      <a routerLink="/disclaimer" class="underline hover:text-teal-600">Disclaimer</a>
+      ·
+      <a routerLink="/privacy" class="underline hover:text-teal-600">Privacy</a>
+      ·
+      <a routerLink="/terms" class="underline hover:text-teal-600">Terms</a>
+    </p>
+  </footer>
+
+  <!-- consultation complete — chat locked, continue with a doctor -->
+  <footer *ngIf="consultComplete" class="border-t border-black/5 bg-white px-3 py-3 sm:px-4" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+    <div class="mx-auto max-w-2xl">
+      <p class="text-center text-[13px] font-medium text-teal-900 sm:text-sm">
+        Your report is ready. Continue with {{ specialistLabel }}.
+      </p>
+      <div class="mt-2.5 flex flex-col gap-2 sm:flex-row">
+        <button (click)="connectDoctor()"
+          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 sm:flex-1">
+          <ds-icon name="medical_services" [size]="18" /> Connect with {{ specialistLabel }}
+        </button>
+        <button (click)="startAmend()"
+          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 sm:w-auto">
+          <ds-icon name="edit_note" [size]="18" /> Add or correct details
+        </button>
+        <button (click)="restart()"
+          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 sm:w-auto">
+          <ds-icon name="refresh" [size]="18" /> New chat
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- location prompt modal -->
+  <div *ngIf="askCity" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-heading text-lg font-bold text-teal-900">Where should I look?</h3>
+        <button (click)="closeLocationPrompt()" type="button" aria-label="Close"
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-teal-900/50 hover:bg-teal-50 hover:text-teal-900">
+          <ds-icon name="close" />
+        </button>
+      </div>
+      <p class="mt-1 text-sm text-teal-900/60">
+        Enter your city/area to find {{ selectedSpecialty || 'doctors' }} nearby.
+      </p>
+      <div class="mt-3 flex gap-2">
+        <input [ngModel]="city" (ngModelChange)="onCityInput($event)" (keyup.enter)="submitCity()"
+          placeholder="e.g. Balasore, Odisha" autocomplete="off" role="combobox" aria-autocomplete="list"
+          [attr.aria-expanded]="citySuggestions.length > 0" aria-controls="city-suggestions"
+          class="flex-1 rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600" autofocus />
+        <button (click)="submitCity()" class="rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white">Search</button>
+      </div>
+
+      <!-- city/area suggestions (debounced; the field still works if they fail) -->
+      <p *ngIf="suggestLoading" class="mt-2 flex items-center gap-1.5 text-xs text-teal-900/50">
+        <svg class="h-3.5 w-3.5 shrink-0 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+          <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        Looking up places…
+      </p>
+      <ul *ngIf="citySuggestions.length" id="city-suggestions" role="listbox"
+        class="mt-2 max-h-56 overflow-y-auto rounded-lg border border-black/10 bg-white">
+        <li *ngFor="let p of citySuggestions" role="option" [attr.aria-selected]="false">
+          <button type="button" (click)="pickPlace(p)"
+            class="flex w-full items-start gap-2 border-b border-black/5 px-3 py-2.5 text-left text-sm text-teal-900 last:border-0 hover:bg-teal-50">
+            <ds-icon name="place" [size]="16" class="mt-0.5 shrink-0 text-teal-600" />
+            <span class="min-w-0">{{ p.label }}</span>
+          </button>
+        </li>
+      </ul>
+      <button (click)="useMyLocation()" class="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-teal-600 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+        <ds-icon name="my_location" [size]="16" /> Use my current location
+      </button>
+      <p *ngIf="locError" class="mt-2 text-xs text-red-600">{{ locError }}</p>
+    </div>
+  </div>
+
+  <!-- doctor results screen — a place of its own, so the patient never has to
+       scroll back through the whole health summary to reach a phone number -->
+  <div *ngIf="showDoctors" class="fixed inset-0 z-40 flex flex-col bg-cream">
+    <header class="flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+      <button (click)="closeDoctors()" aria-label="Back to my health summary"
+        class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-teal-700 hover:bg-teal-50">
+        <ds-icon name="arrow_back" [size]="22" />
+      </button>
+      <div class="min-w-0 flex-1">
+        <!-- One line each, both truncating: a long specialty or a long area name
+             must never wrap the header into the "Change area" button. -->
+        <p class="truncate font-heading text-[15px] font-bold leading-tight text-teal-900 sm:text-base">
+          {{ selectedSpecialty || 'Doctors' }}
+        </p>
+        <p class="truncate text-xs text-teal-900/55" aria-live="polite">
+          <span *ngIf="searchAreaShort">{{ searchAreaShort }}</span>
+          <span *ngIf="searchAreaShort && (doctorsLoading || doctorsSearched)" aria-hidden="true"> · </span>
+          <span *ngIf="doctorsLoading">Searching…</span>
+          <span *ngIf="!doctorsLoading && doctorsSearched">{{ resultCount }} result{{ resultCount === 1 ? '' : 's' }}</span>
+        </p>
+      </div>
+      <button (click)="searchAnotherArea()" aria-label="Search in another area"
+        class="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+        <ds-icon name="edit_location_alt" [size]="18" />
+        <span class="hidden xs:inline">Change area</span>
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-4 py-4" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+      <div class="mx-auto max-w-2xl space-y-4">
+        <p *ngIf="locError && !doctorsLoading" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ locError }}</p>
+
+        <!-- Said once for the whole screen — it used to repeat above the partner
+             card, above the list, and again at the bottom. -->
+        <p *ngIf="hasDoctorResults && !doctorsLoading" class="text-xs leading-snug text-teal-900/55">
+          Listings come from Google and OpenStreetMap. We don't verify or endorse practitioners — please check a doctor's registration before consulting.
+        </p>
+
+        <!-- nothing at all came back -->
+        <div *ngIf="doctorsSearched && !doctorsLoading && !hasDoctorResults && !locError"
+          class="rounded-2xl bg-white p-5 text-center ring-1 ring-black/5">
+          <ds-icon name="location_off" [size]="34" class="text-teal-900/30" />
+          <p class="mt-1 font-heading font-semibold text-teal-900">
+            No {{ selectedSpecialty || 'doctors' }} found<span *ngIf="lastSearchPlace"> in {{ lastSearchPlace }}</span>
+          </p>
+          <p class="mt-1 text-sm text-teal-900/60">Try a nearby city, a larger city, or your pincode.</p>
+        </div>
+
+    <!-- doctor discovery loading. The spinner is inline SVG on purpose: the icon
+         font only ships the classic Material Icons set, so a Material Symbols
+         ligature here rendered as wide literal text and crushed the label. -->
+    <div *ngIf="doctorsLoading" class="space-y-3" role="status" aria-live="polite">
+      <!-- The header already names the specialty and the area, so this line
+           carries the one thing it can't: how long this is likely to take. -->
+      <div class="flex items-start gap-2 text-sm text-teal-900/70">
+        <svg class="mt-0.5 h-[18px] w-[18px] shrink-0 text-teal-500 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+          <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span class="min-w-0">Checking nearby listings — this takes a few seconds.</span>
+      </div>
+      <!-- Same footprint as a real result card, so nothing jumps on arrival. -->
+      <div *ngFor="let s of [1,2,3]" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+        <div class="flex items-start gap-3">
+          <div class="h-11 w-11 shrink-0 rounded-full bg-teal-100 motion-safe:animate-pulse"></div>
+          <div class="min-w-0 flex-1 space-y-2">
+            <div class="h-3.5 w-1/2 rounded bg-teal-100 motion-safe:animate-pulse"></div>
+            <div class="h-2.5 w-3/4 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+            <div class="h-2.5 w-2/5 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+          </div>
+        </div>
+        <div class="mt-3 flex gap-4">
+          <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+          <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+          <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- affiliate-first: partner clinic(s) + offer -->
+    <div *ngIf="affiliateDoctors.length && !doctorsLoading" class="space-y-3">
+      <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-700">
+        <ds-icon name="verified" [size]="16" />
+        Partner clinic
+      </p>
+
+      <!-- clinic-wide offer banner -->
+      <div *ngIf="affiliateOffer" class="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5">
+        <ds-icon name="local_offer" [size]="16" class="shrink-0 text-amber-600" />
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-amber-800">{{ affiliateOffer.title }}<span *ngIf="affiliateOffer.discountText"> — {{ affiliateOffer.discountText }}</span></p>
+          <p *ngIf="affiliateOffer.description" class="text-xs text-amber-700/80">{{ affiliateOffer.description }}</p>
+        </div>
+      </div>
+
+      <div *ngFor="let p of affiliateDoctors" class="rounded-2xl border-2 border-amber-400 bg-white p-4">
+        <div class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
+          <ds-icon name="handshake" [size]="16" /> Partner clinic
+        </div>
+        <div class="mt-2 flex items-start gap-3">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
+            [style.background]="avatarColor(p.name)">{{ initials(p.name) }}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <p class="font-heading font-bold text-teal-900">{{ p.name }}</p>
+                <p *ngIf="p.clinicName" class="text-xs text-teal-900/60">{{ p.clinicName }}</p>
+              </div>
+              <div *ngIf="p.rating" class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                <ds-icon name="star" [size]="16" />{{ p.rating }}
+                <span *ngIf="p.userRatingsTotal" class="text-xs text-teal-900/40">({{ p.userRatingsTotal }})</span>
+              </div>
+            </div>
+            <p *ngIf="p.specialty" class="mt-0.5 text-sm text-teal-900/70">{{ p.specialty }}</p>
+            <p *ngIf="p.address" class="mt-1 text-xs text-teal-900/60"><ds-icon name="place" [size]="14" class="align-middle" /> {{ p.address }}</p>
+            <span *ngIf="p.offer?.discountText" class="mt-1.5 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+              {{ p.offer?.discountText }}
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <a [href]="p.phone ? 'tel:' + p.phone : null" [class.opacity-40]="!p.phone"
+            [attr.aria-label]="'Call ' + p.name"
+            class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-xs font-semibold text-teal-700 transition-colors duration-150 hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1">
+            <ds-icon name="call" [size]="16" /> Call
+          </a>
+          <a [href]="p.bookingUrl || p.website || p.mapsUrl || null" [class.opacity-40]="!(p.bookingUrl || p.website || p.mapsUrl)"
+            target="_blank" rel="noopener" [attr.aria-label]="'Book a consult with ' + p.name"
+            class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-3 text-xs font-semibold text-white transition-colors duration-150 hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1">
+            <ds-icon name="medical_services" [size]="16" /> Book a consult
+          </a>
+        </div>
+      </div>
+
+      <p *ngIf="doctors.length" class="pt-1 text-xs font-semibold uppercase tracking-wide text-teal-900/50">Other doctors nearby</p>
+    </div>
+
+    <div *ngIf="doctors.length" class="space-y-3">
+      <p *ngIf="multiSpecialist" class="text-xs text-teal-900/60">
+        Also recommended:
+        <ng-container *ngFor="let o of otherSpecialists; let last = last">
+          <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-teal-700 underline">show {{ o.specialty }}s</button><span *ngIf="!last">, </span>
+        </ng-container>
+      </p>
+
+      <!-- Listings often omit the specialty, so say what we could and couldn't
+           confirm rather than implying the area has no such doctor. -->
+      <p *ngIf="!hasSpecialtyMatch" class="flex items-start gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <ds-icon name="info" [size]="14" class="shrink-0" />
+        <span>No listing here states {{ selectedSpecialty || 'this specialty' }} — check when you call, or try a larger city.</span>
+      </p>
+
+      <!-- The one pick we lead with. Teal + "Top rated" only when the backend
+           verified the specialty; otherwise amber + "Best rated", so the card
+           never implies an endorsement we can't back. -->
+      <div *ngIf="topPick as rec" class="rounded-2xl border-2 bg-white p-4"
+        [ngClass]="topPickVerified ? 'border-teal-500' : 'border-amber-200'">
+        <div class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide"
+          [ngClass]="topPickVerified ? 'text-teal-700' : 'text-amber-700'">
+          <ds-icon [name]="topPickVerified ? 'recommend' : (rec.rating ? 'star' : 'near_me')" [size]="16" />
+          {{ topPickLabel }}
+        </div>
+        <div class="mt-2 flex items-start gap-3">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
+            [style.background]="avatarColor(rec.name)">{{ initials(rec.name) }}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-heading font-bold text-teal-900">{{ rec.name }}</p>
+              <div *ngIf="rec.rating" class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                <ds-icon name="star" [size]="16" />{{ rec.rating }}
+                <span *ngIf="rec.userRatingsTotal" class="text-xs text-teal-900/40">({{ rec.userRatingsTotal }})</span>
+              </div>
+            </div>
+            <p class="mt-0.5 text-sm text-teal-900/70">{{ recommendReason(rec) }}</p>
+            <span *ngIf="!topPickVerified" class="mt-1.5 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+              Specialty not verified
+            </span>
+            <p *ngIf="rec.address" class="mt-1 text-xs text-teal-900/60"><ds-icon name="place" [size]="14" class="align-middle" /> {{ rec.address }}</p>
+            <p *ngIf="rec.hours" class="mt-0.5 text-xs text-teal-900/60"><ds-icon name="schedule" [size]="14" class="align-middle" /> {{ rec.hours }}</p>
+            <span *ngIf="rec.openNow === true" class="mt-1.5 inline-block rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Open now</span>
+            <span *ngIf="rec.openNow === false" class="mt-1.5 inline-block rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">Closed now</span>
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-teal-900/60">
+          How to book: {{ rec.phone ? 'call the clinic' : 'visit or check the listing' }}{{ rec.website ? ', book on their website' : '' }}, or get directions and go in.
+        </p>
+        <!-- Wraps instead of squeezing: at 320px three columns clipped the
+             labels. Each action keeps a 44px-tall touch target. -->
+        <div class="mt-2 flex flex-wrap gap-2">
+          <a *ngIf="rec.phone" [href]="'tel:' + rec.phone"
+            [attr.aria-label]="'Call ' + rec.name"
+            class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-3 text-xs font-semibold text-white transition-colors duration-150 hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1">
+            <ds-icon name="call" [size]="16" /> Call
+          </a>
+          <a *ngIf="rec.website" [href]="rec.website" target="_blank" rel="noopener"
+            [attr.aria-label]="'Book online with ' + rec.name"
+            class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+            [ngClass]="rec.phone ? 'border border-teal-600 text-teal-700 hover:bg-teal-50' : 'bg-teal-600 text-white hover:bg-teal-700'">
+            <ds-icon name="event" [size]="16" /> Book online
+          </a>
+          <a [href]="rec.mapsUrl" target="_blank" rel="noopener"
+            [attr.aria-label]="'Directions to ' + rec.name"
+            class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
+            [ngClass]="(rec.phone || rec.website) ? 'border border-teal-600 text-teal-700 hover:bg-teal-50' : 'bg-teal-600 text-white hover:bg-teal-700'">
+            <ds-icon name="directions" [size]="16" /> Directions
+          </a>
+        </div>
+      </div>
+
+      <!-- other options -->
+      <p *ngIf="topPick && doctors.length > 1" class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">More options nearby</p>
+      <ng-container *ngFor="let d of doctors">
+        <div *ngIf="d !== topPick" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+          <div class="flex items-start gap-3">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              [style.background]="avatarColor(d.name)">{{ initials(d.name) }}</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <p class="font-heading font-semibold text-teal-900">{{ d.name }}</p>
+                  <p *ngIf="!d.matchesSpecialty" class="text-[11px] text-amber-700">Specialty not verified</p>
+                  <p *ngIf="d.address" class="mt-0.5 text-xs text-teal-900/60">
+                    <ds-icon name="place" [size]="14" class="align-middle" /> {{ d.address }}
+                  </p>
+                  <p *ngIf="d.hours" class="text-xs text-teal-900/60">
+                    <ds-icon name="schedule" [size]="14" class="align-middle" /> {{ d.hours }}
+                  </p>
+                </div>
+                <div *ngIf="d.rating" class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                  <ds-icon name="star" [size]="16" />{{ d.rating }}
+                  <span *ngIf="d.userRatingsTotal" class="text-xs text-teal-900/40">({{ d.userRatingsTotal }})</span>
+                </div>
+              </div>
+              <!-- Padded so each link clears a 40px tap target on a phone. -->
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1">
+                <a *ngIf="d.phone" [href]="'tel:' + d.phone" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+                  <ds-icon name="call" [size]="16" /> Call
+                </a>
+                <a *ngIf="d.website" [href]="d.website" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+                  <ds-icon name="event" [size]="16" /> Book
+                </a>
+                <a *ngIf="d.mapsUrl" [href]="d.mapsUrl" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900">
+                  <ds-icon name="place" [size]="16" /> Maps
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- No verified specialist here: offer to search another city/area. Shown for
+         both "no results" and "results but none match the specialty". -->
+    <!-- The header already names the specialty, so this stays one short line
+         even on a 320px phone. -->
+    <button *ngIf="doctorsSearched && !hasSpecialtyMatch && !doctorsLoading"
+      (click)="searchAnotherArea()"
+      class="mt-1 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+      <ds-icon name="travel_explore" [size]="18" class="shrink-0" />
+      Search another area
+    </button>
+
+        <button *ngIf="!doctorsLoading" (click)="closeDoctors()"
+          class="flex min-h-[44px] w-full items-center justify-center gap-1 rounded-lg border border-black/10 py-2.5 text-sm font-medium text-teal-900/70 hover:bg-white">
+          <ds-icon name="description" [size]="16" /> Back to my health summary
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- leave-chat confirmation (anonymous user navigating home) -->
+  <div *ngIf="showLeaveDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-heading text-lg font-bold text-teal-900">Leave this chat?</h3>
+        <button (click)="showLeaveDialog = false" type="button" aria-label="Stay in this chat"
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-teal-900/50 hover:bg-teal-50 hover:text-teal-900">
+          <ds-icon name="close" />
+        </button>
+      </div>
+      <p class="mt-2 text-sm text-teal-900/70">
+        Your conversation isn't saved yet. Log in or sign up to keep it in your account —
+        or continue to the home page.
+      </p>
+      <button (click)="leaveAndLogin()"
+        class="mt-4 w-full rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700">
+        Log in / Sign up to save
+      </button>
+      <button (click)="leaveWithoutSaving()"
+        class="mt-2 w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm font-medium text-teal-900/70 hover:bg-gray-50">
+        Continue without saving
+      </button>
+    </div>
+  </div>
+
+  <!-- PIN auth gate (account creation / login) -->
+  <app-auth-gate
+    *ngIf="showAuth"
+    [pendingAction]="pendingAction"
+    [sessionId]="state.sessionId"
+    [triageAge]="age"
+    [triageSex]="sex"
+    (authSuccess)="onAuthSuccess($event)"
+    (cancel)="showAuth = false"
+  ></app-auth-gate>
+
+  <!-- consult history (logged-in) -->
+  <app-consult-history
+    *ngIf="showHistory"
+    (openSession)="openPastSession($event)"
+    (close)="showHistory = false"
+    (loggedOut)="onLoggedOut()"
+  ></app-consult-history>
+
+  </div>

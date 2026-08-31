@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>DoctoGuide — AI Health Assistant &amp; Free Symptom Checker | KnocDoc</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- Primary SEO -->
+  <meta name="description" content="DoctoGuide is a free AI health assistant and symptom checker by KnocDoc. Describe your symptoms, understand possible explanations and how urgent they are, and learn which specialist to see. Informational guidance only — not medical advice.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="KnocDoc">
+  <link rel="canonical" href="https://doctoguide.knocdoc.in/">
+
+  <!-- Open Graph (WhatsApp / Facebook / LinkedIn) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DoctoGuide by KnocDoc">
+  <meta property="og:title" content="DoctoGuide — AI Health Assistant &amp; Free Symptom Checker">
+  <meta property="og:description" content="Describe your symptoms, get instant health guidance, the right specialist to see, and doctors near you. Free, informational guidance — not medical advice.">
+  <meta property="og:url" content="https://doctoguide.knocdoc.in/">
+  <meta property="og:image" content="https://doctoguide.knocdoc.in/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DoctoGuide — AI Health Assistant &amp; Free Symptom Checker">
+  <meta name="twitter:description" content="Free AI health guidance — informational only, not medical advice. Symptoms in, clear answer out, plus doctors near you.">
+  <meta name="twitter:image" content="https://doctoguide.knocdoc.in/assets/og-image.png">
+
+  <!-- Tab icon: the DoctoGuide mark (cross + compass) cut out of its badge, so
+       it sits transparent on any tab strip. The .ico carries 16/32/48/64 so
+       Windows/Chrome pick a crisp size. The home-screen / PWA icons keep the
+       solid badge, since iOS composites transparency onto black. -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=3" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png?v=3">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0d9488">
+
+  <!--
+    Fonts are SELF-HOSTED (public/fonts, declared in styles.scss). v1 loaded
+    Outfit / DM Sans / Fraunces / Space Grotesk / Noto Sans Devanagari and the
+    Material Icons face from fonts.googleapis.com and relied on Angular's
+    build-time font inlining. That is gone deliberately:
+
+      - the Capacitor APK must render text, including Hindi, with no network;
+      - the build no longer fails when fonts.googleapis.com is unreachable;
+      - Material Icons died with the PrimeNG/Material removal (see ds-icon).
+
+    Only the two faces needed for first paint are preloaded. Noto Sans
+    Devanagari is NOT preloaded — its unicode-range means it is fetched only
+    when Devanagari text actually appears, which is not the case on any
+    prerendered public page.
+  -->
+  <link rel="preload" as="font" type="font/woff2" href="fonts/clash-display-700.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/clash-display-600.woff2" crossorigin>
+
+  <!--
+    Google Search Console verification. Prefer the DNS TXT method on the
+    knocdoc.in domain property — one record covers every subdomain, now and in
+    future. If you verify this subdomain by HTML tag instead, paste it here:
+    <meta name="google-site-verification" content="YOUR_TOKEN_HERE">
+  -->
+
+  <!--
+    Structured data. One connected graph rather than three loose blocks, so the
+    relationship search engines actually need to resolve — "DoctoGuide is a
+    product operated by KnocDoc" — is stated explicitly via @id references.
+
+    Deliberately NOT MedicalOrganization: DoctoGuide is a software product, not an
+    organisation that provides medical care, and typing it as one would overstate
+    what it is. Deliberately no SearchAction / sitelinks search box either: the
+    only search entry point is /triage, which robots.txt disallows and the router
+    marks noindex, so declaring it would be structured data pointing at a page
+    search engines are told not to visit.
+
+    `sameAs` lists only profiles documented in this repository (see
+    src/environments/environment.ts). Do not add a profile here without a verified
+    URL from project configuration.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://knocdoc.in/#organization",
+        "name": "KnocDoc",
+        "url": "https://knocdoc.in/",
+        "description": "Health-technology company building tools that reduce the time patients spend waiting for and preparing for medical consultations.",
+        "sameAs": [
+          "https://www.instagram.com/knocdoc_health"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://doctoguide.knocdoc.in/#website",
+        "name": "DoctoGuide by KnocDoc",
+        "alternateName": "DoctoGuide",
+        "url": "https://doctoguide.knocdoc.in/",
+        "description": "Free AI health guide and symptom checker. Describe your symptoms, understand possible explanations and urgency, and learn which specialist to see.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://knocdoc.in/#organization" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://doctoguide.knocdoc.in/#app",
+        "name": "DoctoGuide",
+        "alternateName": "DoctoGuide by KnocDoc",
+        "url": "https://doctoguide.knocdoc.in/",
+        "logo": "https://doctoguide.knocdoc.in/assets/logo.png",
+        "image": "https://doctoguide.knocdoc.in/assets/og-image.png",
+        "description": "AI health-information assistant that turns a plain-language symptom description into clear guidance, a sense of urgency, the right medical speciality to consult, and a doctor-ready summary. It does not diagnose, prescribe, or replace a physician.",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript.",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock"
+        },
+        "audience": {
+          "@type": "MedicalAudience",
+          "audienceType": "Patient"
+        },
+        "publisher": { "@id": "https://knocdoc.in/#organization" },
+        "creator": { "@id": "https://knocdoc.in/#organization" },
+        "isPartOf": { "@id": "https://doctoguide.knocdoc.in/#website" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

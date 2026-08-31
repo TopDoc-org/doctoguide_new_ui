@@ -1,0 +1,142 @@
+<div class="pin-reset">
+  <!-- Step 1: phone -->
+  <ng-container *ngIf="resetStep === 'phone'">
+    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-green-50 text-green-600">
+      <ds-icon name="chat" />
+    </div>
+    <p class="text-center text-sm font-semibold text-teal-900">Reset your PIN</p>
+    <p class="mt-1 text-center text-xs text-teal-900/60">
+      Enter your registered mobile number. We'll send a verification code via WhatsApp.
+    </p>
+
+    <div class="mt-4 flex items-center rounded-lg border border-black/10 px-3 focus-within:border-teal-600">
+      <span class="text-sm text-teal-900/60">+91</span>
+      <input
+        [(ngModel)]="resetPhone"
+        type="tel"
+        inputmode="numeric"
+        maxlength="10"
+        placeholder="10-digit mobile number"
+        (keyup.enter)="sendOtp()"
+        class="w-full bg-transparent py-2.5 pl-2 text-sm outline-none"
+      />
+    </div>
+
+    <p *ngIf="resetError" class="mt-2 text-center text-xs text-red-600">{{ resetError }}</p>
+
+    <button
+      (click)="sendOtp()"
+      [disabled]="resetLoading"
+      class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+    >
+      <ds-icon name="chat" [size]="18" *ngIf="!resetLoading" />
+      {{ resetLoading ? 'Sending…' : 'Send WhatsApp Code' }}
+    </button>
+
+    <button (click)="goBack()" class="mt-3 w-full text-center text-xs font-medium text-teal-700 hover:underline">
+      Back to login
+    </button>
+  </ng-container>
+
+  <!-- Step 2: OTP -->
+  <ng-container *ngIf="resetStep === 'otp'">
+    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+      <ds-icon name="verified_user" />
+    </div>
+    <p class="text-center text-sm font-semibold text-teal-900">Verify your number</p>
+    <p class="mt-1 text-center text-xs text-teal-900/60">
+      Enter the 6-digit code sent to
+      <strong class="text-teal-900">+91 {{ maskedPhone }}</strong>
+    </p>
+
+    <div class="mt-5">
+      <app-pin-input
+        [length]="6"
+        [hasError]="!!resetError"
+        [reset]="otpReset"
+        (pinComplete)="onOtpComplete($event)"
+        (pinChange)="onOtpChange($event)"
+      ></app-pin-input>
+    </div>
+
+    <div class="mt-3 text-center text-xs text-teal-900/60">
+      <span *ngIf="resetResendTimer > 0">Resend code in <strong>{{ resetResendTimer }}s</strong></span>
+      <button
+        *ngIf="resetResendTimer === 0"
+        type="button"
+        [disabled]="resetLoading"
+        (click)="resendOtp()"
+        class="font-medium text-teal-700 hover:underline disabled:opacity-60"
+      >
+        Resend Code
+      </button>
+    </div>
+
+    <p *ngIf="resetError" class="mt-2 text-center text-xs text-red-600">{{ resetError }}</p>
+
+    <button
+      (click)="verifyOtp()"
+      [disabled]="resetLoading"
+      class="mt-4 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+    >
+      {{ resetLoading ? 'Verifying…' : 'Verify Code' }}
+    </button>
+
+    <button (click)="changeNumber()" class="mt-3 w-full text-center text-xs font-medium text-teal-700 hover:underline">
+      Change number
+    </button>
+  </ng-container>
+
+  <!-- Step 3: new PIN (create -> confirm) -->
+  <ng-container *ngIf="resetStep === 'pin'">
+    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+      <ds-icon name="lock" />
+    </div>
+    <p class="text-center text-sm font-semibold text-teal-900">
+      {{ resetPinSubStep === 'create' ? 'Create new PIN' : 'Confirm your PIN' }}
+    </p>
+    <p class="mt-1 text-center text-xs text-teal-900/60">
+      {{ resetPinSubStep === 'create' ? "Enter a 4-digit PIN you'll use to sign in." : 'Re-enter your 4-digit PIN to confirm.' }}
+    </p>
+
+    <div class="mt-5">
+      <app-pin-input
+        *ngIf="resetPinSubStep === 'create'"
+        [length]="4"
+        [hasError]="!!resetError"
+        [reset]="pinReset"
+        (pinComplete)="onNewPinComplete($event)"
+      ></app-pin-input>
+
+      <app-pin-input
+        *ngIf="resetPinSubStep === 'confirm'"
+        [length]="4"
+        [hasError]="!!resetError"
+        [reset]="confirmReset"
+        (pinComplete)="onConfirmPinComplete($event)"
+      ></app-pin-input>
+    </div>
+
+    <p *ngIf="resetError" class="mt-3 text-center text-xs text-red-600">{{ resetError }}</p>
+    <p *ngIf="resetLoading" class="mt-3 text-center text-xs text-teal-900/50">Setting your PIN…</p>
+
+    <button
+      *ngIf="resetPinSubStep === 'confirm' && !resetLoading"
+      (click)="backToCreatePin()"
+      class="mt-4 w-full text-center text-xs font-medium text-teal-700 hover:underline"
+    >
+      Back to create PIN
+    </button>
+  </ng-container>
+
+  <!-- Step 4: success -->
+  <ng-container *ngIf="resetStep === 'success'">
+    <div class="py-2 text-center">
+      <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-600">
+        <ds-icon name="check_circle" [size]="28" />
+      </div>
+      <p class="text-sm font-semibold text-teal-900">PIN updated!</p>
+      <p class="mt-1 text-xs text-teal-900/60">Your new PIN has been set successfully.</p>
+    </div>
+  </ng-container>
+</div>

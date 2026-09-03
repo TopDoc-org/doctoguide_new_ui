@@ -4,7 +4,7 @@ import { SeoService } from '../../core/seo/seo.service';
 import { SITE_URL } from '../../core/config/site';
 import { LEGAL_CONFIG } from '../legal/legal-config';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-layout.component';
 
 /**
@@ -19,14 +19,14 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
 @Component({
   selector: 'app-contact-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SeoPageLayoutComponent],
+  imports: [RouterLink, SeoPageLayoutComponent],
   template: `
     <app-seo-page-layout
       heading="Contact DoctoGuide"
       lede="DoctoGuide is built by KnocDoc. Here's how to reach us — and what to do instead if you need medical help right now."
       ctaTitle="Just want to try DoctoGuide?"
       ctaLabel="Start free"
-    >
+      >
       <h2>If you need medical help</h2>
       <p>
         This page is not a medical service and no one here can respond to a medical emergency. In
@@ -50,24 +50,34 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
         </li>
       </ul>
 
-      <h2 *ngIf="privacyEmailKnown">Privacy and data requests</h2>
-      <p *ngIf="privacyEmailKnown">
-        For questions about your data, or to exercise your rights under the DPDP Act, write to
-        <a [href]="'mailto:' + legal.privacyEmail">{{ legal.privacyEmail }}</a>. Details of what we
-        collect and why are in the <a routerLink="/privacy">privacy policy</a>.
-      </p>
-      <p *ngIf="!privacyEmailKnown">
-        For questions about your data and the rights you have over it, see the
-        <a routerLink="/privacy">privacy policy</a>, which sets out what is collected, how it is
-        used, and how long it is kept.
-      </p>
+      @if (privacyEmailKnown) {
+        <h2>Privacy and data requests</h2>
+      }
+      @if (privacyEmailKnown) {
+        <p>
+          For questions about your data, or to exercise your rights under the DPDP Act, write to
+          <a [href]="'mailto:' + legal.privacyEmail">{{ legal.privacyEmail }}</a>. Details of what we
+          collect and why are in the <a routerLink="/privacy">privacy policy</a>.
+        </p>
+      }
+      @if (!privacyEmailKnown) {
+        <p>
+          For questions about your data and the rights you have over it, see the
+          <a routerLink="/privacy">privacy policy</a>, which sets out what is collected, how it is
+          used, and how long it is kept.
+        </p>
+      }
 
-      <h2 *ngIf="grievanceKnown">Grievance Officer</h2>
-      <p *ngIf="grievanceKnown">
-        In accordance with the DPDP Act and IT Rules, complaints can be directed to
-        {{ legal.grievanceOfficerName }} at
-        <a [href]="'mailto:' + legal.grievanceOfficerEmail">{{ legal.grievanceOfficerEmail }}</a>.
-      </p>
+      @if (grievanceKnown) {
+        <h2>Grievance Officer</h2>
+      }
+      @if (grievanceKnown) {
+        <p>
+          In accordance with the DPDP Act and IT Rules, complaints can be directed to
+          {{ legal.grievanceOfficerName }} at
+          <a [href]="'mailto:' + legal.grievanceOfficerEmail">{{ legal.grievanceOfficerEmail }}</a>.
+        </p>
+      }
 
       <h2>Reporting a problem with the guidance</h2>
       <p>
@@ -84,7 +94,7 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
         the channels above.
       </p>
     </app-seo-page-layout>
-  `,
+    `,
 })
 export class ContactPageComponent implements OnInit, OnDestroy {
   instagram = environment.instagram;

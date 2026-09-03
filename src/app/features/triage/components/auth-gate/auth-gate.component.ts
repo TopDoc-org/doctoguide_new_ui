@@ -4,7 +4,7 @@ import { AiDoctorStateService } from '../../services/ai-doctor-state.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { FirebaseAnalyticsService } from '../../../../core/analytics/firebase-analytics.service';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { PinInputComponent } from '../pin-input/pin-input.component';
@@ -31,12 +31,15 @@ const SIGNUP_SOURCE = 'aiDoctor';
 @Component({
   selector: 'app-auth-gate',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, IconComponent, PinInputComponent, PinResetComponent],
+  imports: [RouterLink, FormsModule, IconComponent, PinInputComponent, PinResetComponent],
   templateUrl: './auth-gate.component.html',
 })
 export class AuthGateComponent implements OnInit {
-  // 'pdf' | 'soap' | 'doctors' | 'home' gates run a pending action on success; null = pure login.
-  @Input() pendingAction: 'pdf' | 'soap' | 'doctors' | 'home' | null = null;
+  // 'pdf' | 'soap' | 'doctors' | 'home' | 'report' gates run a pending action on
+  // success; null = pure login. 'report' differs from the rest in that the whole
+  // feature is behind it — the report reader has nothing to show a signed-out
+  // visitor, where the consult runs anonymously and only gates its exits.
+  @Input() pendingAction: 'pdf' | 'soap' | 'doctors' | 'home' | 'report' | null = null;
   @Input() sessionId: string | null = null;
 
   // Age/sex captured during the anonymous triage chat. On a brand-new account

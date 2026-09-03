@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminApiService } from '../../services/admin-api.service';
 import { AdminAuthService } from '../../services/admin-auth.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent],
   templateUrl: './admin-login.component.html',
 })
 export class AdminLoginComponent {

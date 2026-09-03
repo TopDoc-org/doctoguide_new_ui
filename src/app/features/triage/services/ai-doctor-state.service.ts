@@ -12,6 +12,7 @@ const LS_TOKEN = 'aiDoctorToken';
 const LS_USERID = 'aiDoctorUserId';
 const LS_USERNAME = 'aiDoctorUserName';
 const LS_USERMOBILE = 'aiDoctorUserMobile';
+const LS_DOC_CONSENT = 'aiDoctorDocConsent';
 
 // Lightweight session state. sessionId persists in localStorage so a refresh
 // resumes the same anonymous session; chat history is rehydrated from the server.
@@ -91,7 +92,64 @@ export class AiDoctorStateService {
     if (m) storage.set(LS_USERMOBILE, m); else storage.remove(LS_USERMOBILE);
   }
 
-  get isLoggedIn(): boolean { return !!this.authToken; }
+  /**
+   * Is there a usable account session right now?
+   *
+   * Presence of a token is not enough. Patient calls have no expiry
+   * interceptor (the app's only one covers the owner/partner/admin consoles),
+   * so an expired JWT used to sit in localStorage forever: the header kept
+   * saying "My consults", and the chat kept asking a signed-out visitor "Who is
+   * this consultation for?" — a question that only makes sense for someone with
+   * a profile to protect. Every gated call behind that state 401s.
+   *
+   * So the expiry is read off the token itself and a dead session is cleared on
+   * the spot. The claims are NOT trusted for anything else — the server still
+   * verifies the signature; this only decides what the UI offers.
+   */
+  get isLoggedIn(): boolean {
+    const token = this.authToken;
+    if (!token) return false;
+    if (this.isExpired(token)) {
+      this.logout();
+      return false;
+    }
+    return true;
+  }
+
+  /** True only when the JWT says, in its own payload, that it has expired. */
+  private isExpired(token: string): boolean {
+    const exp = this.tokenExpiry(token);
+    // No `exp` claim, or a token we cannot parse: leave it alone. A malformed
+    // token is the server's call to reject, and logging the user out on a
+    // parsing quirk would be the worse failure of the two.
+    return exp !== null && exp * 1000 <= Date.now();
+  }
+
+  /** `exp` (seconds since epoch) out of a JWT payload, or null. */
+  private tokenExpiry(token: string): number | null {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    try {
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64 + '=='.slice(0, (4 - (base64.length % 4)) % 4))
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(''),
+      );
+      const exp = JSON.parse(json)?.exp;
+      return typeof exp === 'number' ? exp : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Consent to upload a medical document for explanation. Asked once per
+  // device, then remembered — unlike the per-chat consent above, which is
+  // deliberately re-asked on every new consult. Survives reset(): it is a
+  // standing permission about this account's files, not chat state.
+  get docConsent(): boolean { return storage.get(LS_DOC_CONSENT) === '1'; }
+  set docConsent(v: boolean) { storage.set(LS_DOC_CONSENT, v ? '1' : '0'); }
 
   logout(): void {
     this.authToken = null;

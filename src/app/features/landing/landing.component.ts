@@ -7,15 +7,15 @@ import { AiDoctorStateService } from '../../features/triage/services/ai-doctor-s
 import { SeoService } from '../../core/seo/seo.service';
 import { FirebaseAnalyticsService } from '../../core/analytics/firebase-analytics.service';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../design-system/icon/icon.component';
-import { CarouselComponent } from '../../design-system/carousel/carousel.component';
+import { TypewriterComponent } from '../../design-system/typewriter/typewriter.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, IconComponent, CarouselComponent],
+  imports: [RouterLink, FormsModule, IconComponent, TypewriterComponent],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
@@ -27,32 +27,22 @@ export class LandingComponent implements OnInit, OnDestroy {
   instagramUrl = environment.instagram.url;
   instagramHandle = environment.instagram.handle;
 
-  // Rotating hero slides (text-only carousel) — headline + supporting line.
-  heroSlides = [
-    {
-      title: 'Ask anything, free',
-      text: 'Describe your symptoms or ask any health question — no sign-up, no credit card, no friction.',
-    },
-    {
-      title: 'Talk in any language',
-      text: 'Type or talk in any language — English, हिन्दी, Hinglish — or just ask the AI to switch to any language you like, anytime.',
-    },
-    {
-      title: 'Find the right specialist',
-      text: "Not sure who to see? We read your concern and point you to the right speciality — so you don't guess.",
-    },
-    {
-      title: 'A clear, shareable summary',
-      text: 'Get an easy-to-read summary of your concern that you can carry to any doctor.',
-    },
-    {
-      title: 'Understand the jargon',
-      text: 'Confused by a lab report or a medicine? Ask in plain language and get a clear, calm answer.',
-    },
-    {
-      title: 'Doctors near you',
-      text: 'Find doctors close by in seconds, matched to what you actually need.',
-    },
+  /**
+   * The hero line, typed one phrase at a time.
+   *
+   * Written as problems, not features: a visitor arrives holding a lab report
+   * they cannot read or a symptom they are worried about, and recognises their
+   * own situation faster than a feature name. Order is deliberate — the two
+   * things nothing else free does (reading a report, reading handwriting) come
+   * first, and the phrase a crawler and a no-JS visitor see is phrase one.
+   */
+  heroPhrases = [
+    'Understand your lab report, in plain words.',
+    "Read your doctor's handwriting for you.",
+    'Know which medicine to take when — before or after food.',
+    'Describe a symptom, in any language.',
+    'Find out which specialist you actually need.',
+    'Carry a clear summary to your next visit.',
   ];
 
   // Example queries typed into the input placeholder, one after another.

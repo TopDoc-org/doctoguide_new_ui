@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { jsPDF } from 'jspdf';
+import type { jsPDF } from 'jspdf';
 import { Report } from '../models';
 
 // Generates the health report + SOAP note as PDFs entirely on the client from
@@ -12,24 +12,42 @@ export class ReportPdfService {
 
   // ---- public API ----------------------------------------------------------
 
-  downloadReport(report: Report, appName: string, fileName: string): void {
-    const w = this.newWriter(report, appName, 'Health Summary');
+  async downloadReport(report: Report, appName: string, fileName: string): Promise<void> {
+    const w = this.newWriter(await this.jsPdfCtor(), report, appName, 'Health Summary');
     this.writeFullReport(w, report);
     this.finish(w, report);
     w.doc.save(fileName);
   }
 
-  downloadSoap(report: Report, appName: string, fileName: string): void {
-    const w = this.newWriter(report, appName, 'Clinical SOAP Note');
+  async downloadSoap(report: Report, appName: string, fileName: string): Promise<void> {
+    const w = this.newWriter(await this.jsPdfCtor(), report, appName, 'Clinical SOAP Note');
     this.writeSoap(w, report);
     this.finish(w, report);
     w.doc.save(fileName);
   }
 
+  // jsPDF — and the canvg / html2canvas / dompurify tail it drags in — was
+  // landing in the triage-shell chunk purely because this service is
+  // constructor-injected there. That is ~340 kB of the chat route's download,
+  // paid for by every consult and used only by the few who tap Download.
+  // Importing it on demand moves it off the critical path; the click already
+  // waits on a file-save dialog, so the extra fetch is not perceptible.
+  private ctor?: typeof import('jspdf').jsPDF;
+
+  private async jsPdfCtor(): Promise<typeof import('jspdf').jsPDF> {
+    this.ctor ??= (await import('jspdf')).jsPDF;
+    return this.ctor;
+  }
+
   // ---- writer plumbing ------------------------------------------------------
 
-  private newWriter(report: Report, appName: string, docTitle: string): Writer {
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  private newWriter(
+    JsPDF: typeof import('jspdf').jsPDF,
+    report: Report,
+    appName: string,
+    docTitle: string
+  ): Writer {
+    const doc = new JsPDF({ unit: 'pt', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
     const w: Writer = {

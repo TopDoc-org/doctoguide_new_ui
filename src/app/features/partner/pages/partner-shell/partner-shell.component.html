@@ -13,7 +13,7 @@
         </div>
       </div>
       <button (click)="logout()" aria-label="Log out"
-        class="flex min-h-[44px] items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        class="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-xl px-3 py-1.5 sm:justify-start text-sm font-medium text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
         <ds-icon name="logout" [size]="18" />
         <span class="hidden sm:inline">Log out</span>
       </button>
@@ -21,19 +21,19 @@
 
     <nav aria-label="Partner sections" class="mx-auto mt-3 flex max-w-5xl gap-1.5 overflow-x-auto whitespace-nowrap">
       <a routerLink="/partner/dashboard" routerLinkActive="bg-grass-600 !text-white shadow-sm"
-        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]">
         <ds-icon name="space_dashboard" [size]="17" />Overview
       </a>
       <a routerLink="/partner/campaigns" routerLinkActive="bg-grass-600 !text-white shadow-sm"
-        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]">
         <ds-icon name="campaign" [size]="17" />Campaigns
       </a>
       <a routerLink="/partner/leads" routerLinkActive="bg-grass-600 !text-white shadow-sm"
-        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]">
         <ds-icon name="group" [size]="17" />Leads
       </a>
       <a routerLink="/partner/offers" routerLinkActive="bg-grass-600 !text-white shadow-sm"
-        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+        class="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]">
         <ds-icon name="local_offer" [size]="17" />Offers
       </a>
     </nav>

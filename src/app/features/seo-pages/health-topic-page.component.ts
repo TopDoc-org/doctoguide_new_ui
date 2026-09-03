@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { SeoService } from '../../core/seo/seo.service';
 import { SITE_URL } from '../../core/config/site';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-layout.component';
 import {
   EMERGENCY_DISCLAIMER,
@@ -26,79 +26,96 @@ import {
 @Component({
   selector: 'app-health-topic-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SeoPageLayoutComponent],
+  imports: [RouterLink, SeoPageLayoutComponent],
   template: `
-    <app-seo-page-layout
-      *ngIf="topic"
-      [heading]="topic.heading"
-      [lede]="topic.lede"
-      ctaTitle="Describe your symptoms and get specific guidance"
-      ctaLabel="Check my symptoms free"
-    >
-      <nav aria-label="Breadcrumb" class="mb-6 text-sm">
-        <a routerLink="/">Home</a>
-        <span class="mx-1.5 text-teal-900/40">/</span>
-        <a routerLink="/health-topics">Health topics</a>
-        <span class="mx-1.5 text-teal-900/40">/</span>
-        <span class="text-teal-900/60">{{ topic.label }}</span>
-      </nav>
-
-      <h2>Get medical help immediately if any of these apply</h2>
-      <ul>
-        <li *ngFor="let f of topic.redFlags">{{ f }}</li>
-      </ul>
-      <p>
-        <strong>{{ emergencyNote }}</strong> In India, call <strong>112</strong> for any emergency
-        or <strong>108</strong> for an ambulance. Elsewhere, use your
-        <a routerLink="/emergency-numbers">local emergency number</a>.
-      </p>
-
-      <ng-container *ngFor="let s of topic.sections">
-        <h2>{{ s.heading }}</h2>
-        <p *ngFor="let p of s.paragraphs">{{ p }}</p>
-        <ol *ngIf="s.items && s.ordered">
-          <li *ngFor="let i of s.items">{{ i }}</li>
-        </ol>
-        <ul *ngIf="s.items && !s.ordered">
-          <li *ngFor="let i of s.items">{{ i }}</li>
+    @if (topic) {
+      <app-seo-page-layout
+        [heading]="topic.heading"
+        [lede]="topic.lede"
+        ctaTitle="Describe your symptoms and get specific guidance"
+        ctaLabel="Check my symptoms free"
+        >
+        <nav aria-label="Breadcrumb" class="mb-6 text-sm">
+          <a routerLink="/">Home</a>
+          <span class="mx-1.5 text-teal-900/40">/</span>
+          <a routerLink="/health-topics">Health topics</a>
+          <span class="mx-1.5 text-teal-900/40">/</span>
+          <span class="text-teal-900/60">{{ topic.label }}</span>
+        </nav>
+        <h2>Get medical help immediately if any of these apply</h2>
+        <ul>
+          @for (f of topic.redFlags; track $index) {
+            <li>{{ f }}</li>
+          }
         </ul>
-      </ng-container>
-
-      <h2>Which doctor treats this</h2>
-      <p>
-        Picking the wrong speciality for a first consultation costs time and money. These are the
-        specialities that commonly handle this, though your particular situation may point
-        elsewhere — <a routerLink="/which-specialist-to-see">work out which specialist to see</a>.
-      </p>
-      <ul>
-        <li *ngFor="let s of topic.specialists">{{ s }}</li>
-      </ul>
-
-      <h2>Questions worth asking your doctor</h2>
-      <ul>
-        <li *ngFor="let q of topic.askYourDoctor">{{ q }}</li>
-      </ul>
-
-      <h2>How DoctoGuide can help</h2>
-      <p>
-        This page is general information — it cannot know your age, history, medicines, or how your
-        symptoms actually present. DoctoGuide asks those follow-up questions, then gives you
-        guidance specific to what you described, a sense of urgency, the speciality to see, and a
-        written summary to take into the consultation. It is free and needs no account.
-      </p>
-      <p>
-        DoctoGuide does not diagnose, prescribe, or replace a doctor. What it can and cannot do is
-        set out on the <a routerLink="/medical-safety">medical safety page</a>.
-      </p>
-
-      <h2 *ngIf="relatedTopics.length">Related topics</h2>
-      <ul *ngIf="relatedTopics.length">
-        <li *ngFor="let r of relatedTopics">
-          <a [routerLink]="['/health-topics', r.slug]">{{ r.heading }}</a>
-        </li>
-      </ul>
-    </app-seo-page-layout>
-  `,
+        <p>
+          <strong>{{ emergencyNote }}</strong> In India, call <strong>112</strong> for any emergency
+          or <strong>108</strong> for an ambulance. Elsewhere, use your
+          <a routerLink="/emergency-numbers">local emergency number</a>.
+        </p>
+        @for (s of topic.sections; track s) {
+          <h2>{{ s.heading }}</h2>
+          @for (p of s.paragraphs; track $index) {
+            <p>{{ p }}</p>
+          }
+          @if (s.items && s.ordered) {
+            <ol>
+              @for (i of s.items; track $index) {
+                <li>{{ i }}</li>
+              }
+            </ol>
+          }
+          @if (s.items && !s.ordered) {
+            <ul>
+              @for (i of s.items; track $index) {
+                <li>{{ i }}</li>
+              }
+            </ul>
+          }
+        }
+        <h2>Which doctor treats this</h2>
+        <p>
+          Picking the wrong speciality for a first consultation costs time and money. These are the
+          specialities that commonly handle this, though your particular situation may point
+          elsewhere — <a routerLink="/which-specialist-to-see">work out which specialist to see</a>.
+        </p>
+        <ul>
+          @for (s of topic.specialists; track $index) {
+            <li>{{ s }}</li>
+          }
+        </ul>
+        <h2>Questions worth asking your doctor</h2>
+        <ul>
+          @for (q of topic.askYourDoctor; track $index) {
+            <li>{{ q }}</li>
+          }
+        </ul>
+        <h2>How DoctoGuide can help</h2>
+        <p>
+          This page is general information — it cannot know your age, history, medicines, or how your
+          symptoms actually present. DoctoGuide asks those follow-up questions, then gives you
+          guidance specific to what you described, a sense of urgency, the speciality to see, and a
+          written summary to take into the consultation. It is free and needs no account.
+        </p>
+        <p>
+          DoctoGuide does not diagnose, prescribe, or replace a doctor. What it can and cannot do is
+          set out on the <a routerLink="/medical-safety">medical safety page</a>.
+        </p>
+        @if (relatedTopics.length) {
+          <h2>Related topics</h2>
+        }
+        @if (relatedTopics.length) {
+          <ul>
+            @for (r of relatedTopics; track r) {
+              <li>
+                <a [routerLink]="['/health-topics', r.slug]">{{ r.heading }}</a>
+              </li>
+            }
+          </ul>
+        }
+      </app-seo-page-layout>
+    }
+    `,
 })
 export class HealthTopicPageComponent implements OnInit, OnDestroy {
   topic?: HealthTopic;

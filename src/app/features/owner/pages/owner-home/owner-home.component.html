@@ -25,9 +25,11 @@
   </button>
 </div>
 
-<p *ngIf="error" role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+@if (error) {
+  <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+}
 
-<ng-container *ngIf="data as d">
+@if (data; as d) {
   <!-- KPI cards -->
   <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
     <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
@@ -52,56 +54,67 @@
       <p class="text-xs text-white/75">{{ d.conversions | number }} proceeded</p>
     </div>
   </div>
-
   <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
     <!-- top clinics -->
     <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
       <p class="font-grotesk font-bold tracking-tight text-stone-900">Top clinics by leads</p>
-      <ul *ngIf="d.topClinics?.length; else noData" class="mt-3 space-y-2.5">
-        <li *ngFor="let c of d.topClinics">
-          <div class="flex items-center justify-between text-sm">
-            <span class="truncate text-stone-700">{{ c.clinicName }}</span>
-            <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
-          </div>
-          <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
-            <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(c.leads, clinicMax)"></div>
-          </div>
-        </li>
-      </ul>
+      @if (d.topClinics?.length) {
+        <ul class="mt-3 space-y-2.5">
+          @for (c of d.topClinics; track c) {
+            <li>
+              <div class="flex items-center justify-between text-sm">
+                <span class="truncate text-stone-700">{{ c.clinicName }}</span>
+                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+              </div>
+              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+                <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(c.leads, clinicMax)"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="mt-3 text-sm text-stone-400">No data in this range yet.</p>
+      }
     </div>
-
     <!-- top campaigns -->
     <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
       <p class="font-grotesk font-bold tracking-tight text-stone-900">Top campaigns by leads</p>
-      <ul *ngIf="d.topCampaigns?.length; else noData" class="mt-3 space-y-2.5">
-        <li *ngFor="let c of d.topCampaigns">
-          <div class="flex items-center justify-between text-sm">
-            <span class="truncate text-stone-700">{{ c.campaign }}</span>
-            <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
-          </div>
-          <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
-            <div class="h-full rounded-full bg-amber-400" [style.width.%]="pct(c.leads, campaignMax)"></div>
-          </div>
-        </li>
-      </ul>
+      @if (d.topCampaigns?.length) {
+        <ul class="mt-3 space-y-2.5">
+          @for (c of d.topCampaigns; track c) {
+            <li>
+              <div class="flex items-center justify-between text-sm">
+                <span class="truncate text-stone-700">{{ c.campaign }}</span>
+                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+              </div>
+              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+                <div class="h-full rounded-full bg-amber-400" [style.width.%]="pct(c.leads, campaignMax)"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="mt-3 text-sm text-stone-400">No data in this range yet.</p>
+      }
     </div>
   </div>
-
   <!-- by state -->
-  <div *ngIf="d.byState?.length" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-    <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by state</p>
-    <ul class="mt-3 space-y-2.5">
-      <li *ngFor="let s of d.byState">
-        <div class="flex items-center justify-between text-sm">
-          <span class="truncate text-stone-700">{{ s.state || '—' }}</span>
-          <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ s.leads | number }}</span>
-        </div>
-        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
-          <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(s.leads, stateMax)"></div>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <ng-template #noData><p class="mt-3 text-sm text-stone-400">No data in this range yet.</p></ng-template>
-</ng-container>
+  @if (d.byState?.length) {
+    <div class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+      <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by state</p>
+      <ul class="mt-3 space-y-2.5">
+        @for (s of d.byState; track s) {
+          <li>
+            <div class="flex items-center justify-between text-sm">
+              <span class="truncate text-stone-700">{{ s.state || '—' }}</span>
+              <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ s.leads | number }}</span>
+            </div>
+            <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+              <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(s.leads, stateMax)"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+}

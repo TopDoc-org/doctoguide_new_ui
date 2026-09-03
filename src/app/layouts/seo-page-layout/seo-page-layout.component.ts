@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { IconComponent } from '../../design-system/icon/icon.component';
 
 // Shared chrome for the public SEO/content pages: header, hero (H1 + lede),
@@ -10,17 +10,17 @@ import { IconComponent } from '../../design-system/icon/icon.component';
 @Component({
   selector: 'app-seo-page-layout',
   standalone: true,
-  imports: [RouterLink, CommonModule, IconComponent],
+  imports: [RouterLink, IconComponent],
   template: `
     <div class="min-h-screen bg-cream">
       <header class="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-        <a routerLink="/" class="flex items-center gap-1 font-heading text-xl font-extrabold text-teal-900">
+        <a routerLink="/" class="flex items-center gap-1 font-heading text-xl font-extrabold text-teal-900 coarse:min-h-[44px]">
           <span class="truncate">{{ appName }}</span>
           <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
         </a>
         <a
           routerLink="/triage"
-          class="rounded-full bg-teal-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-700"
+          class="rounded-full bg-teal-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-700 coarse:min-h-[44px] coarse:inline-flex coarse:items-center"
         >Get started</a>
       </header>
 
@@ -39,7 +39,7 @@ import { IconComponent } from '../../design-system/icon/icon.component';
           <a
             routerLink="/triage"
             class="mt-4 inline-flex items-center gap-1 rounded-xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-700"
-          >
+            >
             {{ ctaLabel }}
             <ds-icon name="arrow_forward" [size]="18" />
           </a>
@@ -49,9 +49,11 @@ import { IconComponent } from '../../design-system/icon/icon.component';
         <nav class="mt-12 border-t border-black/5 pt-6">
           <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Explore DoctoGuide</p>
           <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <li *ngFor="let l of links">
-              <a [routerLink]="l.path" class="text-teal-700 underline hover:text-teal-900">{{ l.label }}</a>
-            </li>
+            @for (l of links; track l) {
+              <li>
+                <a [routerLink]="l.path" class="text-teal-700 underline hover:text-teal-900">{{ l.label }}</a>
+              </li>
+            }
           </ul>
         </nav>
 
@@ -62,13 +64,13 @@ import { IconComponent } from '../../design-system/icon/icon.component';
         </p>
 
         <footer class="mt-6 border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
-          <a routerLink="/privacy" class="hover:text-teal-700">Privacy Policy</a>
+          <a routerLink="/privacy" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Privacy Policy</a>
           <span class="mx-2">·</span>
-          <a routerLink="/terms" class="hover:text-teal-700">Terms of Use</a>
+          <a routerLink="/terms" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Terms of Use</a>
           <span class="mx-2">·</span>
-          <a routerLink="/disclaimer" class="hover:text-teal-700">Medical Disclaimer</a>
+          <a routerLink="/disclaimer" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Medical Disclaimer</a>
           <span class="mx-2">·</span>
-          <a routerLink="/contact" class="hover:text-teal-700">Contact</a>
+          <a routerLink="/contact" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Contact</a>
 
           <!-- Who operates the site and how to reach them, on every public page. -->
           <p class="mt-3 leading-relaxed">
@@ -81,7 +83,7 @@ import { IconComponent } from '../../design-system/icon/icon.component';
         </footer>
       </main>
     </div>
-  `,
+    `,
   // Prose styles for the projected content live in src/styles.scss, not here.
   // <ng-content> nodes carry the parent component's _ngcontent attribute, so
   // emulated-encapsulation rules written in this component never match them.

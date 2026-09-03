@@ -52,8 +52,9 @@ export interface PartnerMetrics {
   clicks: number;
   leads: number;
   conversions: number; // leads that proceeded (e.g. booked / connected)
-  series: MetricPoint[];
-  topSpecialties: SpecialtyCount[];
+  // Optional: API-response shape, and every reader guards with `|| []`.
+  series?: MetricPoint[];
+  topSpecialties?: SpecialtyCount[];
   byCampaign?: CampaignCount[];
   byDistrict?: DistrictCount[];
 }

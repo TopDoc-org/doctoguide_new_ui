@@ -20,6 +20,7 @@ const FALLBACK_ICON = 'circle';
 
 const MATERIAL_ICON_MAP: Record<string, string> = {
   add: 'plus',
+  attach_file: 'paperclip',
   alt_route: 'route',
   add_comment: 'message-square-plus',
   ads_click: 'mouse-pointer-click',
@@ -76,6 +77,8 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   person: 'user',
   place: 'map-pin',
   refresh: 'refresh-cw',
+  // Before/after food on a prescription readout.
+  restaurant: 'utensils',
   remove: 'minus',
   schedule: 'clock',
   science: 'flask-conical',

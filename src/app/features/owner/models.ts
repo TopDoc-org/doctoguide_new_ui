@@ -53,10 +53,11 @@ export interface OwnerSummary {
   conversions: number;
   clinicsCount: number;
   campaignsCount: number;
-  topClinics: ClinicLeadCount[];
-  topCampaigns: CampaignLeadCount[];
-  byState: StateLeadCount[];
-  topSpecialties: SpecialtyCount[];
+  // Optional: API-response shape, and every reader guards with `|| []`.
+  topClinics?: ClinicLeadCount[];
+  topCampaigns?: CampaignLeadCount[];
+  byState?: StateLeadCount[];
+  topSpecialties?: SpecialtyCount[];
 }
 
 // One row of the cross-clinic campaign explorer.

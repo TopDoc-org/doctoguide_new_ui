@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OwnerApiService } from '../../services/owner-api.service';
 import { OwnerAuthService } from '../../services/owner-auth.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 
 @Component({
   selector: 'app-owner-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [FormsModule, IconComponent],
   templateUrl: './owner-login.component.html',
 })
 export class OwnerLoginComponent {

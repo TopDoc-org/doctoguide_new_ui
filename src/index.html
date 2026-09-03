@@ -50,13 +50,21 @@
       - the build no longer fails when fonts.googleapis.com is unreachable;
       - Material Icons died with the PrimeNG/Material removal (see ds-icon).
 
-    Only the two faces needed for first paint are preloaded. Noto Sans
-    Devanagari is NOT preloaded — its unicode-range means it is fetched only
-    when Devanagari text actually appears, which is not the case on any
-    prerendered public page.
+    Only the faces on the first-paint path are preloaded, and only their `latin`
+    subsets: DM Sans (all body copy), Outfit (every heading) and Fraunces (the
+    hero and the SEO ledes). Space Grotesk is NOT preloaded — it is only used by
+    the console realms, which are noindex and behind a login.
+
+    Noto Sans Devanagari is NOT preloaded either: its unicode-range means it is
+    fetched only when Devanagari text actually appears, which is never the case
+    on a prerendered public page.
+
+    The `latin-ext` files are likewise left to unicode-range — preloading a face
+    that usually never downloads is how you waste the user's first 100 KB.
   -->
-  <link rel="preload" as="font" type="font/woff2" href="fonts/clash-display-700.woff2" crossorigin>
-  <link rel="preload" as="font" type="font/woff2" href="fonts/clash-display-600.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/dm-sans-latin.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
 
   <!--
     Google Search Console verification. Prefer the DNS TXT method on the

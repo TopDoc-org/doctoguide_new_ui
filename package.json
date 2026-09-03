@@ -17,6 +17,7 @@
     "serve:ssr:doctoguide": "node dist/doctoguide/server/server.mjs",
     "seo:check": "node scripts/seo-check.js",
     "parity": "node scripts/parity-diff.mjs dist/doctoguide/browser ../doctoguide-baseline",
+    "parity:behaviour": "node scripts/parity-behaviour.mjs ../AIDoctorFront .",
     "serve:cap": "node scripts/serve-cap.mjs",
     "prerender:check": "node scripts/check-prerender-list.mjs"
   },

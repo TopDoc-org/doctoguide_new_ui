@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { FirebaseAnalyticsService } from '../../core/analytics/firebase-analytics.service';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../design-system/icon/icon.component';
 
@@ -41,7 +41,7 @@ import { IconComponent } from '../../design-system/icon/icon.component';
 @Component({
   selector: 'app-ad-landing',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, IconComponent],
+  imports: [RouterLink, FormsModule, IconComponent],
   templateUrl: './ad-landing.component.html',
 })
 export class AdLandingComponent implements OnInit, OnDestroy {

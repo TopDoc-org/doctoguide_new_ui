@@ -21,85 +21,109 @@
       <label for="f-clinic" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Clinic</label>
       <select id="f-clinic" [(ngModel)]="clinicId" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
         <option value="">All clinics</option>
-        <option *ngFor="let c of filters.clinics" [value]="c.clinicId">{{ c.name }}</option>
+        @for (c of filters.clinics; track $index) {
+          <option [value]="c.clinicId">{{ c.name }}</option>
+        }
       </select>
     </div>
     <div>
       <label for="f-state" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">State</label>
       <select id="f-state" [(ngModel)]="state" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
         <option value="">All states</option>
-        <option *ngFor="let s of filters.states" [value]="s">{{ s }}</option>
+        @for (s of filters.states; track $index) {
+          <option [value]="s">{{ s }}</option>
+        }
       </select>
     </div>
     <div>
       <label for="f-district" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">District</label>
       <select id="f-district" [(ngModel)]="district" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
         <option value="">All districts</option>
-        <option *ngFor="let d of filters.districts" [value]="d">{{ d }}</option>
+        @for (d of filters.districts; track $index) {
+          <option [value]="d">{{ d }}</option>
+        }
       </select>
     </div>
     <div>
       <label for="f-specialty" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Specialty</label>
       <select id="f-specialty" [(ngModel)]="specialty" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
         <option value="">All specialties</option>
-        <option *ngFor="let sp of filters.specialties" [value]="sp">{{ sp }}</option>
+        @for (sp of filters.specialties; track $index) {
+          <option [value]="sp">{{ sp }}</option>
+        }
       </select>
     </div>
-    <div *ngIf="filters.campaigns.length">
-      <label for="f-campaign" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Campaign</label>
-      <select id="f-campaign" [(ngModel)]="campaign" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
-        <option value="">All campaigns</option>
-        <option *ngFor="let cp of filters.campaigns" [value]="cp">{{ cp }}</option>
-      </select>
-    </div>
+    @if (filters.campaigns.length) {
+      <div>
+        <label for="f-campaign" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Campaign</label>
+        <select id="f-campaign" [(ngModel)]="campaign" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+          <option value="">All campaigns</option>
+          @for (cp of filters.campaigns; track $index) {
+            <option [value]="cp">{{ cp }}</option>
+          }
+        </select>
+      </div>
+    }
     <div class="sm:col-span-2 lg:col-span-3">
       <label for="f-q" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Search</label>
       <input id="f-q" type="search" [(ngModel)]="q" (keyup.enter)="load(1)" placeholder="Name or mobile"
         class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      </div>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-center gap-2">
+      <button (click)="load(1)" [disabled]="loading"
+        class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+        {{ loading ? 'Loading…' : 'Apply filters' }}
+      </button>
+      <button (click)="reset()" [disabled]="loading"
+        class="min-h-[44px] rounded-xl border border-sand-200 px-4 py-2 text-sm font-medium text-stone-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+        Reset
+      </button>
+      <button (click)="exportCsv()" [disabled]="exporting" aria-label="Export filtered leads to Excel (CSV)"
+        class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+        <ds-icon name="download" [size]="16" />
+        {{ exporting ? 'Exporting…' : 'Export Excel (CSV)' }}
+      </button>
     </div>
   </div>
 
-  <div class="mt-3 flex flex-wrap items-center gap-2">
-    <button (click)="load(1)" [disabled]="loading"
-      class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
-      {{ loading ? 'Loading…' : 'Apply filters' }}
-    </button>
-    <button (click)="reset()" [disabled]="loading"
-      class="min-h-[44px] rounded-xl border border-sand-200 px-4 py-2 text-sm font-medium text-stone-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
-      Reset
-    </button>
-    <button (click)="exportCsv()" [disabled]="exporting" aria-label="Export filtered leads to Excel (CSV)"
-      class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
-      <ds-icon name="download" [size]="16" />
-      {{ exporting ? 'Exporting…' : 'Export Excel (CSV)' }}
-    </button>
-  </div>
-</div>
+  @if (error) {
+    <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+  }
 
-<p *ngIf="error" role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
-
-<!-- mobile cards -->
-<div class="mt-4 space-y-2 sm:hidden">
-  <div *ngFor="let l of leads" class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-    <div class="flex items-start justify-between gap-2">
-      <p class="font-grotesk font-bold text-stone-900">{{ l.name }}</p>
-      <span class="shrink-0 text-xs text-stone-400">{{ l.createdAt | date:'mediumDate' }}</span>
+  <!-- mobile cards -->
+  <div class="mt-4 space-y-2 sm:hidden">
+    @for (l of leads; track l) {
+      <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+        <div class="flex items-start justify-between gap-2">
+          <p class="font-grotesk font-bold text-stone-900">{{ l.name }}</p>
+          <span class="shrink-0 text-xs text-stone-400">{{ l.createdAt | date:'mediumDate' }}</span>
+        </div>
+        <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
+          <ds-icon name="call" [size]="14" />{{ l.mobile }}
+        </a>
+        <p class="mt-1 text-xs font-medium text-grass-700">{{ l.clinicName || 'No clinic' }}</p>
+        <p class="mt-0.5 text-xs text-stone-500">
+          {{ l.city || '—' }}@if (l.district) {
+          <span> · {{ l.district }}</span>
+          }@if (l.state) {
+          <span> · {{ l.state }}</span>
+        }
+      </p>
+      <p class="mt-0.5 text-xs text-stone-500">{{ l.specialty || 'No specialty' }}</p>
+      @if (l.campaign) {
+        <p class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
+          <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+        </p>
+      }
     </div>
-    <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
-      <ds-icon name="call" [size]="14" />{{ l.mobile }}
-    </a>
-    <p class="mt-1 text-xs font-medium text-grass-700">{{ l.clinicName || 'No clinic' }}</p>
-    <p class="mt-0.5 text-xs text-stone-500">
-      {{ l.city || '—' }}<span *ngIf="l.district"> · {{ l.district }}</span><span *ngIf="l.state"> · {{ l.state }}</span>
+  }
+  @if (!leads.length && !loading) {
+    <p class="rounded-2xl bg-white p-6 text-center text-sm text-stone-400 ring-1 ring-sand-200">
+      No leads match these filters.
     </p>
-    <p class="mt-0.5 text-xs text-stone-500">{{ l.specialty || 'No specialty' }}</p>
-    <p *ngIf="l.campaign" class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
-      <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
-    </p>
-  </div>
-  <p *ngIf="!leads.length && !loading" class="rounded-2xl bg-white p-6 text-center text-sm text-stone-400 ring-1 ring-sand-200">
-    No leads match these filters.
-  </p>
+  }
 </div>
 
 <!-- desktop table -->
@@ -119,31 +143,37 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let l of leads" class="border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50">
-        <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
-        <td class="px-4 py-3 tabular-nums text-stone-700">{{ l.mobile }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.clinicName || '—' }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.city || '—' }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.district || '—' }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.state || '—' }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.specialty || '—' }}</td>
-        <td class="px-4 py-3 text-stone-700">{{ l.campaign || '—' }}</td>
-        <td class="px-4 py-3 text-stone-400">{{ l.createdAt | date:'medium' }}</td>
-      </tr>
-      <tr *ngIf="!leads.length && !loading">
-        <td colspan="9" class="px-4 py-8 text-center text-stone-400">No leads match these filters.</td>
-      </tr>
+      @for (l of leads; track l) {
+        <tr class="border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50">
+          <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
+          <td class="px-4 py-3 tabular-nums text-stone-700">{{ l.mobile }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.clinicName || '—' }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.city || '—' }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.district || '—' }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.state || '—' }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.specialty || '—' }}</td>
+          <td class="px-4 py-3 text-stone-700">{{ l.campaign || '—' }}</td>
+          <td class="px-4 py-3 text-stone-400">{{ l.createdAt | date:'medium' }}</td>
+        </tr>
+      }
+      @if (!leads.length && !loading) {
+        <tr>
+          <td colspan="9" class="px-4 py-8 text-center text-stone-400">No leads match these filters.</td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>
 
 <!-- pagination -->
-<div *ngIf="total > pageSize" class="mt-3 flex items-center justify-between text-sm text-stone-600">
-  <span>Page {{ page }} of {{ totalPages }} · {{ total | number }} leads</span>
-  <div class="flex gap-2">
-    <button (click)="prev()" [disabled]="page <= 1"
+@if (total > pageSize) {
+  <div class="mt-3 flex items-center justify-between text-sm text-stone-600">
+    <span>Page {{ page }} of {{ totalPages }} · {{ total | number }} leads</span>
+    <div class="flex gap-2">
+      <button (click)="prev()" [disabled]="page <= 1"
       class="min-h-[44px] rounded-lg border border-sand-200 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Previous</button>
-    <button (click)="next()" [disabled]="page >= totalPages"
+      <button (click)="next()" [disabled]="page >= totalPages"
       class="min-h-[44px] rounded-lg border border-sand-200 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
+    </div>
   </div>
-</div>
+}

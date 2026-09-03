@@ -1,0 +1,344 @@
+<!-- One wrapper, one rhythm. The card is rendered both on the report-reader
+     page and inside a chat turn, and neither parent can space its internals —
+     the gaps between these sections have to live here. -->
+<div class="space-y-5">
+
+  <!-- headline + urgency -->
+  <ds-card>
+    @if (urgency() === 'emergency') {
+      <div class="mb-4 flex items-start gap-2.5 rounded-lg bg-red-50 px-4 py-3 text-red-700">
+        <ds-icon name="emergency" [size]="18" class="mt-0.5 shrink-0" />
+        <p class="text-[15px] font-medium leading-relaxed">
+          {{ a().urgencyReason || 'This needs medical attention today.' }}
+        </p>
+      </div>
+    } @else {
+      <p class="mb-2.5 text-xs font-medium uppercase tracking-wide text-teal-900/40">
+        {{ urgencyLabel(urgency()) }}
+      </p>
+    }
+    <h2 class="font-heading text-lg font-semibold leading-snug text-teal-900">
+      {{ a().headline }}
+    </h2>
+    @if (cached()) {
+      <p class="mt-3 text-sm leading-relaxed text-teal-900/45">
+        You've uploaded this file before — showing the same explanation, and it hasn't
+        used one of today's.
+      </p>
+    }
+  </ds-card>
+
+  <!-- couldn't read it properly: say so before anything else, so a
+       guessy answer is never the first thing the patient trusts -->
+  @if (a().legibility === 'poor') {
+    <ds-card>
+      <div class="flex items-start gap-3">
+        <ds-icon name="info" [size]="18" class="mt-0.5 shrink-0 text-amber-600" />
+        <div>
+          <p class="text-[15px] font-medium text-teal-900">This photo was hard to read</p>
+          <p class="mt-1.5 text-[15px] leading-relaxed text-teal-900/70">
+            Anything below may be incomplete. A sharper, well-lit photo taken straight
+            on — or the PDF, if you have it — gets a much better answer.
+          </p>
+          <ds-button class="mt-4 block" variant="secondary" size="sm" (pressed)="retake.emit()">
+            Try another photo
+          </ds-button>
+        </div>
+      </div>
+    </ds-card>
+  }
+
+  <!-- ── prescription: what the doctor actually wrote ────────────────────
+       Everything a patient has to act on is stated in words: which medicine,
+       how much, in which slots of the day, before or after food, for how long.
+       "1-0-1 p.c. x 5d" is the line they cannot decode, so it is shown last,
+       as the source, rather than as the instruction. -->
+  @if (a().medicines?.length) {
+    <section class="space-y-4">
+      <h3 class="px-1 font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+        What your doctor prescribed
+      </h3>
+
+      @for (m of a().medicines; track m.name; let i = $index) {
+        @if (dosing(m); as d) {
+          <div class="rounded-lg border p-4 sm:p-5"
+            [class]="m.legible && m.verified !== false ? 'border-line/10 bg-surface' : 'border-amber-300/70 bg-amber-50/60'">
+
+            <!-- name -->
+            <div class="flex items-start gap-3">
+              <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-50 text-xs font-semibold text-teal-700">
+                {{ i + 1 }}
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span class="text-base font-semibold leading-snug text-teal-900">{{ m.name }}</span>
+                  @if (m.strength) {
+                    <span class="text-sm font-medium text-teal-900/70">{{ m.strength }}</span>
+                  }
+                  @if (m.form) {
+                    <span class="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] uppercase tracking-wide text-teal-900/55">
+                      {{ m.form }}
+                    </span>
+                  }
+                </div>
+                @if (m.purpose) {
+                  <p class="mt-1 text-sm leading-relaxed text-teal-900/55">
+                    Generally {{ purposePhrase(m.purpose) }}
+                  </p>
+                }
+              </div>
+            </div>
+
+            <!-- When to take it, as a day at a glance. "1-0-1" is precise but
+                 opaque; four labelled slots carrying the dose are not. Filled
+                 vs empty carries the meaning, with the words in every cell —
+                 never colour alone. -->
+            @if (d.hasSchedule) {
+              <div class="mt-4">
+                <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-teal-900/40">
+                  When to take it
+                </p>
+                <!-- Two-up on a phone, one row of four from `sm`. Four cells
+                     across 320px squeezes "Afternoon" and wraps "1 tablet" onto
+                     two lines, which is exactly the readability this section
+                     exists to fix. -->
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-4" role="img" [attr.aria-label]="dosingLabel(m)">
+                  @for (slot of d.slots; track slot.key) {
+                    <div class="rounded-lg px-2 py-2.5 text-center"
+                      [class]="slot.on ? 'bg-teal-50 ring-1 ring-teal-600/15' : 'bg-surface-2/50'">
+                      <span class="block text-[11px] font-medium"
+                        [class]="slot.on ? 'text-teal-900' : 'text-teal-900/35'">{{ slot.label }}</span>
+                      <span class="mt-1 block text-[13px] font-semibold leading-tight"
+                        [class]="slot.on ? 'text-teal-700' : 'text-teal-900/25'">
+                        {{ slot.on ? (d.dose || 'Yes') : '—' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+              <p class="mt-4 rounded-lg bg-surface-2/50 px-3 py-2.5 text-sm leading-relaxed text-teal-900/60">
+                The prescription doesn't say when to take this one — please check the
+                timing with your pharmacist or the clinic.
+              </p>
+            }
+
+            <!-- Before or after food. Most patients assume "after food", so an
+                 unwritten one is stated as unwritten rather than defaulted. -->
+            <div class="mt-3 space-y-2">
+              @if (d.food) {
+                <p class="flex items-start gap-2 text-[15px] leading-relaxed text-teal-900">
+                  <ds-icon name="restaurant" [size]="16" class="mt-1 shrink-0 text-teal-600" />
+                  <span>
+                    <strong class="font-semibold">{{ d.food.label }}</strong>
+                    <span class="text-teal-900/60"> — {{ d.food.detail }}</span>
+                  </span>
+                </p>
+              } @else {
+                <p class="flex items-start gap-2 text-sm leading-relaxed text-teal-900/55">
+                  <ds-icon name="restaurant" [size]="16" class="mt-0.5 shrink-0 text-teal-900/30" />
+                  <span>Before or after food isn't written on the prescription — worth asking.</span>
+                </p>
+              }
+
+              @if (d.frequency || d.duration) {
+                <div class="flex flex-wrap items-center gap-2">
+                  @if (d.frequency) {
+                    <span class="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-teal-900/70">
+                      {{ d.frequency }}
+                    </span>
+                  }
+                  @if (d.duration) {
+                    <span class="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-medium text-teal-900/70">
+                      For {{ d.duration }}
+                    </span>
+                  }
+                </div>
+              }
+
+              @if (d.instructions) {
+                <p class="flex items-start gap-2 text-sm leading-relaxed text-teal-900/75">
+                  <ds-icon name="info" [size]="16" class="mt-0.5 shrink-0 text-teal-600" />
+                  <span>{{ d.instructions }}</span>
+                </p>
+              }
+            </div>
+
+            <!-- The doctor's own line, kept verbatim: the readout above is a
+                 reading of it, and a patient checking us against the paper
+                 needs the original sitting right there. -->
+            @if (d.verbatim) {
+              <p class="mt-3 border-t border-line/10 pt-3 text-xs leading-relaxed text-teal-900/50">
+                As written on the prescription: <span class="text-teal-900/70">{{ d.verbatim }}</span>
+              </p>
+            }
+
+            <!-- Handwriting is the one place a confident misreading does
+                 real harm, so an unsure reading says so plainly. -->
+            @if (medicineNeedsCheck(m)) {
+              <p class="mt-3 flex items-start gap-2 text-sm leading-relaxed text-amber-700">
+                <ds-icon name="info" [size]="16" class="mt-0.5 shrink-0" />
+                <span>
+                  We're not fully sure we read this one correctly — please check it with
+                  your pharmacist or the clinic before taking it.
+                  @if (m.catalogueName && m.verified === false) {
+                    <span> (Did it perhaps say <strong>{{ m.catalogueName }}</strong>?)</span>
+                  }
+                </span>
+              </p>
+            }
+          </div>
+        }
+      }
+
+      <p class="px-1 text-xs leading-relaxed text-teal-900/50">
+        This is a reading of your prescription, not a change to it. Only your doctor can
+        change what you take.
+      </p>
+    </section>
+  }
+
+  <!-- findings -->
+  @if (a().findings.length) {
+    <section class="space-y-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 px-1">
+        <h3 class="font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+          What was measured
+        </h3>
+        <!-- The reassuring half of the report, said out loud. Most values on
+             most reports are fine, and a patient scanning a list of numbers
+             rarely notices that. Only shown when something was actually
+             compared against a range — see statedCount(). -->
+        @if (statedCount(a().findings); as stated) {
+          <span class="text-xs text-teal-900/50">
+            {{ inRangeCount(a().findings) }} of {{ stated }} in the usual range
+          </span>
+        }
+      </div>
+      <!-- Read the meters once, here, instead of relabelling all of them.
+           Nothing to read when no finding printed a range. -->
+      @if (anyMeter(a().findings)) {
+      <div class="flex items-center gap-4 px-1 pb-1 text-[11px] text-teal-900/45">
+        <span class="flex items-center gap-1.5">
+          <span class="h-1.5 w-6 rounded-full bg-teal-200"></span> usual range
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="h-2.5 w-2.5 rounded-full bg-teal-600 ring-2 ring-white"></span> your value
+        </span>
+      </div>
+      }
+      @for (f of a().findings; track f.name) {
+        <div class="rounded-lg border p-4" [class]="findingClass(f)">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <span class="text-[15px] font-medium text-teal-900">{{ f.name }}</span>
+            <span class="text-[15px] text-teal-900">
+              <strong>{{ f.value || '—' }}</strong>
+              @if (f.unit) { <span class="text-teal-900/60">{{ f.unit }}</span> }
+            </span>
+          </div>
+          <div class="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-teal-900/55">
+            <span>{{ statusLabel(f) }}</span>
+            @if (f.referenceRange) { <span>· usual: {{ f.referenceRange }}</span> }
+          </div>
+
+          <!-- Meter: where this value sits against its own usual range.
+               The digits say 9.4; this says how far from usual that is.
+               Status colour never carries the meaning alone — the label
+               above already states it in words. -->
+          @if (meter(f); as m) {
+            <div class="mt-3" role="img" [attr.aria-label]="meterLabel(f)">
+              <div class="relative h-1.5 w-full rounded-full bg-surface-2">
+                <!-- the usual range -->
+                <div class="absolute inset-y-0 rounded-full bg-teal-200"
+                  [style.left.%]="m.bandLeft" [style.width.%]="m.bandWidth"></div>
+                <!-- this patient's value: 10px mark, 2px surface ring so it
+                     stays visible where it overlaps the band -->
+                <div
+                  class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white"
+                  [style.left.%]="m.pos"
+                  [class]="m.outside ? 'bg-amber-600' : 'bg-teal-600'"></div>
+              </div>
+              <!-- The three-word scale used to repeat under every meter,
+                   which is noise once you've read it once — it lives under
+                   the section heading now. Only a value pinned at the edge
+                   says anything here, because "off the scale" is the one
+                   thing the marker position cannot show. -->
+              @if (m.clamped) {
+                <p class="mt-1.5 text-[10px] text-amber-700"
+                  [class.text-right]="m.clamped === 'high'">
+                  {{ m.clamped === 'low' ? 'well below the usual range' : 'well above the usual range' }}
+                </p>
+              }
+            </div>
+          }
+          @if (f.plainMeaning) {
+            <p class="mt-3 text-[15px] leading-relaxed text-teal-900/80">{{ f.plainMeaning }}</p>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- what it means -->
+  @if (a().whatThisMeans) {
+    <ds-card>
+      <h3 class="font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+        What this means
+      </h3>
+      <p class="mt-3 text-[15px] leading-relaxed text-teal-900/85">{{ a().whatThisMeans }}</p>
+    </ds-card>
+  }
+
+  <!-- what to do -->
+  @if (a().whatToDo.length) {
+    <ds-card>
+      <h3 class="font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+        What to do next
+      </h3>
+      <ul class="mt-3 space-y-3">
+        @for (item of a().whatToDo; track item) {
+          <li class="flex items-start gap-2.5 text-[15px] leading-relaxed text-teal-900/85">
+            <ds-icon name="check_circle" [size]="16" class="mt-1 shrink-0 text-teal-600" />
+            <span>{{ item }}</span>
+          </li>
+        }
+      </ul>
+    </ds-card>
+  }
+
+  <!-- questions for the doctor -->
+  @if (a().questionsForYourDoctor.length) {
+    <ds-card>
+      <h3 class="font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+        Worth asking your doctor
+      </h3>
+      <ul class="mt-3 space-y-3">
+        @for (q of a().questionsForYourDoctor; track q) {
+          <li class="flex items-start gap-2.5 text-[15px] leading-relaxed text-teal-900/85">
+            <ds-icon name="chat" [size]="16" class="mt-1 shrink-0 text-teal-600" />
+            <span>{{ q }}</span>
+          </li>
+        }
+      </ul>
+    </ds-card>
+  }
+
+  <!-- what we could not read: the reason we don't guess -->
+  @if (a().notInterpreted.length) {
+    <ds-card>
+      <h3 class="flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-teal-900/50">
+        <ds-icon name="info" [size]="16" /> Couldn't read
+      </h3>
+      <ul class="mt-3 space-y-2">
+        @for (n of a().notInterpreted; track n) {
+          <li class="text-[15px] leading-relaxed text-teal-900/70">{{ n }}</li>
+        }
+      </ul>
+      <p class="mt-3 text-xs leading-relaxed text-teal-900/45">
+        We leave these out rather than guess. A sharper photo usually helps.
+      </p>
+    </ds-card>
+  }
+
+  <p class="px-1 pb-1 text-xs leading-relaxed text-teal-900/50">{{ disclaimer() }}</p>
+</div>

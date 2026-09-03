@@ -13,133 +13,118 @@
   <!-- nav -->
   <!-- z-30: avatar dropdown overflows below the nav and must paint above <main> (z-10) -->
   <header>
-  <nav aria-label="Primary" class="relative z-30 mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:px-6">
-    <div class="flex min-w-0 shrink flex-col leading-tight">
-      <div class="flex items-center gap-1 truncate font-heading text-xl font-extrabold text-teal-900 sm:text-2xl">
-        <span class="truncate">{{ appName }}</span>
-        <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
-      </div>
-      <span class="flex items-center gap-1 truncate text-[11px] font-semibold text-teal-900/50">
-        powered by
-        <span class="font-extrabold"><span style="color:#0a1480">Knoc</span><span style="color:#4fb0f9">Doc</span></span>
-      </span>
-    </div>
-    <div class="hidden items-center gap-8 font-body text-[15px] text-teal-900 md:flex">
-      <a routerLink="/find-doctors" class="hover:text-teal-600">Find Doctors</a>
-      <a routerLink="/how-it-works" class="hover:text-teal-600">How it works</a>
-      <a routerLink="/pricing" class="hover:text-teal-600">Pricing</a>
-    </div>
-    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
-      <a
-        [href]="instagramUrl"
-        target="_blank"
-        rel="noopener"
-        (click)="trackInstagramFollow('nav')"
-        [attr.aria-label]="'Follow ' + instagramHandle + ' on Instagram'"
-        [title]="instagramHandle"
-        class="flex h-9 w-9 items-center justify-center rounded-full border border-teal-700/25 text-teal-900/70 hover:border-teal-700/50 hover:bg-white hover:text-teal-700"
-      >
-        <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-        </svg>
-      </a>
-      <ng-container *ngIf="!isLoggedIn; else loggedInNav">
-        <button (click)="login()" class="rounded-full border border-teal-700/30 px-3 py-1.5 text-sm font-medium text-teal-900 hover:bg-white sm:px-4">Log in</button>
-        <button (click)="login()" class="rounded-full bg-teal-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-700 sm:px-4">Sign up</button>
-      </ng-container>
-      <ng-template #loggedInNav>
-        <!-- avatar + dropdown mirroring the triage-shell side drawer -->
-        <div class="relative">
-          <button (click)="menuOpen = !menuOpen" aria-label="Account menu" [attr.aria-expanded]="menuOpen"
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-teal-900 font-heading text-base font-bold text-white shadow-sm ring-2 ring-white hover:bg-teal-700">
-            <ng-container *ngIf="userInitial; else avatarIcon">{{ userInitial }}</ng-container>
-            <ng-template #avatarIcon><ds-icon name="person" /></ng-template>
-          </button>
-
-          <!-- click-away backdrop -->
-          <div *ngIf="menuOpen" class="fixed inset-0 z-20" (click)="menuOpen = false"></div>
-
-          <div *ngIf="menuOpen"
-            class="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-2xl border border-teal-100 bg-white py-1 shadow-xl">
-            <div class="border-b border-black/5 px-4 py-3">
-              <p class="truncate font-heading text-sm font-bold text-teal-900">{{ userName || 'My account' }}</p>
-              <p *ngIf="userMobile" class="truncate text-xs text-teal-900/50">+91 {{ userMobile }}</p>
-            </div>
-            <button (click)="goProfile()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50">
-              <ds-icon name="person" class="text-teal-600" /> Profile
-            </button>
-            <button (click)="goChangePin()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50">
-              <ds-icon name="password" class="text-teal-600" /> Change PIN
-            </button>
-            <button (click)="goConsults()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50">
-              <ds-icon name="history" class="text-teal-600" /> My consults
-            </button>
-            <div class="my-1 border-t border-black/5"></div>
-            <button (click)="logout()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
-              <ds-icon name="logout" /> Log out
-            </button>
-          </div>
+    <nav aria-label="Primary" class="relative z-30 mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:px-6">
+      <div class="flex min-w-0 shrink flex-col leading-tight">
+        <div class="flex items-center gap-1 truncate font-heading text-xl font-extrabold text-teal-900 sm:text-2xl">
+          <span class="truncate">{{ appName }}</span>
+          <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
         </div>
-      </ng-template>
-    </div>
-  </nav>
+        <span class="flex items-center gap-1 truncate text-[11px] font-semibold text-teal-900/50">
+          powered by
+          <span class="font-extrabold"><span style="color:#0a1480">Knoc</span><span style="color:#4fb0f9">Doc</span></span>
+        </span>
+      </div>
+      <div class="hidden items-center gap-8 font-body text-[15px] text-teal-900 md:flex">
+        <a routerLink="/find-doctors" class="hover:text-teal-600">Find Doctors</a>
+        <a routerLink="/how-it-works" class="hover:text-teal-600">How it works</a>
+        <a routerLink="/pricing" class="hover:text-teal-600">Pricing</a>
+      </div>
+      <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+        <a
+          [href]="instagramUrl"
+          target="_blank"
+          rel="noopener"
+          (click)="trackInstagramFollow('nav')"
+          [attr.aria-label]="'Follow ' + instagramHandle + ' on Instagram'"
+          [title]="instagramHandle"
+          class="flex h-9 w-9 items-center justify-center rounded-full border border-teal-700/25 text-teal-900/70 hover:border-teal-700/50 hover:bg-white hover:text-teal-700 coarse:min-h-[44px]"
+          >
+          <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+          </svg>
+        </a>
+        @if (!isLoggedIn) {
+          <button (click)="login()" class="rounded-full border border-teal-700/30 px-3 py-1.5 text-sm font-medium text-teal-900 hover:bg-white sm:px-4 coarse:min-h-[44px]">Log in</button>
+          <button (click)="login()" class="rounded-full bg-teal-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-700 sm:px-4 coarse:min-h-[44px]">Sign up</button>
+        } @else {
+          <!-- avatar + dropdown mirroring the triage-shell side drawer -->
+          <div class="relative">
+            <button (click)="menuOpen = !menuOpen" aria-label="Account menu" [attr.aria-expanded]="menuOpen"
+              class="flex h-10 w-10 items-center justify-center rounded-full bg-teal-900 font-heading text-base font-bold text-white shadow-sm ring-2 ring-white hover:bg-teal-700 coarse:min-h-[44px]">
+              @if (userInitial) {
+                {{ userInitial }}
+              } @else {
+                <ds-icon name="person" />
+              }
+            </button>
+            <!-- click-away backdrop -->
+            @if (menuOpen) {
+              <div class="fixed inset-0 z-20" (click)="menuOpen = false"></div>
+            }
+            @if (menuOpen) {
+              <div
+                class="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-2xl border border-teal-100 bg-white py-1 shadow-xl">
+                <div class="border-b border-black/5 px-4 py-3">
+                  <p class="truncate font-heading text-sm font-bold text-teal-900">{{ userName || 'My account' }}</p>
+                  @if (userMobile) {
+                    <p class="truncate text-xs text-teal-900/50">+91 {{ userMobile }}</p>
+                  }
+                </div>
+                <button (click)="goProfile()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50 coarse:min-h-[44px]">
+                  <ds-icon name="person" class="text-teal-600" /> Profile
+                </button>
+                <button (click)="goChangePin()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50 coarse:min-h-[44px]">
+                  <ds-icon name="password" class="text-teal-600" /> Change PIN
+                </button>
+                <button (click)="goConsults()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-teal-900 hover:bg-teal-50 coarse:min-h-[44px]">
+                  <ds-icon name="history" class="text-teal-600" /> My consults
+                </button>
+                <div class="my-1 border-t border-black/5"></div>
+                <button (click)="logout()" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 coarse:min-h-[44px]">
+                  <ds-icon name="logout" /> Log out
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </nav>
   </header>
 
-  <!-- hero -->
-  <!-- flex-col + order-* so MOBILE shows the entry box right under the headline
-       (visible without scrolling); md+ restores the original visual order. -->
-  <main class="relative z-10 mx-auto flex max-w-4xl flex-col px-6 pt-5 text-center md:pt-7">
-    <h1 class="order-1 font-display text-[2rem] leading-[1.1] text-teal-900 sm:text-5xl md:text-6xl">
+  <!-- ── hero ──────────────────────────────────────────────────────────
+  One claim at a time, on one line that types itself, instead of the stack this
+  used to be: a rotating card, a row of pills, a feature card and a language
+  line, each making its own point in its own box. Four boxes competing above
+  the fold read as advertising; a single moving line reads as a product that
+  knows what it does. Every phrase the typewriter cycles is also emitted as
+  static text inside <ds-typewriter>, so crawlers and screen readers get all of
+  them without watching an animation. -->
+  <main class="relative z-10 mx-auto flex max-w-4xl flex-col px-6 pt-6 text-center md:pt-10">
+    <h1 class="order-1 font-display text-[2rem] leading-[1.1] text-teal-900 sm:text-5xl md:text-[3.4rem]">
       {{ appName }} — <span class="italic">AI health assistant</span> <br class="hidden md:block" />
       &amp; symptom checker
     </h1>
-    <!-- Brand tagline. Kept as its own line rather than inside the H1 so the H1
-         carries the brand and the primary keywords on their own. -->
-    <p class="order-1 mx-auto mt-3 font-display text-lg italic text-teal-900/60 sm:text-xl">
-      Health answers, always within reach.
-    </p>
-    <!-- rotating hero text (carousel, text-only, branding) -->
-    <!-- Supporting/marketing text — sits BELOW the primary input on every breakpoint
-         (the input is the hero per AI-landing pattern). Soft card so the auto-rotating
-         text reads as intentional, not a floating fragment. -->
-    <div class="order-4 mx-auto mt-8 w-full max-w-xl rounded-2xl border border-teal-100 bg-white/60 px-2 py-3">
-      <ds-carousel
-        [slides]="heroSlides"
-        [interval]="isBrowser ? 6500 : 0"
-        [showIndicators]="true"
-        ariaLabel="What DoctoGuide does"
-      />
-    </div>
 
-    <!-- zero-friction highlight pills -->
-    <div class="order-3 mx-auto mt-7 flex max-w-3xl flex-wrap items-center justify-center gap-2.5">
-      <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
-        <ds-icon name="check_circle" [size]="18" class="text-teal-600" /> 100% free to start
-      </span>
-      <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
-        <ds-icon name="how_to_reg" [size]="18" class="text-teal-600" /> No sign-up
-      </span>
-      <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
-        <ds-icon name="credit_card_off" [size]="18" class="text-teal-600" /> No credit card
-      </span>
-      <span class="flex items-center gap-1.5 rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
-        <ds-icon name="bolt" [size]="18" class="text-teal-600" /> Ready in seconds
-      </span>
-      <!-- newest capability — filled pill so it reads as the headline feature -->
-      <span class="flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md">
-        <ds-icon name="translate" [size]="18" /> Chat in any language
-      </span>
-    </div>
+    <!-- The rotating value proposition. min-h holds two lines on a phone so the
+    entry box beneath it never jumps as the text types and erases. -->
+    <p class="order-1 mx-auto mt-4 flex min-h-[3.5rem] max-w-2xl items-start justify-center font-heading text-lg font-semibold leading-snug text-teal-700 sm:min-h-[2.75rem] sm:text-2xl">
+      <ds-typewriter [phrases]="heroPhrases" />
+    </p>
 
     <!-- entry box — the primary action; directly under the headline on every
-         breakpoint so it sits above the fold without scrolling. -->
-    <div class="order-2 mx-auto mt-6 w-full max-w-2xl md:mt-8">
-      <p class="mb-2.5 text-center text-sm font-semibold text-teal-900">What brings you in?</p>
+    breakpoint so it sits above the fold without scrolling. -->
+    <div class="order-2 mx-auto mt-5 w-full max-w-2xl">
       <!-- input + CTA: a leading icon anchors the field so it never reads empty,
-           input and button share the same height for a clean aligned card. -->
-      <div class="flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-lg ring-1 ring-black/5 sm:flex-row sm:items-center">
+      input and button share the same height for a clean aligned card. -->
+      <!-- The focus ring lives on this PILL, not on the <input>. The input is
+      visually nested inside the pill, so the global :focus-visible outline
+      drew a hard rectangle floating inside a rounded card — the green box.
+      Moving it to the container keeps focus clearly visible (it is the only
+      cue a keyboard user gets) and makes the whole control light up as one
+      object, which is what it looks like. -->
+      <div class="flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-lg ring-1 ring-black/5 transition-shadow focus-within:ring-2 focus-within:ring-teal-500/60 sm:flex-row sm:items-center">
         <div class="flex flex-1 items-center gap-2 px-3">
           <ds-icon name="chat_bubble_outline" class="shrink-0 text-teal-500" />
           <input
@@ -147,263 +132,270 @@
             (keyup.enter)="start()"
             [placeholder]="placeholder"
             aria-label="Describe your symptom or health question"
-            class="h-12 w-full bg-transparent text-base text-teal-900 outline-none placeholder:text-teal-900/40"
-          />
+            class="h-12 w-full bg-transparent text-base text-teal-900 outline-none focus-visible:outline-none placeholder:text-teal-900/40"
+            />
+          </div>
+          <button
+            (click)="start()"
+            class="flex h-12 w-full shrink-0 items-center justify-center gap-1 rounded-xl bg-teal-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-teal-700 sm:w-auto"
+            >
+            Get started
+            <ds-icon name="arrow_forward" [size]="18" />
+          </button>
         </div>
-        <button
-          (click)="start()"
-          class="flex h-12 w-full shrink-0 items-center justify-center gap-1 rounded-xl bg-teal-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-teal-700 sm:w-auto"
-        >
-          Get started
-          <ds-icon name="arrow_forward" [size]="18" />
-        </button>
+
+        <!-- The second door, as a quiet secondary action rather than a card of
+        its own. Someone holding a printout is not looking for a chat box, and
+        this is the only other thing the page asks them to consider. -->
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          <a routerLink="/triage/report-reader"
+            class="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-white px-4 py-2.5 text-sm font-semibold text-teal-800 shadow-sm transition-colors hover:border-teal-400 hover:text-teal-900 coarse:min-h-[44px]">
+            <ds-icon name="biotech" [size]="18" class="text-teal-600" />
+            Explain my report or prescription
+          </a>
+          <span class="text-xs font-medium text-teal-900/45">Free · No sign-up · Any language</span>
+        </div>
+
+        <!-- Upfront compliance disclaimer. Sits directly beneath the input
+        container, above every other supporting line, so the informational
+        nature of the tool is stated before the visitor types anything
+        (Google Ads healthcare / misrepresentation policy). -->
+        <p class="mt-4 text-center text-xs leading-relaxed text-teal-900/60">
+          For informational and educational guidance only. Not medical advice or a formal
+          diagnosis. In an emergency, please contact your local emergency services.
+        </p>
       </div>
 
-      <!-- Upfront compliance disclaimer. Sits directly beneath the input
-           container, above every other supporting line, so the informational
-           nature of the tool is stated before the visitor types anything
-           (Google Ads healthcare / misrepresentation policy). -->
-      <p class="mt-3 text-center text-xs leading-relaxed text-teal-900/60">
-        For informational and educational guidance only. Not medical advice or a formal
-        diagnosis. In an emergency, please contact your local emergency services.
-      </p>
+        <!-- Hero subhead. Visible (not sr-only) so the page's target keywords sit in real
+        copy rather than hidden text. order-2 keeps it below the entry box on mobile. -->
+        <p class="order-2 mx-auto mt-5 max-w-2xl text-base leading-relaxed text-teal-900/75 sm:text-lg">
+          A free AI health assistant and symptom guide for {{ countryForCopy }} — describe how you feel
+          and get instant, easy-to-read health guidance, the right specialist to see, and doctors near
+          you. An informational tool, not a licensed medical practitioner.
+        </p>
 
-      <!-- multilingual hint: demonstrate, don't just claim -->
-      <p class="mt-3 flex items-center justify-center gap-1.5 text-sm font-medium text-teal-800">
-        <ds-icon name="translate" [size]="17" class="text-teal-600" />
-        <span>Type in <span class="font-semibold">any language</span> — English · हिन्दी · Hinglish — the AI replies in yours.</span>
-      </p>
+        <!-- Trust, as one quiet line. This was seven chips wrapping into three
+        rows of boxes directly under a hero that already makes its case — the
+        same words carry further when they are not each in a container. -->
+        <p class="order-5 mx-auto mt-7 flex max-w-2xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-teal-900/55">
+          @for (c of trustChips; track $index; let last = $last) {
+            <span class="whitespace-nowrap">{{ c.label }}</span>
+            @if (!last) {
+              <span aria-hidden="true" class="text-teal-900/25">·</span>
+            }
+          }
+        </p>
+
+        <!-- SEO content + FAQ (crawlable, keyword-rich, native <details> needs no JS) -->
+        <section class="order-6 mx-auto mt-16 max-w-2xl text-left">
+          <h2 class="font-heading text-2xl font-bold text-teal-900">
+            What is {{ appName }}?
+          </h2>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            {{ appName }} by KnocDoc is a free AI health assistant built for {{ countryForCopy }}. Describe your
+            symptoms in plain language and get instant, easy-to-read AI health guidance — what could
+            be going on, which specialist to see, and when to seek urgent care. When you're ready,
+            find doctors near you. No sign-up, no credit card, ready in seconds.
+          </p>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            It is a health-<em>information</em> assistant, not a physician. It does not diagnose,
+            prescribe, or treat — it helps you understand what you are feeling and get to the right
+            care faster. <a routerLink="/about" class="text-teal-700 underline">More about {{ appName }} and KnocDoc</a>.
+          </p>
+
+          <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
+            How {{ appName }} works
+          </h2>
+          <ol class="mt-3 list-decimal space-y-2 pl-5 font-body text-[15px] leading-relaxed text-teal-900/70">
+            <li><strong class="text-teal-900">Describe your symptoms</strong> in your own words — English, हिन्दी, Hinglish, or another language.</li>
+            <li><strong class="text-teal-900">Answer a few follow-up questions</strong>, the kind a clinician would ask before pointing you anywhere.</li>
+            <li><strong class="text-teal-900">Understand possible explanations</strong> in plain language, without a wall of worst-case search results.</li>
+            <li><strong class="text-teal-900">Understand how urgent it might be</strong> — whether this needs attention now, soon, or routinely.</li>
+            <li><strong class="text-teal-900">Decide what to do next</strong>, with the right speciality named and a summary you can carry to the consultation.</li>
+          </ol>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            <a routerLink="/how-it-works" class="text-teal-700 underline">See how it works in detail</a>.
+          </p>
+
+          <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
+            What {{ appName }} can help with
+          </h2>
+          <ul class="mt-3 list-disc space-y-2 pl-5 font-body text-[15px] leading-relaxed text-teal-900/70">
+            <li>Making sense of <a routerLink="/symptom-checker" class="text-teal-700 underline">symptoms you can't quite describe</a>.</li>
+            <li>General health questions you'd otherwise type into a search engine.</li>
+            <li>Getting a sense of <strong class="text-teal-900">how urgent</strong> something might be.</li>
+            <li>Preparing for a consultation, with a clear written summary to bring along.</li>
+            <li>Working out <a routerLink="/which-specialist-to-see" class="text-teal-700 underline">which specialist to see</a> so a first appointment isn't wasted.</li>
+            <li><a routerLink="/triage/report-reader" class="text-teal-700 underline">Understanding a lab report</a> or a medicine label in plain language.</li>
+            <li>Reading up on <a routerLink="/health-topics" class="text-teal-700 underline">common symptoms</a> like headache, fever, cough, and stomach pain.</li>
+          </ul>
+
+          <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
+            When you should seek medical care
+          </h2>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            Do not use a website — this one included — to decide whether an emergency is an emergency.
+            Get help immediately for chest pain or pressure, difficulty breathing, sudden weakness or
+            numbness on one side, drooping face or sudden trouble speaking, a seizure, confusion or
+            unresponsiveness, heavy bleeding that won't stop, a severe allergic reaction, or thoughts of
+            harming yourself. {{ emergencySentence }}
+          </p>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            Anything sudden, severe, or rapidly worsening needs medical attention regardless of what any
+            tool says. See <a routerLink="/medical-safety" class="text-teal-700 underline">medical safety</a>
+            for the full list, or <a routerLink="/emergency-numbers" class="text-teal-700 underline">emergency numbers by country</a>.
+          </p>
+
+          <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
+            {{ appName }} is not a replacement for a doctor
+          </h2>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            {{ appName }} cannot examine you, order tests, diagnose a condition, prescribe or adjust
+            medication, or treat anything. It has no access to your history beyond what you type, and
+            like any AI it can state something incorrect in confident-sounding language. A reassuring
+            answer is not clearance.
+          </p>
+          <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
+            Use it to arrive at a consultation better prepared — not instead of one. If you are choosing
+            between reading this and seeing a doctor, see the doctor.
+          </p>
+
+          <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">Frequently asked questions</h2>
+          <div class="mt-4 space-y-3">
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Is DoctoGuide free?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                Yes. DoctoGuide by KnocDoc is 100% free to start. There is no sign-up and no credit
+                card needed to describe your symptoms and get AI health guidance.
+              </p>
+            </details>
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Is {{ appName }} medical advice?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                DoctoGuide is an AI health-information assistant, not a licensed physician. It gives
+                educational information and suggests which specialist to see, but it does not provide a
+                diagnosis, treatment, or prescription. {{ emergencySentence }}
+              </p>
+            </details>
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Which specialist should I see for my symptoms?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                Describe what you're feeling in plain language and DoctoGuide reads your concern and
+                points you to the right speciality, then helps you find doctors near you{{ inCountry }}.
+              </p>
+            </details>
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Do I need to sign up to use the AI symptom checker?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                No. You can use the AI symptom checker instantly with no sign-up. You only create an
+                account if you want to save your health summary or past consultations.
+              </p>
+            </details>
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Can I chat in Hindi or my own language?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                Yes. Type the way you talk — English, हिन्दी, Hinglish, or another language — and
+                the AI replies in the same language you use.
+              </p>
+            </details>
+            <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
+              <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
+                Can DoctoGuide help me find a doctor near me{{ inCountry }}?
+              </summary>
+              <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
+                Yes. After reviewing your symptoms, DoctoGuide can help you find licensed doctors
+                near you by city or location, with ratings, hours, and contact details.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <p class="order-7 mx-auto mt-12 max-w-2xl text-xs text-teal-900/50">
+          {{ appName }} is an AI health-information assistant, not a licensed physician.
+          It does not provide medical advice, diagnosis, treatment, or prescriptions.
+          {{ emergencySentence }}
+        </p>
+
+        <!-- legal footer -->
+        <footer class="order-8 mx-auto mt-10 max-w-2xl border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
+          <a
+            [href]="instagramUrl"
+            target="_blank"
+            rel="noopener"
+            (click)="trackInstagramFollow('footer')"
+            class="mb-3 inline-flex items-center gap-1.5 text-teal-900/70 hover:text-teal-700 coarse:min-h-[44px]"
+            aria-label="Follow KnocDoc Health on Instagram"
+            >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+            </svg>
+            <span>{{ instagramHandle }}</span>
+          </a>
+          <!-- Contact. Icon only: the number is never rendered into the HTML, so a
+          scraper cannot lift it off the page. openWhatsApp() assembles and opens
+          the link at click time — an <a href> would put the number back in the markup. -->
+          <button
+            type="button"
+            (click)="openWhatsApp()"
+            class="mb-3 ml-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#25D366] align-middle text-white shadow-md transition-colors hover:bg-[#1DA851] focus:outline-none focus:ring-2 focus:ring-[#25D366]/40 coarse:min-h-[44px]"
+            aria-label="Chat with us on WhatsApp"
+            title="Chat with us on WhatsApp"
+            >
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2 22l5.36-1.4a9.78 9.78 0 0 0 4.68 1.2h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.9c-.24.68-1.4 1.32-1.94 1.36-.5.05-1.12.07-1.8-.11a15.6 15.6 0 0 1-1.63-.6c-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36l.55.01c.17.01.41-.07.64.49.24.57.82 1.98.89 2.12.07.14.12.31.02.5-.09.19-.14.31-.28.47l-.42.49c-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.17-.19.69-.8.87-1.08.19-.28.37-.23.62-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/>
+            </svg>
+          </button>
+          <!-- Internal links to the SEO landing pages. The homepage is the highest-authority
+          page on the site; without these the eight pages are only reachable via sitemap.xml. -->
+          <nav aria-label="More from DoctoGuide" class="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5">
+            <a routerLink="/ai-doctor" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">AI Health Assistant</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/symptom-checker" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Symptom Checker</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/which-specialist-to-see" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Which Specialist to See</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/health-guide" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Health Guide</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/emergency-numbers" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Emergency Numbers</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/how-it-works" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">How It Works</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/find-doctors" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Find Doctors</a>
+            <span aria-hidden="true">·</span>
+            <a routerLink="/pricing" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Pricing</a>
+          </nav>
+          <div>
+            <a routerLink="/privacy" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Privacy Policy</a>
+            <span class="mx-2">·</span>
+            <a routerLink="/terms" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Terms of Use</a>
+            <span class="mx-2">·</span>
+            <a routerLink="/disclaimer" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Medical Disclaimer</a>
+            <span class="mx-2">·</span>
+            <a routerLink="/contact" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Contact</a>
+          </div>
+
+          <!-- Business ownership + a reachable support address. Google Ads
+          misrepresentation policy expects a visitor to be able to tell who is
+          behind the site and how to reach them, without hunting. -->
+          <p class="mt-3 leading-relaxed">
+            {{ appName }} is operated by <strong class="font-semibold text-teal-900/70">KnocDoc</strong>.
+            Support:
+            <a href="mailto:support@knocdoc.in" class="underline hover:text-teal-700">support&#64;knocdoc.in</a>
+            ·
+            <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-teal-700">knocdoc.in</a>
+          </p>
+        </footer>
+      </main>
     </div>
-
-    <!-- Hero subhead. Visible (not sr-only) so the page's target keywords sit in real
-         copy rather than hidden text. order-2 keeps it below the entry box on mobile. -->
-    <p class="order-2 mx-auto mt-5 max-w-2xl text-base leading-relaxed text-teal-900/75 sm:text-lg">
-      A free AI health assistant and symptom guide for {{ countryForCopy }} — describe how you feel
-      and get instant, easy-to-read health guidance, the right specialist to see, and doctors near
-      you. An informational tool, not a licensed medical practitioner.
-    </p>
-
-    <!-- trust chips -->
-    <div class="order-5 mt-8 flex flex-wrap items-center justify-center gap-3">
-      <span
-        *ngFor="let c of trustChips"
-        class="flex items-center gap-1.5 rounded-lg bg-white/70 px-3 py-1.5 text-xs font-medium text-teal-900/80 ring-1 ring-black/5"
-      >
-        <ds-icon [name]="c.icon" [size]="15" class="text-teal-600" />
-        {{ c.label }}
-      </span>
-    </div>
-
-    <!-- SEO content + FAQ (crawlable, keyword-rich, native <details> needs no JS) -->
-    <section class="order-6 mx-auto mt-16 max-w-2xl text-left">
-      <h2 class="font-heading text-2xl font-bold text-teal-900">
-        What is {{ appName }}?
-      </h2>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        {{ appName }} by KnocDoc is a free AI health assistant built for {{ countryForCopy }}. Describe your
-        symptoms in plain language and get instant, easy-to-read AI health guidance — what could
-        be going on, which specialist to see, and when to seek urgent care. When you're ready,
-        find doctors near you. No sign-up, no credit card, ready in seconds.
-      </p>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        It is a health-<em>information</em> assistant, not a physician. It does not diagnose,
-        prescribe, or treat — it helps you understand what you are feeling and get to the right
-        care faster. <a routerLink="/about" class="text-teal-700 underline">More about {{ appName }} and KnocDoc</a>.
-      </p>
-
-      <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
-        How {{ appName }} works
-      </h2>
-      <ol class="mt-3 list-decimal space-y-2 pl-5 font-body text-[15px] leading-relaxed text-teal-900/70">
-        <li><strong class="text-teal-900">Describe your symptoms</strong> in your own words — English, हिन्दी, Hinglish, or another language.</li>
-        <li><strong class="text-teal-900">Answer a few follow-up questions</strong>, the kind a clinician would ask before pointing you anywhere.</li>
-        <li><strong class="text-teal-900">Understand possible explanations</strong> in plain language, without a wall of worst-case search results.</li>
-        <li><strong class="text-teal-900">Understand how urgent it might be</strong> — whether this needs attention now, soon, or routinely.</li>
-        <li><strong class="text-teal-900">Decide what to do next</strong>, with the right speciality named and a summary you can carry to the consultation.</li>
-      </ol>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        <a routerLink="/how-it-works" class="text-teal-700 underline">See how it works in detail</a>.
-      </p>
-
-      <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
-        What {{ appName }} can help with
-      </h2>
-      <ul class="mt-3 list-disc space-y-2 pl-5 font-body text-[15px] leading-relaxed text-teal-900/70">
-        <li>Making sense of <a routerLink="/symptom-checker" class="text-teal-700 underline">symptoms you can't quite describe</a>.</li>
-        <li>General health questions you'd otherwise type into a search engine.</li>
-        <li>Getting a sense of <strong class="text-teal-900">how urgent</strong> something might be.</li>
-        <li>Preparing for a consultation, with a clear written summary to bring along.</li>
-        <li>Working out <a routerLink="/which-specialist-to-see" class="text-teal-700 underline">which specialist to see</a> so a first appointment isn't wasted.</li>
-        <li>Understanding a lab report or a medicine label in plain language.</li>
-        <li>Reading up on <a routerLink="/health-topics" class="text-teal-700 underline">common symptoms</a> like headache, fever, cough, and stomach pain.</li>
-      </ul>
-
-      <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
-        When you should seek medical care
-      </h2>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        Do not use a website — this one included — to decide whether an emergency is an emergency.
-        Get help immediately for chest pain or pressure, difficulty breathing, sudden weakness or
-        numbness on one side, drooping face or sudden trouble speaking, a seizure, confusion or
-        unresponsiveness, heavy bleeding that won't stop, a severe allergic reaction, or thoughts of
-        harming yourself. {{ emergencySentence }}
-      </p>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        Anything sudden, severe, or rapidly worsening needs medical attention regardless of what any
-        tool says. See <a routerLink="/medical-safety" class="text-teal-700 underline">medical safety</a>
-        for the full list, or <a routerLink="/emergency-numbers" class="text-teal-700 underline">emergency numbers by country</a>.
-      </p>
-
-      <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">
-        {{ appName }} is not a replacement for a doctor
-      </h2>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        {{ appName }} cannot examine you, order tests, diagnose a condition, prescribe or adjust
-        medication, or treat anything. It has no access to your history beyond what you type, and
-        like any AI it can state something incorrect in confident-sounding language. A reassuring
-        answer is not clearance.
-      </p>
-      <p class="mt-3 font-body text-[15px] leading-relaxed text-teal-900/70">
-        Use it to arrive at a consultation better prepared — not instead of one. If you are choosing
-        between reading this and seeing a doctor, see the doctor.
-      </p>
-
-      <h2 class="mt-10 font-heading text-2xl font-bold text-teal-900">Frequently asked questions</h2>
-      <div class="mt-4 space-y-3">
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Is DoctoGuide free?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            Yes. DoctoGuide by KnocDoc is 100% free to start. There is no sign-up and no credit
-            card needed to describe your symptoms and get AI health guidance.
-          </p>
-        </details>
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Is {{ appName }} medical advice?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            DoctoGuide is an AI health-information assistant, not a licensed physician. It gives
-            educational information and suggests which specialist to see, but it does not provide a
-            diagnosis, treatment, or prescription. {{ emergencySentence }}
-          </p>
-        </details>
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Which specialist should I see for my symptoms?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            Describe what you're feeling in plain language and DoctoGuide reads your concern and
-            points you to the right speciality, then helps you find doctors near you{{ inCountry }}.
-          </p>
-        </details>
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Do I need to sign up to use the AI symptom checker?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            No. You can use the AI symptom checker instantly with no sign-up. You only create an
-            account if you want to save your health summary or past consultations.
-          </p>
-        </details>
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Can I chat in Hindi or my own language?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            Yes. Type the way you talk — English, हिन्दी, Hinglish, or another language — and
-            the AI replies in the same language you use.
-          </p>
-        </details>
-        <details class="group rounded-2xl border border-teal-200 bg-white/70 p-4">
-          <summary class="cursor-pointer font-heading text-base font-semibold text-teal-900">
-            Can DoctoGuide help me find a doctor near me{{ inCountry }}?
-          </summary>
-          <p class="mt-2 font-body text-sm leading-relaxed text-teal-900/70">
-            Yes. After reviewing your symptoms, DoctoGuide can help you find licensed doctors
-            near you by city or location, with ratings, hours, and contact details.
-          </p>
-        </details>
-      </div>
-    </section>
-
-    <p class="order-7 mx-auto mt-12 max-w-2xl text-xs text-teal-900/50">
-      {{ appName }} is an AI health-information assistant, not a licensed physician.
-      It does not provide medical advice, diagnosis, treatment, or prescriptions.
-      {{ emergencySentence }}
-    </p>
-
-    <!-- legal footer -->
-    <footer class="order-8 mx-auto mt-10 max-w-2xl border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
-      <a
-        [href]="instagramUrl"
-        target="_blank"
-        rel="noopener"
-        (click)="trackInstagramFollow('footer')"
-        class="mb-3 inline-flex items-center gap-1.5 text-teal-900/70 hover:text-teal-700"
-        aria-label="Follow KnocDoc Health on Instagram"
-      >
-        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-        </svg>
-        <span>{{ instagramHandle }}</span>
-      </a>
-      <!-- Contact. Icon only: the number is never rendered into the HTML, so a
-           scraper cannot lift it off the page. openWhatsApp() assembles and opens
-           the link at click time — an <a href> would put the number back in the markup. -->
-      <button
-        type="button"
-        (click)="openWhatsApp()"
-        class="mb-3 ml-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#25D366] align-middle text-white shadow-md transition-colors hover:bg-[#1DA851] focus:outline-none focus:ring-2 focus:ring-[#25D366]/40"
-        aria-label="Chat with us on WhatsApp"
-        title="Chat with us on WhatsApp"
-      >
-        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true">
-          <path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2 22l5.36-1.4a9.78 9.78 0 0 0 4.68 1.2h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.9c-.24.68-1.4 1.32-1.94 1.36-.5.05-1.12.07-1.8-.11a15.6 15.6 0 0 1-1.63-.6c-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36l.55.01c.17.01.41-.07.64.49.24.57.82 1.98.89 2.12.07.14.12.31.02.5-.09.19-.14.31-.28.47l-.42.49c-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.17-.19.69-.8.87-1.08.19-.28.37-.23.62-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36Z"/>
-        </svg>
-      </button>
-      <!-- Internal links to the SEO landing pages. The homepage is the highest-authority
-           page on the site; without these the eight pages are only reachable via sitemap.xml. -->
-      <nav aria-label="More from DoctoGuide" class="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5">
-        <a routerLink="/ai-doctor" class="hover:text-teal-700">AI Health Assistant</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/symptom-checker" class="hover:text-teal-700">Symptom Checker</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/which-specialist-to-see" class="hover:text-teal-700">Which Specialist to See</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/health-guide" class="hover:text-teal-700">Health Guide</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/emergency-numbers" class="hover:text-teal-700">Emergency Numbers</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/how-it-works" class="hover:text-teal-700">How It Works</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/find-doctors" class="hover:text-teal-700">Find Doctors</a>
-        <span aria-hidden="true">·</span>
-        <a routerLink="/pricing" class="hover:text-teal-700">Pricing</a>
-      </nav>
-      <div>
-      <a routerLink="/privacy" class="hover:text-teal-700">Privacy Policy</a>
-      <span class="mx-2">·</span>
-      <a routerLink="/terms" class="hover:text-teal-700">Terms of Use</a>
-      <span class="mx-2">·</span>
-      <a routerLink="/disclaimer" class="hover:text-teal-700">Medical Disclaimer</a>
-      <span class="mx-2">·</span>
-      <a routerLink="/contact" class="hover:text-teal-700">Contact</a>
-      </div>
-
-      <!-- Business ownership + a reachable support address. Google Ads
-           misrepresentation policy expects a visitor to be able to tell who is
-           behind the site and how to reach them, without hunting. -->
-      <p class="mt-3 leading-relaxed">
-        {{ appName }} is operated by <strong class="font-semibold text-teal-900/70">KnocDoc</strong>.
-        Support:
-        <a href="mailto:support@knocdoc.in" class="underline hover:text-teal-700">support&#64;knocdoc.in</a>
-        ·
-        <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-teal-700">knocdoc.in</a>
-      </p>
-    </footer>
-  </main>
-</div>

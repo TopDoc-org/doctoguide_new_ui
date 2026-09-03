@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-partner-dashboard',
@@ -144,7 +145,12 @@ export class PartnerDashboardComponent implements OnInit {
     // Land on the branded home page (not straight into chat) for brand coherence.
     // AffiliateService.capture() runs on every navigation, so the ?ref= is still
     // captured here and persists into the chat the patient starts next.
-    this.campaignUrl = `${window.location.origin}/?${params.toString()}`;
+    // environment.siteUrl, NOT window.location.origin: inside the Capacitor
+    // WebView the origin is https://localhost, so every campaign link a partner
+    // copied out of the APK pointed at their own phone and was dead everywhere
+    // else. environment.prod.ts documents this as the rule for exactly this
+    // value; the ported v1 code predated it.
+    this.campaignUrl = `${environment.siteUrl}/?${params.toString()}`;
   }
 
   constructor(private api: PartnerApiService, private auth: PartnerAuthService, private router: Router) {}

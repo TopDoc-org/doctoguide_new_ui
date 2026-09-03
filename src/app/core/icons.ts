@@ -9,9 +9,9 @@ import {
   Crosshair, Download, Eye, EyeOff, FileText, FlaskConical, GitMerge, Globe, Handshake,
   HeartPulse, History, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
   Lock, LogIn, LogOut, MapPin, MapPinOff, Megaphone, Menu, MessageCircle,
-  MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, PenLine,
+  MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, Paperclip, PenLine,
   Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
-  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Wallet,
+  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Utensils, Wallet,
   X, Zap,
 } from 'lucide-angular';
 
@@ -21,9 +21,9 @@ export const icons = {
   Crosshair, Download, Eye, EyeOff, FileText, FlaskConical, GitMerge, Globe, Handshake,
   HeartPulse, History, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
   Lock, LogIn, LogOut, MapPin, MapPinOff, Megaphone, Menu, MessageCircle,
-  MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, PenLine,
+  MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, Paperclip, PenLine,
   Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
-  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Wallet,
+  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Utensils, Wallet,
   X, Zap,
 };
 

@@ -21,7 +21,9 @@
     <select id="leads-campaign" [(ngModel)]="campaign" (ngModelChange)="load(1)"
       class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
       <option value="">All campaigns</option>
-      <option *ngFor="let c of campaignOptions" [value]="c">{{ c }}</option>
+      @for (c of campaignOptions; track $index) {
+        <option [value]="c">{{ c }}</option>
+      }
     </select>
   </div>
   <div class="flex-1 sm:flex-none">
@@ -29,7 +31,9 @@
     <select id="leads-specialty" [(ngModel)]="specialty" (ngModelChange)="load(1)"
       class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
       <option value="">All specialties</option>
-      <option *ngFor="let s of specialtyOptions" [value]="s">{{ s }}</option>
+      @for (s of specialtyOptions; track $index) {
+        <option [value]="s">{{ s }}</option>
+      }
     </select>
   </div>
   <div class="flex-1 sm:flex-none">
@@ -37,7 +41,9 @@
     <select id="leads-district" [(ngModel)]="district" (ngModelChange)="load(1)"
       class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto">
       <option value="">All districts</option>
-      <option *ngFor="let d of districtOptions" [value]="d">{{ d }}</option>
+      @for (d of districtOptions; track $index) {
+        <option [value]="d">{{ d }}</option>
+      }
     </select>
   </div>
   <div class="flex-1 sm:flex-none">
@@ -61,26 +67,36 @@
   </button>
 </div>
 
-<p *ngIf="error" role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+@if (error) {
+  <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+}
 
 <!-- mobile: stacked cards -->
 <div class="mt-4 space-y-2 sm:hidden">
-  <div *ngFor="let l of leads" class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-    <div class="flex items-start justify-between gap-2">
-      <p class="font-heading font-semibold text-stone-900">{{ l.name }}</p>
-      <span class="shrink-0 text-xs text-stone-900/45">{{ l.createdAt | date:'mediumDate' }}</span>
+  @for (l of leads; track l) {
+    <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+      <div class="flex items-start justify-between gap-2">
+        <p class="font-heading font-semibold text-stone-900">{{ l.name }}</p>
+        <span class="shrink-0 text-xs text-stone-900/45">{{ l.createdAt | date:'mediumDate' }}</span>
+      </div>
+      <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
+        <ds-icon name="call" [size]="14" />{{ l.mobile }}
+      </a>
+      <p class="mt-1 text-xs text-stone-900/60">{{ l.city || '—' }}@if (l.district) {
+        <span> · {{ l.district }}</span>
+      } · {{ l.specialty || 'No specialty' }}</p>
+      @if (l.campaign) {
+        <p class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
+          <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+        </p>
+      }
     </div>
-    <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
-      <ds-icon name="call" [size]="14" />{{ l.mobile }}
-    </a>
-    <p class="mt-1 text-xs text-stone-900/60">{{ l.city || '—' }}<span *ngIf="l.district"> · {{ l.district }}</span> · {{ l.specialty || 'No specialty' }}</p>
-    <p *ngIf="l.campaign" class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
-      <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+  }
+  @if (!leads.length && !loading) {
+    <p class="rounded-2xl bg-white p-6 text-center text-sm text-stone-900/50 ring-1 ring-black/5">
+      No leads in this range yet.
     </p>
-  </div>
-  <p *ngIf="!leads.length && !loading" class="rounded-2xl bg-white p-6 text-center text-sm text-stone-900/50 ring-1 ring-black/5">
-    No leads in this range yet.
-  </p>
+  }
 </div>
 
 <!-- desktop: table -->
@@ -98,34 +114,44 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let l of leads" class="border-b border-black/5 transition-colors last:border-0 hover:bg-grass-50/40">
-        <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
-        <td class="px-4 py-3 tabular-nums text-stone-900/80">{{ l.mobile }}</td>
-        <td class="px-4 py-3 text-stone-900/80">{{ l.city || '—' }}</td>
-        <td class="px-4 py-3 text-stone-900/80">{{ l.district || '—' }}</td>
-        <td class="px-4 py-3 text-stone-900/80">{{ l.specialty || '—' }}</td>
-        <td class="px-4 py-3">
-          <span *ngIf="l.campaign" class="inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-xs font-medium text-grass-700">
-            <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
-          </span>
-          <span *ngIf="!l.campaign" class="text-stone-900/40">—</span>
-        </td>
-        <td class="px-4 py-3 text-stone-900/60">{{ l.createdAt | date:'medium' }}</td>
-      </tr>
-      <tr *ngIf="!leads.length && !loading">
-        <td colspan="7" class="px-4 py-8 text-center text-stone-900/50">No leads in this range yet.</td>
-      </tr>
+      @for (l of leads; track l) {
+        <tr class="border-b border-black/5 transition-colors last:border-0 hover:bg-grass-50/40">
+          <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
+          <td class="px-4 py-3 tabular-nums text-stone-900/80">{{ l.mobile }}</td>
+          <td class="px-4 py-3 text-stone-900/80">{{ l.city || '—' }}</td>
+          <td class="px-4 py-3 text-stone-900/80">{{ l.district || '—' }}</td>
+          <td class="px-4 py-3 text-stone-900/80">{{ l.specialty || '—' }}</td>
+          <td class="px-4 py-3">
+            @if (l.campaign) {
+              <span class="inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-xs font-medium text-grass-700">
+                <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+              </span>
+            }
+            @if (!l.campaign) {
+              <span class="text-stone-900/40">—</span>
+            }
+          </td>
+          <td class="px-4 py-3 text-stone-900/60">{{ l.createdAt | date:'medium' }}</td>
+        </tr>
+      }
+      @if (!leads.length && !loading) {
+        <tr>
+          <td colspan="7" class="px-4 py-8 text-center text-stone-900/50">No leads in this range yet.</td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>
 
 <!-- pagination -->
-<div *ngIf="total > pageSize" class="mt-3 flex items-center justify-between text-sm text-stone-900/70">
-  <span>Page {{ page }} of {{ totalPages }} · {{ total }} leads</span>
-  <div class="flex gap-2">
-    <button (click)="prev()" [disabled]="page <= 1"
+@if (total > pageSize) {
+  <div class="mt-3 flex items-center justify-between text-sm text-stone-900/70">
+    <span>Page {{ page }} of {{ totalPages }} · {{ total }} leads</span>
+    <div class="flex gap-2">
+      <button (click)="prev()" [disabled]="page <= 1"
       class="min-h-[44px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Previous</button>
-    <button (click)="next()" [disabled]="page >= totalPages"
+      <button (click)="next()" [disabled]="page >= totalPages"
       class="min-h-[44px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
+    </div>
   </div>
-</div>
+}

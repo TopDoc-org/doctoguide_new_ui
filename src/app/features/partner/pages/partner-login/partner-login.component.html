@@ -17,11 +17,13 @@
     </div>
 
     <!-- session timed out -->
-    <div *ngIf="sessionExpired" role="alert"
-      class="mt-3 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
-      <ds-icon name="schedule" [size]="18" class="text-amber-600" />
-      <span><span class="font-semibold">Your session timed out.</span> Please log in again to continue.</span>
-    </div>
+    @if (sessionExpired) {
+      <div role="alert"
+        class="mt-3 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+        <ds-icon name="schedule" [size]="18" class="text-amber-600" />
+        <span><span class="font-semibold">Your session timed out.</span> Please log in again to continue.</span>
+      </div>
+    }
 
     <p class="mt-3 flex items-start gap-1 rounded-xl bg-grass-50 px-2.5 py-2 text-xs text-stone-900/70">
       <ds-icon name="verified_user" [size]="14" class="text-grass-600" />
@@ -31,11 +33,11 @@
     <!-- choose credential type -->
     <div class="mt-4 grid grid-cols-2 gap-1 rounded-xl bg-grass-50 p-1" role="tablist" aria-label="Sign-in method">
       <button type="button" role="tab" [attr.aria-selected]="mode === 'password'" (click)="setMode('password')"
-        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500"
-        [ngClass]="mode === 'password' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">Password</button>
+        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]"
+      [ngClass]="mode === 'password' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">Password</button>
       <button type="button" role="tab" [attr.aria-selected]="mode === 'pin'" (click)="setMode('pin')"
-        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500"
-        [ngClass]="mode === 'pin' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">PIN</button>
+        class="min-h-[40px] rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 coarse:min-h-[44px]"
+      [ngClass]="mode === 'pin' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-900/55'">PIN</button>
     </div>
     <p class="mt-1.5 text-xs text-stone-900/50">{{ mode === 'password' ? 'For KnocDoc Pro admins.' : 'For clinic accounts created here.' }}</p>
 
@@ -44,30 +46,32 @@
       autocomplete="username" placeholder="Registered mobile" [attr.aria-invalid]="!!error"
       class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
 
-    <ng-container *ngIf="mode === 'password'">
-      <label for="partner-password" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Password</label>
-      <input id="partner-password" [(ngModel)]="password" (keyup.enter)="submit()" type="password"
-        autocomplete="current-password" placeholder="Password" [attr.aria-invalid]="!!error"
-        class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
-    </ng-container>
+      @if (mode === 'password') {
+        <label for="partner-password" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Password</label>
+        <input id="partner-password" [(ngModel)]="password" (keyup.enter)="submit()" type="password"
+          autocomplete="current-password" placeholder="Password" [attr.aria-invalid]="!!error"
+          class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+        }
 
-    <ng-container *ngIf="mode === 'pin'">
-      <label for="partner-pin" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">PIN</label>
-      <input id="partner-pin" [(ngModel)]="pin" (keyup.enter)="submit()" type="password"
-        autocomplete="current-password" placeholder="PIN" [attr.aria-invalid]="!!error"
-        class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
-    </ng-container>
+        @if (mode === 'pin') {
+          <label for="partner-pin" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-900/60">PIN</label>
+          <input id="partner-pin" [(ngModel)]="pin" (keyup.enter)="submit()" type="password"
+            autocomplete="current-password" placeholder="PIN" [attr.aria-invalid]="!!error"
+            class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+          }
 
-    <p *ngIf="error" role="alert" class="mt-2 text-xs text-red-600">{{ error }}</p>
+          @if (error) {
+            <p role="alert" class="mt-2 text-xs text-red-600">{{ error }}</p>
+          }
 
-    <button (click)="submit()" [disabled]="loading"
-      class="mt-5 min-h-[48px] w-full rounded-xl bg-gradient-to-r from-grass-600 to-grass-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-stone-900/20 transition-all duration-150 hover:from-grass-700 hover:to-grass-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
-      {{ loading ? 'Signing in…' : 'Sign in' }}
-    </button>
+          <button (click)="submit()" [disabled]="loading"
+            class="mt-5 min-h-[48px] w-full rounded-xl bg-gradient-to-r from-grass-600 to-grass-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-stone-900/20 transition-all duration-150 hover:from-grass-700 hover:to-grass-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+            {{ loading ? 'Signing in…' : 'Sign in' }}
+          </button>
 
-    <p class="mt-4 text-center text-sm text-stone-900/60">
-      New clinic?
-      <a routerLink="/partner/signup" class="font-semibold text-grass-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">Create an account</a>
-    </p>
-  </div>
-</div>
+          <p class="mt-4 text-center text-sm text-stone-900/60">
+            New clinic?
+            <a routerLink="/partner/signup" class="font-semibold text-grass-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">Create an account</a>
+          </p>
+        </div>
+      </div>

@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AiDoctorApiService } from '../../services/ai-doctor-api.service';
 import { AiDoctorStateService } from '../../services/ai-doctor-state.service';
-import { CommonModule } from '@angular/common';
+
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { ButtonComponent } from '../../../../design-system/button/button.component';
 import { InputComponent } from '../../../../design-system/input/input.component';
@@ -16,7 +16,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, IconComponent, ButtonComponent, InputComponent, SelectComponent, DateFieldComponent, ReactiveFormsModule],
+  imports: [IconComponent, ButtonComponent, InputComponent, SelectComponent, DateFieldComponent, ReactiveFormsModule],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {

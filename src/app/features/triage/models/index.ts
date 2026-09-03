@@ -4,6 +4,33 @@ export interface ChatMessage {
   role: Role;
   text: string;
   intent?: string;
+  /**
+   * What this turn IS. Absent means plain text, so every message the chat has
+   * ever produced keeps rendering exactly as before; only an uploaded report
+   * renders as something other than a bubble.
+   */
+  kind?: 'text' | 'document';
+  /**
+   * The analysed document behind a `kind: 'document'` turn. Persisted on the
+   * server message (sessionService.appendMessage's `meta`), because chat history
+   * is rehydrated from the session — a card that lived only in the browser would
+   * vanish on refresh.
+   */
+  documentId?: string;
+  /** Resolved for rendering: fetched by `documentId` when history is rehydrated. */
+  analysis?: import('../services/report-analysis.service').ReportAnalysis;
+  /** Urgency of that analysis, so the card can colour its banner. */
+  documentUrgency?: import('../services/report-analysis.service').ReportUrgency;
+  /** Set while an upload is in flight, so the placeholder can show a spinner. */
+  pending?: boolean;
+  /**
+   * A restored card the patient can re-open questions on.
+   *
+   * Set when history is rehydrated, instead of silently putting the composer
+   * back into document mode: after a refresh, typing must go to the symptom
+   * interview unless the patient says otherwise on this specific report.
+   */
+  canAskAbout?: boolean;
 }
 
 export interface PossibleCause {
@@ -37,8 +64,11 @@ export interface CarePlan {
 export interface ConfidenceAssessment {
   score: number; // 0-100
   level: 'low' | 'moderate' | 'high';
-  factors: string[];
-  missing: string[];
+  // Optional because these come off an API response, not a constructor:
+  // older reports and partial responses omit them, which is exactly what
+  // every reader already guards for.
+  factors?: string[];
+  missing?: string[];
 }
 
 // One recommended specialist. Reports can suggest 1-3 (ranked, first = primary)

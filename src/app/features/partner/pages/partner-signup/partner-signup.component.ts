@@ -4,14 +4,14 @@ import { PartnerApiService } from '../../services/partner-api.service';
 import { PartnerAuthService } from '../../services/partner-auth.service';
 import { PartnerSignupPayload } from '../../models';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 
 @Component({
   selector: 'app-partner-signup',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, IconComponent],
+  imports: [RouterLink, FormsModule, IconComponent],
   templateUrl: './partner-signup.component.html',
 })
 export class PartnerSignupComponent {

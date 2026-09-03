@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -67,6 +67,7 @@ export class CountryService {
     const cached = this.readCache();
     if (cached) {
       this.apply(cached);
+      this.logDetected(cached, 'localStorage cache');
       return;
     }
 
@@ -83,6 +84,23 @@ export class CountryService {
     };
     this.apply(resolved);
     this.writeCache(resolved);
+    this.logDetected(resolved, 'IP lookup (get.geojs.io)');
+  }
+
+  /**
+   * Dev-only trace of the country this visitor was placed in, and where that
+   * came from — cache or a fresh lookup. Country detection is otherwise
+   * invisible apart from the banner, which makes a stale cached country hard to
+   * spot. isDevMode() keeps it out of production builds.
+   */
+  private logDetected(c: CachedCountry, via: string): void {
+    if (!isDevMode()) return;
+    console.log(
+      `%c📍 country%c ${c.countryName ?? 'unknown'} (${c.countryCode ?? '--'}) via ${via}`,
+      'background:#0b7;color:#fff;padding:1px 5px;border-radius:3px',
+      'color:inherit',
+      { ...c, resolvedAt: new Date(c.ts).toISOString() },
+    );
   }
 
   /**

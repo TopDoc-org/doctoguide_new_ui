@@ -11,40 +11,43 @@ import {
   SimpleChanges,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 // 4-box numeric PIN input. Ported from PremiumDocSite's pin-input
 // (auto-advance, paste, backspace nav). Inline styles flattened to plain CSS.
 @Component({
   selector: 'app-pin-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="pin-input-container" [class.pin-input--error]="hasError">
-      <div
-        *ngFor="let slot of digitSlots; let i = index; trackBy: trackByIndex"
-        class="pin-box-wrap"
-        [class.pin-box-wrap--active]="focusedIndex === i && !digits[i]"
-      >
-        <input
-          #pinBox
-          type="tel"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          maxlength="1"
-          [attr.aria-label]="'PIN digit ' + (i + 1) + ' of ' + length"
-          [disabled]="disabled"
-          (input)="onInput($event, i)"
-          (keydown)="onKeyDown($event, i)"
-          (paste)="onPaste($event, i)"
-          (focus)="onFocus($event, i)"
-          (blur)="onBlur()"
-        />
-        <span class="pin-cursor" *ngIf="focusedIndex === i && !digits[i]"></span>
+      @for (slot of digitSlots; track slot; let i = $index) {
+        <div
+          class="pin-box-wrap"
+          [class.pin-box-wrap--active]="focusedIndex === i && !digits[i]"
+          >
+          <input
+            #pinBox
+            type="tel"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="1"
+            [attr.aria-label]="'PIN digit ' + (i + 1) + ' of ' + length"
+            [disabled]="disabled"
+            (input)="onInput($event, i)"
+            (keydown)="onKeyDown($event, i)"
+            (paste)="onPaste($event, i)"
+            (focus)="onFocus($event, i)"
+            (blur)="onBlur()"
+            />
+            @if (focusedIndex === i && !digits[i]) {
+              <span class="pin-cursor"></span>
+            }
+          </div>
+        }
       </div>
-    </div>
-  `,
+    `,
   styles: [
     `
       .pin-input-container {
@@ -148,9 +151,6 @@ export class PinInputComponent implements AfterViewInit, OnChanges {
     this.initArrays();
   }
 
-  trackByIndex(index: number): number {
-    return index;
-  }
 
   ngAfterViewInit(): void {
     if (this.autoFocus) {

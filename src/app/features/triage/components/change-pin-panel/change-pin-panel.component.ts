@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { AiDoctorApiService } from '../../services/ai-doctor-api.service';
 import { AiDoctorStateService } from '../../services/ai-doctor-state.service';
 import { ResetSuccess } from '../pin-reset/pin-reset.component';
-import { CommonModule } from '@angular/common';
+
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { PinInputComponent } from '../pin-input/pin-input.component';
 import { PinResetComponent } from '../pin-reset/pin-reset.component';
@@ -13,7 +13,7 @@ import { PinResetComponent } from '../pin-reset/pin-reset.component';
 @Component({
   selector: 'app-change-pin-panel',
   standalone: true,
-  imports: [CommonModule, IconComponent, PinInputComponent, PinResetComponent],
+  imports: [IconComponent, PinInputComponent, PinResetComponent],
   templateUrl: './change-pin-panel.component.html',
 })
 export class ChangePinPanelComponent {

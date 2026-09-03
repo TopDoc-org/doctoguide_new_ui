@@ -5,16 +5,22 @@
 // and `text-muted` all work AND swap with [data-theme] for free.
 const rgb = (v) => `rgb(var(${v}) / <alpha-value>)`;
 
-// Locked decision: system-sans body stack, Clash Display for headings, and
-// 'Noto Sans Devanagari' appended to EVERY family. Devanagari sits second-to-last
-// so it wins for Devanagari codepoints but never displaces the Latin faces —
-// the chat is multilingual (Hindi / Hinglish) and Clash Display has no
-// Devanagari coverage, so without this Hindi renders as tofu.
-const SANS = [
+// The v1 type stack, restored. These four families are what
+// doctoguide.knocdoc.in actually renders; v2 had pointed all of them at Clash
+// Display, which collapsed a four-voice system into one.
+//
+// 'Noto Sans Devanagari' is appended to EVERY family, second-to-last, so it
+// wins for Devanagari codepoints but never displaces the Latin faces — the chat
+// is multilingual (Hindi / Hinglish) and none of the Latin faces covers
+// Devanagari, so without it Hindi renders as tofu.
+const FALLBACK = [
   '-apple-system', 'system-ui', '"Segoe UI"', 'Roboto', '"Helvetica Neue"',
   'Arial', '"Noto Sans"', '"Noto Sans Devanagari"', 'sans-serif',
 ];
-const DISPLAY = ['"Clash Display"', ...SANS];
+const BODY = ['"DM Sans"', ...FALLBACK];              // body copy, buttons, links
+const HEADING = ['Outfit', ...FALLBACK];              // headings, wordmark
+const DISPLAY = ['Fraunces', '"Noto Sans Devanagari"', 'Georgia', 'serif']; // serif hero
+const GROTESK = ['"Space Grotesk"', ...FALLBACK];     // console display
 
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
@@ -55,28 +61,28 @@ module.exports = {
         danger: rgb('--danger'), info: rgb('--info'),
       },
 
-      // Class NAMES are preserved from the base config so no template needs
-      // editing; only the values are repointed.
-      //   heading: was Outfit          -> Clash Display
-      //   body:    was DM Sans         -> system sans
-      //   display: was Fraunces (SERIF) -> Clash Display  << visible change
-      //   grotesk: was Space Grotesk   -> Clash Display
+      // Class NAMES are unchanged, so no template needs editing; only the
+      // values are repointed — back to what v1 ships.
       fontFamily: {
-        heading: DISPLAY,
-        body: SANS,
+        heading: HEADING,
+        body: BODY,
         display: DISPLAY,
-        grotesk: DISPLAY,
-        sans: SANS,
+        grotesk: GROTESK,
+        sans: BODY,
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
 
-      fontSize: {
-        xs: ['12px', '1.5'], sm: ['14px', '1.55'], base: ['16px', '1.6'],
-        lg: ['18px', '1.6'], xl: ['20px', '1.5'], '2xl': ['24px', '1.35'],
-        '3xl': ['30px', '1.25'], '4xl': ['36px', '1.15'], '5xl': ['48px', '1.08'],
-        '6xl': ['60px', '1.04'], '7xl': ['72px', '1.0'],
-      },
-      letterSpacing: { tightest: '-0.022em', tighter: '-0.016em', tight: '-0.011em' },
+      // NO fontSize or letterSpacing overrides — deliberately.
+      //
+      // v1 uses the stock Tailwind scale for both, so every ported template was
+      // written against stock metrics. v2 had introduced a custom scale (from
+      // DocTribe): 14px/1.55 instead of 14/20, 18px/1.6 instead of 18/28, and a
+      // `tracking-tight` of -0.011em against Tailwind's -0.025em.
+      //
+      // Nothing looked broken, which is why it survived — every line was just
+      // 1-2px looser than production, across 129 tracking-* usages and every
+      // text size in the app. Restoring the stock scale makes the type metrics
+      // identical to doctoguide.knocdoc.in instead of merely similar.
       borderRadius: { sm: '8px', md: '12px', lg: '16px', xl: '20px', '2xl': '28px' },
       boxShadow: { e1: 'var(--elev-1)', e2: 'var(--elev-2)', e3: 'var(--elev-3)', glow: 'var(--elev-glow)' },
       transitionTimingFunction: {
@@ -129,5 +135,12 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // `coarse:` — a touch-input variant. Tailwind 3.4 has no pointer-* variants
+    // (they arrive in v4), and the mobile touch floor must NOT key off a width
+    // breakpoint: a phone in landscape is still a finger, and a narrow desktop
+    // window is still a mouse. Used for the 44px tap-target floor on markup
+    // ported from v1, so desktop keeps its original, denser sizing.
+    ({ addVariant }) => addVariant('coarse', '@media (pointer: coarse)'),
+  ],
 };

@@ -12,48 +12,58 @@
     </div>
 
     <!-- loading -->
-    <p *ngIf="loading" class="mt-6 text-center text-sm text-teal-900/50">Loading…</p>
+    @if (loading) {
+      <p class="mt-6 text-center text-sm text-teal-900/50">Loading…</p>
+    }
 
     <!-- error -->
-    <p *ngIf="!loading && error" class="mt-6 text-center text-sm text-red-600">{{ error }}</p>
+    @if (!loading && error) {
+      <p class="mt-6 text-center text-sm text-red-600">{{ error }}</p>
+    }
 
     <!-- empty -->
-    <p
-      *ngIf="!loading && !error && sessions.length === 0"
-      class="mt-6 text-center text-sm text-teal-900/50"
-    >
-      No past consults yet.
-    </p>
+    @if (!loading && !error && sessions.length === 0) {
+      <p
+        class="mt-6 text-center text-sm text-teal-900/50"
+        >
+        No past consults yet.
+      </p>
+    }
 
     <!-- list -->
-    <div *ngIf="!loading && sessions.length" class="mt-4 flex-1 space-y-2 overflow-y-auto">
-      <button
-        *ngFor="let s of sessions"
-        (click)="openSession.emit(s.sessionId)"
-        class="flex w-full flex-col items-start rounded-xl border border-black/10 px-4 py-3 text-left hover:border-teal-500 hover:bg-teal-50/50"
-      >
-        <span class="line-clamp-2 text-sm font-medium text-teal-900">{{ s.title }}</span>
-        <span class="mt-1 flex items-center gap-2 text-[11px] text-teal-900/50">
-          <span>{{ s.updatedAt | date: 'mediumDate' }}</span>
-          <span
-            *ngFor="let chip of specialtyChips(s)"
-            class="rounded-full bg-teal-100 px-2 py-0.5 font-medium text-teal-700"
-            >{{ chip }}</span
-          >
-          <span
-            *ngIf="s.emergency"
-            class="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700"
-            >urgent</span
-          >
-        </span>
-      </button>
-    </div>
+    @if (!loading && sessions.length) {
+      <div class="mt-4 flex-1 space-y-2 overflow-y-auto">
+        @for (s of sessions; track s) {
+          <button
+            (click)="openSession.emit(s.sessionId)"
+            class="flex w-full flex-col items-start rounded-xl border border-black/10 px-4 py-3 text-left hover:border-teal-500 hover:bg-teal-50/50"
+            >
+            <span class="line-clamp-2 text-sm font-medium text-teal-900">{{ s.title }}</span>
+            <span class="mt-1 flex items-center gap-2 text-[11px] text-teal-900/50">
+              <span>{{ s.updatedAt | date: 'mediumDate' }}</span>
+              @for (chip of specialtyChips(s); track $index) {
+                <span
+                  class="rounded-full bg-teal-100 px-2 py-0.5 font-medium text-teal-700"
+                  >{{ chip }}</span
+                  >
+                }
+                @if (s.emergency) {
+                  <span
+                    class="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700"
+                    >urgent</span
+                    >
+                  }
+                </span>
+              </button>
+            }
+          </div>
+        }
 
-    <button
-      (click)="logout()"
-      class="mt-4 w-full text-center text-xs font-medium text-teal-700 hover:underline"
-    >
-      Log out
-    </button>
-  </div>
-</div>
+        <button
+          (click)="logout()"
+          class="mt-4 w-full text-center text-xs font-medium text-teal-700 hover:underline"
+          >
+          Log out
+        </button>
+      </div>
+    </div>

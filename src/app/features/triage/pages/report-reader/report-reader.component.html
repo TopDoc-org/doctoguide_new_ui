@@ -1,0 +1,180 @@
+<div class="flex min-h-[100dvh] flex-col bg-cream">
+  <!-- header -->
+  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+    <button (click)="goToConsult()" aria-label="Back"
+      class="flex shrink-0 items-center rounded-lg p-1.5 text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+      <ds-icon name="arrow_back" [size]="22" />
+    </button>
+    <h1 class="flex-1 truncate font-heading text-lg font-bold text-teal-900">Explain my report</h1>
+    @if (state.isLoggedIn && quota(); as q) {
+      <span class="shrink-0 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-800">
+        {{ q.remaining }} of {{ q.limit }} left today
+      </span>
+    }
+  </header>
+
+  <main class="flex-1 overflow-y-auto px-4 py-5">
+    <div class="mx-auto max-w-2xl space-y-5">
+
+      <!-- ── what this is ─────────────────────────────────────────────── -->
+      @if (status() === 'idle' && !result()) {
+        <ds-card>
+          <div class="flex items-start gap-3">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700">
+              <ds-icon name="biotech" [size]="20" />
+            </span>
+            <div>
+              <h2 class="font-heading text-base font-semibold text-teal-900">
+                Upload a report or prescription, get it in plain words
+              </h2>
+              <p class="mt-1 text-sm text-teal-900/70">
+                A blood test, a scan report, a discharge summary — or a prescription you
+                can't quite read. We'll explain what was measured, what's outside the usual
+                range, and what each medicine is for, the way a doctor would explain it
+                across the table.
+              </p>
+              <p class="mt-2 text-xs text-teal-900/50">
+                Your file is read once and then deleted. Only the explanation is saved to
+                your account.
+              </p>
+            </div>
+          </div>
+        </ds-card>
+      }
+
+      <!-- ── picker ───────────────────────────────────────────────────── -->
+      @if (status() === 'idle' && !result()) {
+        <ds-card>
+          <label
+            class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-teal-200 px-4 py-8 text-center transition-colors hover:border-teal-400 hover:bg-teal-50/40">
+            <ds-icon name="description" [size]="28" class="text-teal-600" />
+            <span class="font-medium text-teal-900">Choose a PDF or photo</span>
+            <span class="text-xs text-teal-900/50">
+              Up to {{ maxFiles }} files, {{ maxFileMb }}MB each
+            </span>
+            <input type="file" class="hidden" [accept]="accept" multiple (change)="onPick($event)" />
+          </label>
+
+          @if (files().length) {
+            <ul class="mt-4 space-y-2">
+              @for (f of files(); track f.name + f.size) {
+                <li class="flex items-center gap-2 rounded-lg border border-line/10 bg-surface-2/50 px-3 py-2">
+                  <ds-icon name="description" [size]="18" class="shrink-0 text-teal-700" />
+                  <span class="min-w-0 flex-1 truncate text-sm text-teal-900">{{ f.name }}</span>
+                  <span class="shrink-0 text-xs text-teal-900/50">{{ fileSizeLabel(f) }}</span>
+                  <button type="button" (click)="removeFile($index)" aria-label="Remove file"
+                    class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-teal-900/40 hover:bg-teal-50 hover:text-teal-900">
+                    <ds-icon name="close" [size]="16" />
+                  </button>
+                </li>
+              }
+            </ul>
+
+            <!-- consent: asked once, then remembered -->
+            <label class="mt-4 flex cursor-pointer items-start gap-3 rounded-lg bg-surface-2/60 px-3 py-3">
+              <input type="checkbox" [checked]="consent()" (change)="toggleConsent()"
+                class="mt-0.5 h-4 w-4 shrink-0 accent-teal-600" />
+              <span class="text-xs leading-relaxed text-teal-900/70">
+                This is my own medical document, and I understand this is an explanation to
+                help me understand it — not a diagnosis, and not a substitute for my doctor.
+              </span>
+            </label>
+
+            <ds-button class="mt-4 block" [block]="true" [disabled]="!canAnalyse()" (pressed)="analyse()">
+              <ds-icon name="auto_awesome" [size]="18" />Explain my report
+            </ds-button>
+          }
+
+          @if (errorMsg()) {
+            <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-center text-sm text-red-600">
+              {{ errorMsg() }}
+            </p>
+          }
+        </ds-card>
+      }
+
+      <!-- ── working ──────────────────────────────────────────────────── -->
+      @if (status() === 'analysing') {
+        <ds-card>
+          <div class="flex flex-col items-center gap-3 py-8 text-center">
+            <ds-spinner [size]="28" class="text-teal-600" />
+            <p class="font-medium text-teal-900">Reading your report…</p>
+            <p class="text-sm text-teal-900/60">This usually takes about 20 seconds.</p>
+          </div>
+        </ds-card>
+      }
+
+      <!-- ── the daily wall ───────────────────────────────────────────── -->
+      @if (status() === 'limit') {
+        <ds-card>
+          <div class="text-center">
+            <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-teal-50 text-teal-700">
+              <ds-icon name="history" [size]="22" />
+            </span>
+            <h2 class="mt-3 font-heading text-base font-semibold text-teal-900">
+              You've used today's {{ quota()?.limit ?? 2 }} report explanations
+            </h2>
+            <p class="mt-1 text-sm text-teal-900/70">
+              Your next {{ quota()?.limit ?? 2 }} unlock at midnight@if (resetTimeLabel()) {
+                <span> ({{ resetTimeLabel() }} your time)</span>
+              }. Nothing you've uploaded is lost — past explanations stay in your
+              account.
+            </p>
+
+            @if (interestSent()) {
+              <p class="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-green-700">
+                <ds-icon name="check_circle" [size]="18" /> Noted — thank you.
+              </p>
+            } @else {
+              <p class="mt-4 text-sm text-teal-900/60">Need more than that?</p>
+              <ds-button class="mt-2 block" variant="secondary" (pressed)="tellUsYouWantMore()">
+                Tell us you'd want more
+              </ds-button>
+            }
+
+            <button type="button" (click)="goToConsult()"
+              class="mt-4 text-sm font-medium text-teal-700 underline underline-offset-2">
+              Back to the symptom check
+            </button>
+          </div>
+        </ds-card>
+      }
+
+      <!-- ── result ───────────────────────────────────────────────────── -->
+      @if (status() === 'result' && result(); as res) {
+        <app-report-analysis-card
+          [analysis]="res.analysis"
+          [urgency]="res.urgency"
+          [disclaimer]="res.disclaimer"
+          [cached]="!!res.cached"
+          (retake)="resetToPicker()" />
+
+
+        <div class="flex flex-wrap gap-2 pb-6">
+          <ds-button variant="secondary" (pressed)="resetToPicker()">
+            <ds-icon name="add" [size]="18" />Explain another report
+          </ds-button>
+          <ds-button variant="ghost" routerLink="/triage">Back to symptom check</ds-button>
+        </div>
+      }
+
+      <!-- ── signed out ───────────────────────────────────────────────── -->
+      @if (!state.isLoggedIn && status() === 'idle') {
+        <ds-card>
+          <p class="text-sm text-teal-900/70">
+            You'll need an account to have a report explained — it's free, takes a minute,
+            and gives you {{ quota()?.limit ?? 2 }} reports a day.
+          </p>
+          <ds-button class="mt-3 block" (pressed)="startAuth()">Create a free account</ds-button>
+        </ds-card>
+      }
+    </div>
+  </main>
+</div>
+
+@if (showAuth()) {
+  <app-auth-gate
+    pendingAction="report"
+    (authSuccess)="onAuthSuccess($event)"
+    (cancel)="onAuthCancel()" />
+}

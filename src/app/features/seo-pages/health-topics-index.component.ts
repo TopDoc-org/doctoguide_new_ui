@@ -3,7 +3,7 @@ import { SeoService } from '../../core/seo/seo.service';
 import { SITE_URL } from '../../core/config/site';
 import { HEALTH_TOPICS, HealthTopic } from './health-topics.data';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-layout.component';
 
 /**
@@ -16,14 +16,14 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
 @Component({
   selector: 'app-health-topics-index',
   standalone: true,
-  imports: [RouterLink, CommonModule, SeoPageLayoutComponent],
+  imports: [RouterLink, SeoPageLayoutComponent],
   template: `
     <app-seo-page-layout
       heading="Health topics"
       lede="Plain-language guides to common symptoms: what usually causes them, the warning signs that need urgent care, and which kind of doctor treats them."
       ctaTitle="Not sure which of these fits?"
       ctaLabel="Describe your symptoms free"
-    >
+      >
       <nav aria-label="Breadcrumb" class="mb-6 text-sm">
         <a routerLink="/">Home</a>
         <span class="mx-1.5 text-teal-900/40">/</span>
@@ -40,9 +40,11 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
 
       <h2>Browse topics</h2>
       <ul>
-        <li *ngFor="let t of topics">
-          <a [routerLink]="['/health-topics', t.slug]">{{ t.heading }}</a>
-        </li>
+        @for (t of topics; track t) {
+          <li>
+            <a [routerLink]="['/health-topics', t.slug]">{{ t.heading }}</a>
+          </li>
+        }
       </ul>
 
       <h2>If this is an emergency</h2>
@@ -60,7 +62,7 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
         <li><a routerLink="/find-doctors">Find doctors near you</a></li>
       </ul>
     </app-seo-page-layout>
-  `,
+    `,
 })
 export class HealthTopicsIndexComponent implements OnInit, OnDestroy {
   topics: HealthTopic[] = HEALTH_TOPICS;

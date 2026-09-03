@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   MessageResponse,
@@ -12,9 +12,54 @@ import {
 import { AiDoctorStateService } from './ai-doctor-state.service';
 import { AffiliateService } from '../../../core/affiliate/affiliate.service';
 
+/**
+ * Where the server decided this visitor is coming from, resolved from the
+ * request IP (city-level, no permission prompt). The server keeps the visitor
+ * hash to itself — only the place comes back here.
+ */
+export interface VisitorOrigin {
+  city: string | null;
+  region: string | null;
+  country: string | null;
+  timezone: string | null;
+  org: string | null; // ISP / carrier
+  lat: number | null;
+  lng: number | null;
+  source: 'cdn-header' | 'ipinfo' | 'ipapi' | 'none';
+}
+
+export interface CreateSessionResponse {
+  sessionId: string;
+  disclaimer: string;
+  origin?: VisitorOrigin;
+}
+
+/**
+ * Dev-only console trace of the tracked location, so the value the backend
+ * actually recorded is visible in DevTools without opening Elasticsearch.
+ * isDevMode() keeps it out of production builds — a visitor should not find
+ * their own city and ISP printed in their console.
+ */
+function logVisitorOrigin(origin: VisitorOrigin | undefined, sessionId: string): void {
+  if (!isDevMode()) return;
+  if (!origin) {
+    console.log('%c📍 visitor origin', 'color:#0b7', 'not returned by the server');
+    return;
+  }
+  const place = [origin.city, origin.region, origin.country].filter(Boolean).join(', ');
+  console.log(
+    `%c📍 visitor origin%c ${place || 'unknown location'}`,
+    'background:#0b7;color:#fff;padding:1px 5px;border-radius:3px',
+    'color:inherit',
+    { ...origin, sessionId },
+  );
+}
+
 export interface SessionState {
   sessionId: string;
-  messages: { role: string; text: string; intent?: string }[];
+  // `documentId` is set on a turn that carried an uploaded report
+  // (sessionService.appendMessage's `meta`), so a refresh can rebuild the card.
+  messages: { role: string; text: string; intent?: string; documentId?: string }[];
   report: Report | null;
   emergency: boolean;
   age: number | null;
@@ -73,7 +118,7 @@ export class AiDoctorApiService {
     private affiliate: AffiliateService
   ) {}
 
-  createSession(): Observable<{ sessionId: string; disclaimer: string }> {
+  createSession(): Observable<CreateSessionResponse> {
     // Tag the new session to the user if logged in (so it lands in their history).
     const token = this.state.authToken;
     const options = token
@@ -83,11 +128,9 @@ export class AiDoctorApiService {
     const clinicId = this.affiliate.clinicId || undefined;
     const campaign = this.affiliate.campaign || undefined;
     const utm = this.affiliate.utm || undefined;
-    return this.http.post<{ sessionId: string; disclaimer: string }>(
-      `${this.base}/session`,
-      { clinicId, campaign, utm },
-      options
-    );
+    return this.http
+      .post<CreateSessionResponse>(`${this.base}/session`, { clinicId, campaign, utm }, options)
+      .pipe(tap((res) => logVisitorOrigin(res.origin, res.sessionId)));
   }
 
   // Rehydrate chat history from the server (authoritative).

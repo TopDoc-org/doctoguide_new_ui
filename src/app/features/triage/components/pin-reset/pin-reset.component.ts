@@ -7,7 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { AiDoctorApiService } from '../../services/ai-doctor-api.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { PinInputComponent } from '../pin-input/pin-input.component';
@@ -23,7 +23,7 @@ export interface ResetSuccess {
 @Component({
   selector: 'app-pin-reset',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, PinInputComponent],
+  imports: [FormsModule, IconComponent, PinInputComponent],
   templateUrl: './pin-reset.component.html',
 })
 export class PinResetComponent implements OnInit, OnDestroy {

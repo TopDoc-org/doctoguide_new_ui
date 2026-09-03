@@ -89,8 +89,9 @@ export interface AdminOverview {
   clicks: number;
   leads: number;
   conversions: number;
-  byClinic: ClinicLeadCount[];
-  byState: StateLeadCount[];
-  topSpecialties: SpecialtyCount[];
+  // Optional: API-response shape, and every reader guards with `|| []`.
+  byClinic?: ClinicLeadCount[];
+  byState?: StateLeadCount[];
+  topSpecialties?: SpecialtyCount[];
   byCampaign?: CampaignLeadCount[];
 }

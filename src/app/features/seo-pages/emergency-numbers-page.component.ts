@@ -4,7 +4,7 @@ import { SITE_URL } from '../../core/config/site';
 // Static import (not HTTP) so the full table is present in the prerendered HTML.
 import countriesJson from '../../../assets/countries.json';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-layout.component';
 
 interface EmergencyRow {
@@ -19,14 +19,14 @@ interface EmergencyRow {
 @Component({
   selector: 'app-emergency-numbers-page',
   standalone: true,
-  imports: [RouterLink, CommonModule, SeoPageLayoutComponent],
+  imports: [RouterLink, SeoPageLayoutComponent],
   template: `
     <app-seo-page-layout
       heading="Emergency numbers by country"
       lede="The official emergency and ambulance phone numbers for over 190 countries — one page, always free. Bookmark it before you travel."
       ctaTitle="Worried about a symptom right now?"
       ctaLabel="Check symptoms free"
-    >
+      >
       <p>
         <strong>If someone is in immediate danger, stop reading and call the number for your
         country below.</strong> When unsure, 112 works in many countries worldwide and on most
@@ -45,13 +45,15 @@ interface EmergencyRow {
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of rows">
-            <td>{{ r.name }}</td>
-            <td>{{ r.all }}</td>
-            <td>{{ r.ambulance }}</td>
-            <td>{{ r.police || '—' }}</td>
-            <td>{{ r.fire || '—' }}</td>
-          </tr>
+          @for (r of rows; track r) {
+            <tr>
+              <td>{{ r.name }}</td>
+              <td>{{ r.all }}</td>
+              <td>{{ r.ambulance }}</td>
+              <td>{{ r.police || '—' }}</td>
+              <td>{{ r.fire || '—' }}</td>
+            </tr>
+          }
         </tbody>
       </table>
 
@@ -63,7 +65,7 @@ interface EmergencyRow {
         <a routerLink="/which-specialist-to-see">which specialist to see</a>.
       </p>
     </app-seo-page-layout>
-  `,
+    `,
 })
 export class EmergencyNumbersPageComponent implements OnInit, OnDestroy {
   rows: EmergencyRow[] = Object.entries(countriesJson as Record<string, any>)

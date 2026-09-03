@@ -10,13 +10,109 @@
    Self-hosted, not <link>ed from fonts.googleapis.com like the v1 app did:
    the Capacitor APK must render text (including Hindi) with no network. */
 
-/* Clash Display — editorial display face, headings only. No Devanagari coverage. */
-@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
-@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-600.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
-@font-face { font-family:'Clash Display'; src:url('/fonts/clash-display-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }
+/* The v1 type stack, self-hosted.
+   Outfit (headings), DM Sans (body), Fraunces (serif display), Space Grotesk.
+   This is what doctoguide.knocdoc.in actually renders, and matching it is the
+   point — v2 had substituted Clash Display for all four, which flattened the
+   serif/sans contrast the hero is built on and lost Outfit's real 800.
 
-/* Noto Sans Devanagari — the chat is multilingual (Hindi / Hinglish) and neither
-   Clash Display nor the system sans stack covers Devanagari.
+   Each family is ONE VARIABLE file per subset, so `font-weight: 400 800`
+   interpolates every weight instead of shipping a file each. latin and
+   latin-ext only: Devanagari is a separate face below, and the remaining
+   Google subsets are dead weight on a phone. unicode-range means latin-ext is
+   fetched only if such a codepoint actually appears.
+
+   Self-hosted rather than <link>ed like v1 does, because the Capacitor APK has
+   to render text with no network. It is also simply faster than v1: no DNS +
+   TLS to fonts.googleapis.com AND fonts.gstatic.com before any glyph paints. */
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/outfit-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-latin-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-latin-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Fraunces is variable on BOTH weight and optical size. font-optical-sizing is
+   `auto` by default, which ties opsz to the rendered font-size — correct here:
+   the 32px hero gets display-cut letterforms, the 18px lede gets text-cut ones.
+   That is the face doing what it was designed to do; do not pin opsz. */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-latin-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Noto Sans Devanagari — the chat is multilingual (Hindi / Hinglish) and none
+   of the four Latin faces above covers Devanagari.
 
    ONE file, not three: Google serves the Devanagari subset as a VARIABLE font,
    and the woff2 URL is byte-identical for weights 400/500/600. `font-weight:
@@ -134,10 +230,12 @@ body {
   margin: 0;
   background: rgb(var(--bg));
   color: rgb(var(--text));
-  font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue',
-               Arial, 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
-  /* 16px, NOT DocTribe's 15px: dropping a pixel would shrink every page in the
-     app relative to the v1 baseline. Revisit only after parity is signed off. */
+  /* DM Sans, exactly as production serves it. v2 had fallen back to the system
+     sans stack, which renders a different width and colour on every platform —
+     the one thing a brand body face exists to prevent. */
+  font-family: 'DM Sans', 'Noto Sans Devanagari', -apple-system, system-ui,
+               'Segoe UI', Roboto, Arial, sans-serif;
+  /* 16px / 1.5, matching production's computed 16px/24px body. */
   font-size: 16px;
   line-height: 1.5;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
@@ -147,13 +245,30 @@ body {
   transition: background-color .24s cubic-bezier(.2,0,0,1), color .24s cubic-bezier(.2,0,0,1);
 }
 
+/* Headings get the FAMILY here and nothing else.
+   
+   Tailwind's Preflight resets h1-h6 to `font-size: inherit; font-weight:
+   inherit`, and v1 relies on that: every heading's size and weight comes from
+   the utility classes on the element. v2 had added `font-weight: 600` and a
+   line-height here, which quietly overrode Preflight and re-weighted every
+   heading in the app — the hero included, which production sets in Fraunces
+   400 and which came out at 700.
+   
+   So: family and colour only. Size, weight and leading stay where v1 put them,
+   in the templates. Anything set here fights 100+ ported components. */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Clash Display', 'Noto Sans Devanagari', -apple-system, system-ui,
+  font-family: 'Outfit', 'Noto Sans Devanagari', -apple-system, system-ui,
                'Segoe UI', Roboto, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
   color: rgb(var(--text-strong));
+}
+
+/* Elements marked `font-display` opt into the serif — the hero, the SEO ledes.
+   Only the optical niceties are set here; size and leading stay in the
+   templates, matching production. Fraunces' optical-size axis is left on `auto`
+   so a 32px hero gets display-cut letterforms and an 18px lede gets text-cut
+   ones — that is the face earning its keep. */
+.font-display {
+  letter-spacing: -0.01em;
 }
 
 ::selection { background: rgb(var(--teal-500) / .3); }
@@ -198,6 +313,25 @@ html { -webkit-text-size-adjust: 100%; }
 :where(a, button, [role='tab'], [role='button']):focus:not(:focus-visible) { outline: none; }
 
 a, button, [role='tab'], [role='button'], label, select, summary { touch-action: manipulation; }
+
+/* iOS Safari zooms the viewport whenever a focused form control's font-size is
+   under 16px, and it does NOT zoom back out on blur — the page just stays
+   scaled and horizontally scrollable. 51 controls in the markup ported from v1
+   are `text-sm` (14px), including the triage composer, the auth gate and every
+   console filter, so the first tap into any of them wrecked the layout.
+   The floor is raised only for touch pointers, so the denser 14px controls on
+   the desktop consoles are untouched. Keyed on `pointer: coarse` rather than a
+   width breakpoint: a phone in landscape is still a finger, and a narrow
+   desktop window is still a mouse.
+   The ds-* controls already declare `text-base`; this only lifts the raw
+   `<input>` / `<select>` / `<textarea>` markup that did not go through them. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
 a[href], button:not(:disabled), [role='tab'], [role='button'], label[for], summary { cursor: pointer; }
 
 .skip-link {
@@ -242,6 +376,21 @@ a[href], button:not(:disabled), [role='tab'], [role='button'], label[for], summa
 .seo-prose strong { color: rgb(var(--prose-head)); }
 
 .seo-prose table { width: 100%; border-collapse: collapse; margin: .8rem 0 1.2rem; font-size: .9rem; }
+
+/* Content tables can be far wider than a phone — /emergency-numbers is five
+   columns and 200+ rows — and nothing in the prose markup contains them, so
+   the PAGE scrolled sideways instead of the table. `display: block` is what
+   makes a bare <table> its own scroll container; doing it here rather than
+   wrapping each table in a div keeps it to one rule instead of an edit in
+   every prose template, and leaves the prerendered HTML byte-identical. */
+@media (max-width: 640px) {
+  .seo-prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 .seo-prose :is(th, td) { border: 1px solid rgb(var(--teal-600) / .25); padding: .5rem .75rem; text-align: left; vertical-align: top; }
 .seo-prose th { background: rgb(var(--teal-600) / .08); font-weight: 600; color: rgb(var(--prose-head)); }
 

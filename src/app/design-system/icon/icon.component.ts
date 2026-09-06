@@ -10,8 +10,8 @@ import { REGISTERED_ICON_NAMES } from '../../core/icons';
  * public API is what makes porting a template a pure textual substitution
  * rather than 172 individual naming decisions:
  *
- *   <span class="material-icons text-teal-600">person</span>
- *   ->  <ds-icon name="person" class="text-teal-600" />
+ *   <span class="material-icons text-brand-ink-soft">person</span>
+ *   ->  <ds-icon name="person" class="text-brand-ink-soft" />
  *
  * Values are pick() KEYS kebab-cased (see core/icons.ts), not lucide filenames.
  */
@@ -36,6 +36,7 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   check_circle: 'check-circle',
   chevron_right: 'chevron-right',
   close: 'x',
+  content_copy: 'copy',
   // No "card off" glyph in lucide; the semantics at the call site are
   // "no card needed", which a plain card reads as well enough.
   credit_card_off: 'credit-card',
@@ -46,6 +47,8 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   edit_note: 'pen-line',
   emergency: 'siren',
   event: 'calendar',
+  // "routine, nothing time-critical" on the report's urgency badge.
+  event_available: 'calendar-check',
   expand_less: 'chevron-up',
   forum: 'messages-square',
   expand_more: 'chevron-down',
@@ -54,6 +57,7 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   handshake: 'handshake',
   healing: 'heart-pulse',
   history: 'history',
+  hourglass_empty: 'hourglass',
   how_to_reg: 'user-check',
   hub: 'git-merge',
   info: 'info',
@@ -72,10 +76,18 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   money_off: 'ban',
   menu: 'menu',
   my_location: 'crosshair',
+  near_me: 'navigation',
   password: 'key-round',
   payments: 'wallet',
   person: 'user',
   place: 'map-pin',
+  // Material's "!" glyph. Only ever rendered on a non-routine urgency badge,
+  // which is why it maps to the warning triangle rather than a bare mark.
+  priority_high: 'triangle-alert',
+  radio_button_checked: 'circle-dot',
+  radio_button_unchecked: 'circle',
+  // Material's filled thumbs-up-in-a-circle, used to flag a verified top pick.
+  recommend: 'badge-check',
   refresh: 'refresh-cw',
   // Before/after food on a prescription readout.
   restaurant: 'utensils',
@@ -87,6 +99,13 @@ const MATERIAL_ICON_MAP: Record<string, string> = {
   sort: 'arrow-up-down',
   space_dashboard: 'layout-dashboard',
   star: 'star',
+  // Lucide ships one star outline, not a filled/outline pair. Both ligatures
+  // therefore resolve to the same glyph and the FILL is what distinguishes a
+  // selected star from an empty one — see the rating row in triage-shell,
+  // which adds `[&_svg]:fill-current` on the selected ones. A descendant CSS
+  // rule beats the svg's own `fill="none"` presentation attribute, so this
+  // needs no change to the component.
+  star_border: 'star',
   store: 'store',
   storefront: 'store',
   translate: 'languages',

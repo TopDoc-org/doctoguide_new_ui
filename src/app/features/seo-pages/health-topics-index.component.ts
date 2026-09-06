@@ -26,8 +26,8 @@ import { SeoPageLayoutComponent } from '../../layouts/seo-page-layout/seo-page-l
       >
       <nav aria-label="Breadcrumb" class="mb-6 text-sm">
         <a routerLink="/">Home</a>
-        <span class="mx-1.5 text-teal-900/40">/</span>
-        <span class="text-teal-900/60">Health topics</span>
+        <span class="mx-1.5 text-muted">/</span>
+        <span class="text-muted">Health topics</span>
       </nav>
 
       <p>

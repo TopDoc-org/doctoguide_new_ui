@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { ButtonComponent } from '../../../../design-system/button/button.component';
 import { CardComponent } from '../../../../design-system/card/card.component';
+import { CheckboxComponent } from '../../../../design-system/checkbox/checkbox.component';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { SpinnerComponent } from '../../../../design-system/spinner/spinner.component';
 import { AuthGateComponent, AuthSuccess } from '../../components/auth-gate/auth-gate.component';
@@ -16,6 +17,8 @@ import {
   MAX_FILE_BYTES,
   QuotaStatus,
   ReportAnalysisService,
+  documentsOf,
+  shrinkForUpload,
 } from '../../services/report-analysis.service';
 import { ReportAnalysisCardComponent } from '../../components/report-analysis-card/report-analysis-card.component';
 
@@ -38,6 +41,7 @@ import { ReportAnalysisCardComponent } from '../../components/report-analysis-ca
     RouterLink,
     ButtonComponent,
     CardComponent,
+    CheckboxComponent,
     IconComponent,
     SpinnerComponent,
     AuthGateComponent,
@@ -67,12 +71,33 @@ export class ReportReaderComponent implements OnInit {
   protected consent = signal(false);
   protected showAuth = signal(false);
 
-  protected canAnalyse = computed(
-    () => this.files().length > 0 && this.consent() && this.status() !== 'analysing',
-  );
+  /**
+   * The documents to draw, one card each. One entry for an ordinary upload;
+   * more when the files turned out to be separate documents rather than pages
+   * of the same one. Falls back to the single `analysis` for anything stored
+   * before multi-document support.
+   */
+  protected documents = computed(() => documentsOf(this.result()));
+
+  /**
+   * Enabled only when there is something to send AND we do not already know the
+   * answer is no.
+   *
+   * `remaining` is only consulted when the server has actually told us a
+   * number: a null quota (never loaded, or the counter endpoint was down) must
+   * NOT disable the button, or a flaky counter would deny a patient an
+   * allowance they still have. The server is the gate; this only avoids
+   * uploading a medical document to be told it was never going to work.
+   */
+  protected canAnalyse = computed(() => {
+    if (this.files().length === 0 || !this.consent() || this.status() === 'analysing') return false;
+    const q = this.quota();
+    return !q || q.remaining > 0;
+  });
 
   ngOnInit(): void {
     this.consent.set(this.state.docConsent);
+    if (this.state.documentQuota) this.quota.set(this.state.documentQuota);
     if (this.state.isLoggedIn) this.loadQuota();
 
     // Arrived from the chat composer's attach button with a file already
@@ -85,9 +110,15 @@ export class ReportReaderComponent implements OnInit {
     }
   }
 
+  /** Keep the shared copy in step — the chat's paperclip spends the same two. */
+  private setQuota(q: QuotaStatus): void {
+    this.quota.set(q);
+    this.state.documentQuota = q;
+  }
+
   private loadQuota(): void {
     this.api.getQuota().subscribe({
-      next: (q) => this.quota.set(q),
+      next: (q) => this.setQuota(q),
       // A missing counter is not worth a visible error — the upload itself
       // still enforces the allowance server-side.
       error: () => {},
@@ -96,11 +127,21 @@ export class ReportReaderComponent implements OnInit {
 
   // ── picking files ────────────────────────────────────────────────────────
 
-  protected onPick(event: Event): void {
+  protected async onPick(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const picked = Array.from(input.files || []);
     input.value = ''; // so re-picking the same file still fires a change
-    if (picked.length) this.acceptFiles(picked);
+    if (!picked.length) return;
+
+    // Count first: refusing four files costs nothing, and there is no reason to
+    // spend a second re-encoding photos we are about to reject.
+    if (picked.length > this.maxFiles) {
+      this.errorMsg.set(`Please choose up to ${this.maxFiles} files.`);
+      return;
+    }
+    // Shrink BEFORE the size check, so a 12MP photo is accepted at its shrunk
+    // size rather than refused at its original one.
+    this.acceptFiles(await shrinkForUpload(picked));
   }
 
   /**
@@ -135,8 +176,10 @@ export class ReportReaderComponent implements OnInit {
     this.files.update((list) => list.filter((_, i) => i !== index));
   }
 
-  protected toggleConsent(): void {
-    const next = !this.consent();
+  /** Takes the control's value rather than negating our own: the checkbox has
+   *  already decided what it is, and deriving it a second way here is how the
+   *  two drift apart. */
+  protected setConsent(next: boolean): void {
     this.consent.set(next);
     this.state.docConsent = next;
   }
@@ -157,7 +200,7 @@ export class ReportReaderComponent implements OnInit {
       next: (res) => {
         this.result.set(res);
         this.status.set('result');
-        if (res.usage) this.quota.set(res.usage);
+        if (res.usage) this.setQuota(res.usage);
         else this.loadQuota();
         this.analytics.logAnalyticsEvent('report_analysed', {
           documentType: res.documentType,

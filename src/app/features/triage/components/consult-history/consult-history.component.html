@@ -1,30 +1,30 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-  <div class="flex max-h-[80vh] w-full max-w-sm flex-col rounded-2xl bg-white p-6 shadow-xl">
+  <div class="flex max-h-[80vh] w-full max-w-sm flex-col rounded-2xl bg-surface p-6 shadow-xl">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="font-heading text-lg font-bold text-teal-900">My consults</h3>
-        <p class="text-xs text-teal-900/50">{{ state.userName || 'Signed in' }}</p>
+        <h3 class="font-heading text-lg font-bold text-ink">My consults</h3>
+        <p class="text-xs text-muted">{{ state.userName || 'Signed in' }}</p>
       </div>
       <button (click)="close.emit()" type="button" aria-label="Close"
-        class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-teal-900/50 hover:bg-teal-50 hover:text-teal-900">
+        class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-tint hover:text-ink">
         <ds-icon name="close" />
       </button>
     </div>
 
     <!-- loading -->
     @if (loading) {
-      <p class="mt-6 text-center text-sm text-teal-900/50">Loading…</p>
+      <p class="mt-6 text-center text-sm text-muted">Loading…</p>
     }
 
     <!-- error -->
     @if (!loading && error) {
-      <p class="mt-6 text-center text-sm text-red-600">{{ error }}</p>
+      <p class="mt-6 text-center text-sm text-danger-ink">{{ error }}</p>
     }
 
     <!-- empty -->
     @if (!loading && !error && sessions.length === 0) {
       <p
-        class="mt-6 text-center text-sm text-teal-900/50"
+        class="mt-6 text-center text-sm text-muted"
         >
         No past consults yet.
       </p>
@@ -36,20 +36,20 @@
         @for (s of sessions; track s) {
           <button
             (click)="openSession.emit(s.sessionId)"
-            class="flex w-full flex-col items-start rounded-xl border border-black/10 px-4 py-3 text-left hover:border-teal-500 hover:bg-teal-50/50"
+            class="flex w-full flex-col items-start rounded-xl border border-line/10 px-4 py-3 text-left hover:border-teal-500 hover:bg-brand-tint/50"
             >
-            <span class="line-clamp-2 text-sm font-medium text-teal-900">{{ s.title }}</span>
-            <span class="mt-1 flex items-center gap-2 text-[11px] text-teal-900/50">
+            <span class="line-clamp-2 text-sm font-medium text-ink">{{ s.title }}</span>
+            <span class="mt-1 flex items-center gap-2 text-[11px] text-muted">
               <span>{{ s.updatedAt | date: 'mediumDate' }}</span>
               @for (chip of specialtyChips(s); track $index) {
                 <span
-                  class="rounded-full bg-teal-100 px-2 py-0.5 font-medium text-teal-700"
+                  class="rounded-full bg-brand-tint-strong px-2 py-0.5 font-medium text-brand-ink"
                   >{{ chip }}</span
                   >
                 }
                 @if (s.emergency) {
                   <span
-                    class="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700"
+                    class="rounded-full bg-danger-tint-strong px-2 py-0.5 font-medium text-danger-ink"
                     >urgent</span
                     >
                   }
@@ -61,7 +61,7 @@
 
         <button
           (click)="logout()"
-          class="mt-4 w-full text-center text-xs font-medium text-teal-700 hover:underline"
+          class="mt-4 w-full text-center text-xs font-medium text-brand-ink hover:underline"
           >
           Log out
         </button>

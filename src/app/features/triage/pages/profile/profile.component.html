@@ -1,13 +1,13 @@
-<div class="flex min-h-[100dvh] flex-col bg-cream">
+<div class="flex min-h-[100dvh] flex-col bg-bg">
   <!-- header -->
-  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-line/5 bg-surface px-3 py-3 sm:px-4">
     <button (click)="goBack()" aria-label="Back"
-      class="flex shrink-0 items-center rounded-lg p-1.5 text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+      class="flex shrink-0 items-center rounded-lg p-1.5 text-brand-ink hover:bg-brand-tint hover:text-ink coarse:min-h-[44px]">
       <ds-icon name="arrow_back" [size]="22" />
     </button>
-    <h1 class="flex-1 truncate font-heading text-lg font-bold text-teal-900">My profile</h1>
+    <h1 class="flex-1 truncate font-heading text-lg font-bold text-ink">My profile</h1>
     @if (saved) {
-      <span class="flex shrink-0 items-center gap-1 text-sm font-medium text-green-600">
+      <span class="flex shrink-0 items-center gap-1 text-sm font-medium text-success-ink">
         <ds-icon name="check_circle" [size]="18" /> Saved
       </span>
     }
@@ -16,15 +16,15 @@
     </ds-button>
   </header>
 
-  <main class="flex-1 overflow-y-auto px-4 py-5">
+  <main id="main" class="flex-1 overflow-y-auto px-4 py-5">
     <div class="mx-auto max-w-2xl">
       @if (loading) {
-        <p class="py-10 text-center text-sm text-teal-900/50">Loading your details…</p>
+        <p class="py-10 text-center text-sm text-muted">Loading your details…</p>
       }
 
       @if (!loading && error && !saving) {
         <p
-          class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-center text-sm text-red-600">
+          class="mb-4 rounded-lg bg-danger-tint px-3 py-2 text-center text-sm text-danger-ink">
           {{ error }}
         </p>
       }
@@ -32,79 +32,79 @@
       @if (!loading) {
         <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
           <!-- Personal details -->
-          <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-            <h2 class="mb-4 font-heading text-base font-semibold text-teal-900">Personal details</h2>
+          <section class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line/10">
+            <h2 class="mb-4 font-heading text-base font-semibold text-ink">Personal details</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">First name</label>
+                <label class="text-xs font-medium text-muted">First name</label>
                 <ds-input formControlName="first_name" placeholder="First name" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Last name</label>
+                <label class="text-xs font-medium text-muted">Last name</label>
                 <ds-input formControlName="last_name" placeholder="Last name" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Date of birth</label>
+                <label class="text-xs font-medium text-muted">Date of birth</label>
                 <ds-date-field formControlName="DOB" [max]="today" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Gender</label>
+                <label class="text-xs font-medium text-muted">Gender</label>
                 <ds-select formControlName="gender" [options]="genders" placeholder="Select" />
               </div>
             </div>
           </section>
           <!-- Contact -->
-          <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-            <h2 class="mb-4 font-heading text-base font-semibold text-teal-900">Contact</h2>
+          <section class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line/10">
+            <h2 class="mb-4 font-heading text-base font-semibold text-ink">Contact</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Email</label>
+                <label class="text-xs font-medium text-muted">Email</label>
                 <ds-input type="email" formControlName="email" placeholder="you@example.com" />
                 @if (form.get('email')?.touched && form.get('email')?.invalid) {
-                  <small class="text-red-600">
+                  <small class="text-danger-ink">
                     Enter a valid email.
                   </small>
                 }
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Mobile number</label>
+                <label class="text-xs font-medium text-muted">Mobile number</label>
                 <ds-input formControlName="mobile" />
-                <small class="text-teal-900/40">Your account ID — can't be changed.</small>
+                <small class="text-muted">Your account ID — can't be changed.</small>
               </div>
             </div>
           </section>
           <!-- Address -->
-          <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-            <h2 class="mb-4 font-heading text-base font-semibold text-teal-900">Address</h2>
+          <section class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line/10">
+            <h2 class="mb-4 font-heading text-base font-semibold text-ink">Address</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="flex flex-col gap-1 sm:col-span-2">
-                <label class="text-xs font-medium text-teal-900/60">Address</label>
+                <label class="text-xs font-medium text-muted">Address</label>
                 <ds-input formControlName="address" placeholder="House / street" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">City</label>
+                <label class="text-xs font-medium text-muted">City</label>
                 <ds-input formControlName="city" placeholder="City" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">State</label>
+                <label class="text-xs font-medium text-muted">State</label>
                 <ds-input formControlName="state" placeholder="State" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Country</label>
+                <label class="text-xs font-medium text-muted">Country</label>
                 <ds-input formControlName="country" placeholder="Country" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Zipcode</label>
+                <label class="text-xs font-medium text-muted">Zipcode</label>
                 <ds-input formControlName="Zipcode" placeholder="Zipcode" inputmode="numeric" />
               </div>
             </div>
           </section>
           <!-- Medical -->
-          <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5" formGroupName="medical_records">
-            <h2 class="mb-4 font-heading text-base font-semibold text-teal-900">Medical</h2>
+          <section class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line/10" formGroupName="medical_records">
+            <h2 class="mb-4 font-heading text-base font-semibold text-ink">Medical</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-teal-900/60">Blood group</label>
+                <label class="text-xs font-medium text-muted">Blood group</label>
                 <ds-select formControlName="blood_group" [options]="bloodGroups" placeholder="Select" />
               </div>
             </div>

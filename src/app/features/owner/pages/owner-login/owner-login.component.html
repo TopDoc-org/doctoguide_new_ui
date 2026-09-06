@@ -1,6 +1,6 @@
 <div class="grid min-h-[100dvh] lg:grid-cols-2">
   <!-- brand panel (desktop) -->
-  <div class="relative hidden overflow-hidden bg-stone-900 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+  <div class="relative hidden overflow-hidden bg-grass-900 p-10 text-white lg:flex lg:flex-col lg:justify-between">
     <div aria-hidden="true" class="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-grass-500/30 blur-3xl motion-safe:animate-blob"></div>
     <p class="relative flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-300">
       <span class="h-px w-6 bg-grass-400"></span>DoctoGuide · Creator
@@ -12,34 +12,34 @@
   </div>
 
   <!-- form panel -->
-  <div class="flex items-center justify-center bg-sand-50 px-4 py-10">
+  <div class="flex items-center justify-center bg-bg px-4 py-10">
     <div class="w-full max-w-sm">
-      <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
+      <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-console-ink">
         <span class="h-px w-6 bg-grass-500"></span>Creator Console
       </p>
-      <h1 class="mt-2 font-grotesk text-3xl font-bold tracking-tight text-stone-900">Owners only.</h1>
-      <p class="mt-1 text-sm text-stone-500">App-wide analytics across every clinic and campaign.</p>
+      <h1 class="mt-2 font-grotesk text-3xl font-bold tracking-tight text-content-strong">Owners only.</h1>
+      <p class="mt-1 text-sm text-muted">App-wide analytics across every clinic and campaign.</p>
 
       @if (sessionExpired) {
         <div role="alert"
-          class="mt-4 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
-          <ds-icon name="schedule" [size]="18" class="text-amber-600" />
+          class="mt-4 flex items-start gap-2 rounded-xl border border-console-gold-line bg-console-gold-tint px-3 py-2.5 text-sm text-console-gold">
+          <ds-icon name="schedule" [size]="18" class="text-console-gold-soft" />
           <span><span class="font-semibold">Your session timed out.</span> Please log in again to continue.</span>
         </div>
       }
 
-      <label for="owner-username" class="mt-5 block text-xs font-semibold uppercase tracking-wide text-stone-500">Username</label>
+      <label for="owner-username" class="mt-5 block text-xs font-semibold uppercase tracking-wide text-muted">Username</label>
       <input id="owner-username" [(ngModel)]="username" (keyup.enter)="submit()" type="text" inputmode="text"
         autocomplete="username" placeholder="Creator username" [attr.aria-invalid]="!!error"
-        class="mt-1 min-h-[44px] w-full rounded-xl border border-sand-200 bg-white px-3 py-2.5 text-base outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+        class="console-field" />
 
-        <label for="owner-password" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-stone-500">Password</label>
+        <label for="owner-password" class="mt-3 block text-xs font-semibold uppercase tracking-wide text-muted">Password</label>
         <input id="owner-password" [(ngModel)]="password" (keyup.enter)="submit()" type="password"
           autocomplete="current-password" placeholder="Password" [attr.aria-invalid]="!!error"
-          class="mt-1 min-h-[44px] w-full rounded-xl border border-sand-200 bg-white px-3 py-2.5 text-base outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+          class="console-field" />
 
           @if (error) {
-            <p role="alert" class="mt-2 text-xs text-red-600">{{ error }}</p>
+            <p role="alert" class="mt-2 text-xs text-danger">{{ error }}</p>
           }
 
           <button (click)="submit()" [disabled]="loading"
@@ -47,7 +47,7 @@
             {{ loading ? 'Signing in…' : 'Sign in' }}
           </button>
 
-          <p class="mt-6 text-center text-xs text-stone-400">Creators only. Not for clinics or staff.</p>
+          <p class="mt-6 text-center text-xs text-muted">Creators only. Not for clinics or staff.</p>
         </div>
       </div>
     </div>

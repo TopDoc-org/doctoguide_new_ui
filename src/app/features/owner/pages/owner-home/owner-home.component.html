@@ -1,52 +1,52 @@
 <!-- hero -->
 <div class="mb-5">
-  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
+  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-console-ink">
     <span class="h-px w-6 bg-grass-500"></span>Platform-wide
   </p>
-  <h1 class="mt-2 font-grotesk text-4xl font-bold leading-[0.95] tracking-tight text-stone-900 sm:text-5xl">
-    The whole platform, <span class="text-grass-600">at a glance.</span>
+  <h1 class="mt-2 font-grotesk text-4xl font-bold leading-[0.95] tracking-tight text-content-strong sm:text-5xl">
+    The whole platform, <span class="text-console-ink">at a glance.</span>
   </h1>
-  <p class="mt-2 max-w-xl text-sm text-stone-500">Every clinic, every campaign, every lead — across the entire app.</p>
+  <p class="mt-2 max-w-xl text-sm text-muted">Every clinic, every campaign, every lead — across the entire app.</p>
 </div>
 
 <!-- date range -->
-<div class="flex flex-wrap items-end gap-3 rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+<div class="flex flex-wrap items-end gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line/10">
   <div class="flex-1 sm:flex-none">
-    <label for="oh-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
-    <input id="oh-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+    <label for="oh-from" class="console-label">From</label>
+    <input id="oh-from" type="date" [(ngModel)]="from" class="console-field sm:w-auto" />
   </div>
   <div class="flex-1 sm:flex-none">
-    <label for="oh-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
-    <input id="oh-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+    <label for="oh-to" class="console-label">To</label>
+    <input id="oh-to" type="date" [(ngModel)]="to" class="console-field sm:w-auto" />
   </div>
   <button (click)="load()" [disabled]="loading"
-    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    class="console-btn">
     {{ loading ? 'Loading…' : 'Apply' }}
   </button>
 </div>
 
 @if (error) {
-  <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+  <p role="alert" class="mt-3 text-sm text-danger">{{ error }}</p>
 }
 
 @if (data; as d) {
   <!-- KPI cards -->
   <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
-    <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Clinics</p>
-      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-stone-900">{{ d.clinicsCount | number }}</p>
+    <div class="console-panel">
+      <p class="text-xs font-semibold uppercase tracking-wide text-muted">Clinics</p>
+      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-content-strong">{{ d.clinicsCount | number }}</p>
     </div>
-    <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Campaigns</p>
-      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-stone-900">{{ d.campaignsCount | number }}</p>
+    <div class="console-panel">
+      <p class="text-xs font-semibold uppercase tracking-wide text-muted">Campaigns</p>
+      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-content-strong">{{ d.campaignsCount | number }}</p>
     </div>
-    <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Clicks</p>
-      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-stone-900">{{ d.clicks | number }}</p>
+    <div class="console-panel">
+      <p class="text-xs font-semibold uppercase tracking-wide text-muted">Clicks</p>
+      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-content-strong">{{ d.clicks | number }}</p>
     </div>
-    <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-      <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Leads</p>
-      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-stone-900">{{ d.leads | number }}</p>
+    <div class="console-panel">
+      <p class="text-xs font-semibold uppercase tracking-wide text-muted">Leads</p>
+      <p class="mt-1 font-grotesk text-3xl font-bold tabular-nums text-content-strong">{{ d.leads | number }}</p>
     </div>
     <div class="col-span-2 rounded-2xl bg-grass-600 p-4 text-white shadow-sm lg:col-span-1">
       <p class="text-xs font-semibold uppercase tracking-wide text-white/80">Conversion</p>
@@ -56,60 +56,60 @@
   </div>
   <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
     <!-- top clinics -->
-    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-      <p class="font-grotesk font-bold tracking-tight text-stone-900">Top clinics by leads</p>
+    <div class="rounded-2xl bg-surface p-5 ring-1 ring-line/10">
+      <p class="font-grotesk font-bold tracking-tight text-content-strong">Top clinics by leads</p>
       @if (d.topClinics?.length) {
         <ul class="mt-3 space-y-2.5">
           @for (c of d.topClinics; track c) {
             <li>
               <div class="flex items-center justify-between text-sm">
-                <span class="truncate text-stone-700">{{ c.clinicName }}</span>
-                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+                <span class="truncate text-content">{{ c.clinicName }}</span>
+                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-content-strong">{{ c.leads | number }}</span>
               </div>
-              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-2">
                 <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(c.leads, clinicMax)"></div>
               </div>
             </li>
           }
         </ul>
       } @else {
-        <p class="mt-3 text-sm text-stone-400">No data in this range yet.</p>
+        <p class="mt-3 text-sm text-muted">No data in this range yet.</p>
       }
     </div>
     <!-- top campaigns -->
-    <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-      <p class="font-grotesk font-bold tracking-tight text-stone-900">Top campaigns by leads</p>
+    <div class="rounded-2xl bg-surface p-5 ring-1 ring-line/10">
+      <p class="font-grotesk font-bold tracking-tight text-content-strong">Top campaigns by leads</p>
       @if (d.topCampaigns?.length) {
         <ul class="mt-3 space-y-2.5">
           @for (c of d.topCampaigns; track c) {
             <li>
               <div class="flex items-center justify-between text-sm">
-                <span class="truncate text-stone-700">{{ c.campaign }}</span>
-                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ c.leads | number }}</span>
+                <span class="truncate text-content">{{ c.campaign }}</span>
+                <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-content-strong">{{ c.leads | number }}</span>
               </div>
-              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+              <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-2">
                 <div class="h-full rounded-full bg-amber-400" [style.width.%]="pct(c.leads, campaignMax)"></div>
               </div>
             </li>
           }
         </ul>
       } @else {
-        <p class="mt-3 text-sm text-stone-400">No data in this range yet.</p>
+        <p class="mt-3 text-sm text-muted">No data in this range yet.</p>
       }
     </div>
   </div>
   <!-- by state -->
   @if (d.byState?.length) {
-    <div class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-      <p class="font-grotesk font-bold tracking-tight text-stone-900">Leads by state</p>
+    <div class="mt-4 rounded-2xl bg-surface p-5 ring-1 ring-line/10">
+      <p class="font-grotesk font-bold tracking-tight text-content-strong">Leads by state</p>
       <ul class="mt-3 space-y-2.5">
         @for (s of d.byState; track s) {
           <li>
             <div class="flex items-center justify-between text-sm">
-              <span class="truncate text-stone-700">{{ s.state || '—' }}</span>
-              <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-stone-900">{{ s.leads | number }}</span>
+              <span class="truncate text-content">{{ s.state || '—' }}</span>
+              <span class="ml-2 shrink-0 font-grotesk font-bold tabular-nums text-content-strong">{{ s.leads | number }}</span>
             </div>
-            <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-sand-100">
+            <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-2">
               <div class="h-full rounded-full bg-grass-500" [style.width.%]="pct(s.leads, stateMax)"></div>
             </div>
           </li>

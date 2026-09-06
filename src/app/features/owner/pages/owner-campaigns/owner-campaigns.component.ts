@@ -1,16 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OwnerApiService } from '../../services/owner-api.service';
 import { OwnerCampaignRow, OwnerFilters, OwnerLead, OwnerQuery } from '../../models';
 import { downloadBlob } from '../../../../core/platform/download';
+import { ToastService } from '../../../../design-system/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EmptyStateComponent } from '../../../../design-system/empty-state/empty-state.component';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
+import { PageHeaderComponent } from '../../../../design-system/page-header/page-header.component';
+import { TableComponent } from '../../../../design-system/table/table.component';
 
 @Component({
   selector: 'app-owner-campaigns',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [
+    CommonModule, FormsModule,
+    IconComponent, PageHeaderComponent, TableComponent, EmptyStateComponent,
+  ],
   templateUrl: './owner-campaigns.component.html',
 })
 export class OwnerCampaignsComponent implements OnInit {
@@ -35,6 +42,13 @@ export class OwnerCampaignsComponent implements OnInit {
   page = 1;
   pageSize = 20;
   total = 0;
+
+  /** Export outcomes are announced, not written into a paragraph the
+   *  user has already scrolled past. A CSV export is the one console
+   *  action with NO on-screen result: on success the only evidence is a
+   *  file in the browser's download tray, and on failure the old inline
+   *  `error` sat above a table the user was looking at the bottom of. */
+  private readonly toast = inject(ToastService);
 
   constructor(private api: OwnerApiService, private route: ActivatedRoute) {}
 
@@ -141,10 +155,11 @@ export class OwnerCampaignsComponent implements OnInit {
       next: (blob) => {
         this.exporting = false;
         this.download(blob, `campaigns-${this.from}-to-${this.to}.csv`);
+        this.toast.success('Export ready — check your downloads.');
       },
       error: () => {
         this.exporting = false;
-        this.error = 'Export failed. Try again.';
+        this.toast.error('Export failed.', { action: { label: 'Retry', run: () => this.exportCsv() } });
       },
     });
   }
@@ -152,8 +167,14 @@ export class OwnerCampaignsComponent implements OnInit {
   exportSelectedLeads(): void {
     if (!this.selected) return;
     this.api.exportLeads({ from: this.from, to: this.to, campaign: this.selected.campaign, clinicId: this.selected.clinicId }).subscribe({
-      next: (blob) => this.download(blob, `leads-${this.selected!.campaign}-${this.selected!.clinicId}.csv`),
-      error: () => (this.error = 'Export failed. Try again.'),
+      next: (blob) => {
+        this.download(blob, `leads-${this.selected!.campaign}-${this.selected!.clinicId}.csv`);
+        this.toast.success('Export ready — check your downloads.');
+      },
+      error: () =>
+        this.toast.error('Export failed.', {
+          action: { label: 'Retry', run: () => this.exportSelectedLeads() },
+        }),
     });
   }
 

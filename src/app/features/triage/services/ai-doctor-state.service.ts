@@ -21,6 +21,16 @@ const LS_DOC_CONSENT = 'aiDoctorDocConsent';
 // prerender. v1 read localStorage unguarded here and got away with it only
 // because /triage was excluded from prerendering — but LandingComponent also
 // reads userName/userMobile off this service, and `/` IS prerendered.
+/** Mirrors `QuotaStatus` from report-analysis.service, kept structural so this
+ *  service does not depend on a feature service it is a peer of. */
+export interface DocumentQuota {
+  tier: 'free' | 'premium';
+  limit: number;
+  used: number;
+  remaining: number;
+  resetAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AiDoctorStateService {
   messages: ChatMessage[] = [];
@@ -151,7 +161,22 @@ export class AiDoctorStateService {
   get docConsent(): boolean { return storage.get(LS_DOC_CONSENT) === '1'; }
   set docConsent(v: boolean) { storage.set(LS_DOC_CONSENT, v ? '1' : '0'); }
 
+  /**
+   * The document allowance, shared by the two surfaces that spend it: the
+   * /report-reader page and the in-chat paperclip. They used to track it
+   * separately — the reader had its own signal and the chat only learned the
+   * number from an upload RESPONSE — so a chat upload left the reader showing
+   * a stale count, and the chat had no idea of the allowance until it had
+   * already spent one of it.
+   *
+   * In memory only, and never the authority. It is what the server last told
+   * us, kept so the UI can stop a request it already knows will be refused.
+   * The server decides; this only stops us wasting the user's time asking.
+   */
+  documentQuota: DocumentQuota | null = null;
+
   logout(): void {
+    this.documentQuota = null;
     this.authToken = null;
     this.userId = null;
     this.userName = null;

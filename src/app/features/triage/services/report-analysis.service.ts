@@ -22,7 +22,23 @@ export interface ReportFinding {
   unit: string;
   referenceRange: string;
   status: 'low' | 'normal' | 'high' | 'not_stated';
+  /** What THIS patient's number suggests. The only per-patient line here. */
   plainMeaning: string;
+
+  /* ── behind the info button: general facts about the test itself ──────────
+     These read the same whatever the patient's own value is, which is what
+     makes them safe to show on a normal result — and a normal result is
+     exactly when someone taps to ask what the range was for. Absent on
+     analyses stored before this shipped; the button hides itself then. */
+
+  /** What the test measures and why a doctor orders it. */
+  aboutTest?: string;
+  /** What sitting inside the usual range tells you. */
+  rangeMeaning?: string;
+  /** What a below-range result generally suggests. */
+  ifLow?: string;
+  /** What an above-range result generally suggests. */
+  ifHigh?: string;
 }
 
 export type ReportUrgency = 'routine' | 'urgent' | 'emergency';
@@ -80,8 +96,43 @@ export interface PrescribedMedicine {
   catalogueName?: string | null;
 }
 
+/**
+ * The parts of a prescription that are NOT a medicine, and that a patient most
+ * often cannot read off the page — the follow-up date above all, which is the
+ * single most missed instruction on any prescription.
+ *
+ * Every field is optional and every one is "as the page says it". The backend
+ * fills in what it can actually see; the card renders only what arrived and
+ * says nothing at all when a field is absent. That is deliberate: an empty
+ * "Next visit" row would be read as "no follow-up needed", which is a claim
+ * about someone's care that we are in no position to make.
+ */
+export interface PrescriptionDetails {
+  /** "12 September 2026", "after 5 days", "in 2 weeks" — however it is written. */
+  followUp?: string;
+  /** What the prescription is for, in the doctor's own words. */
+  diagnosis?: string;
+  /** Tests or scans the doctor asked for. */
+  testsAdvised?: string[];
+  /** Non-medicine instructions: rest, fluids, diet, exercises, physiotherapy. */
+  generalAdvice?: string[];
+  /** The date on the prescription. */
+  prescribedOn?: string;
+  /** Who wrote it — doctor, clinic, or both. */
+  prescriber?: string;
+}
+
 export interface ReportAnalysis {
-  documentType: 'lab_report' | 'imaging' | 'discharge' | 'prescription' | 'unknown';
+  documentType: 'lab_report' | 'pathology' | 'imaging' | 'discharge' | 'prescription' | 'unknown';
+  /**
+   * A short name for THIS document, used only when an upload turned out to hold
+   * more than one ("Blood test, 12 Sep", "Prescription from Dr Rao"). Absent on
+   * single-document analyses and on everything stored before multi-document
+   * support shipped — the card falls back to the document type.
+   */
+  title?: string;
+  /** Which of the uploaded files this document was read off. */
+  sourceFiles?: string[];
   headline: string;
   findings: ReportFinding[];
   whatThisMeans: string;
@@ -92,6 +143,8 @@ export interface ReportAnalysis {
   /** Absent on analyses stored before prescription support shipped. */
   legibility?: Legibility;
   medicines?: PrescribedMedicine[];
+  /** Everything on the page that is not a medicine. Absent on older analyses. */
+  prescription?: PrescriptionDetails;
   /** Anything the model could not read. Shown as-is: it is why we don't guess. */
   notInterpreted: string[];
 }
@@ -111,11 +164,38 @@ export interface AnalysisResponse {
   status: string;
   documentType: string;
   urgency: ReportUrgency;
+  /**
+   * The first document of the upload, and the only one before multi-document
+   * support. Kept alongside `documents` so a stored analysis, a PDF export or a
+   * client that predates the change still finds something to render.
+   */
   analysis: ReportAnalysis;
+  /**
+   * Every distinct document found in the upload, in the order they were sent.
+   *
+   * Three files are not necessarily three documents — a lab report photographed
+   * in two halves is one — so the count here is what the model decided, not the
+   * file count. Absent on analyses stored before this shipped; read it through
+   * `documentsOf()`, which falls back to `[analysis]`.
+   */
+  documents?: ReportAnalysis[];
   disclaimer: string;
   /** True when the same file had already been explained — costs no allowance. */
   cached?: boolean;
   usage?: QuotaStatus;
+}
+
+/**
+ * The documents in a response, whatever shape it arrived in.
+ *
+ * The one place that reconciles new multi-document responses with the single
+ * `analysis` that older stored rows carry, so no caller has to remember which
+ * it is holding.
+ */
+export function documentsOf(res: AnalysisResponse | null | undefined): ReportAnalysis[] {
+  if (!res) return [];
+  if (res.documents?.length) return res.documents;
+  return res.analysis ? [res.analysis] : [];
 }
 
 export interface AnalysisSummary {
@@ -124,6 +204,8 @@ export interface AnalysisSummary {
   documentType: string;
   urgency: ReportUrgency;
   headline: string;
+  /** How many documents that one upload held. Absent on older rows, meaning 1. */
+  documentCount?: number;
 }
 
 /** Mirrors the server's caps so a doomed upload never leaves the phone. */
@@ -137,6 +219,103 @@ export const ACCEPTED_TYPES = [
   'image/heic',
   'image/heif',
 ];
+
+/* ── shrinking a photo before it leaves the phone ───────────────────────── */
+
+/**
+ * Longest edge we send. A report photographed at 12MP carries no more readable
+ * text than the same shot at 2000px — the model is not using those pixels — so
+ * everything above this is pure upload time, prompt tokens and latency.
+ *
+ * 2000 rather than something smaller because these are often HANDWRITTEN
+ * prescriptions, where the difference between an "l" and a "1" is a few pixels
+ * and a misread drug name is a real harm.
+ */
+export const MAX_IMAGE_EDGE = 2000;
+
+/** Below this an image is sent untouched — not worth re-encoding. */
+const SHRINK_ABOVE_BYTES = 1024 * 1024;
+
+/** JPEG quality for the re-encode. Visually lossless for text on paper. */
+const SHRINK_QUALITY = 0.85;
+
+/**
+ * Types the browser can reliably decode into a canvas. HEIC/HEIF are missing on
+ * purpose: most browsers cannot decode them, `createImageBitmap` throws, and the
+ * catch below sends the original — which is the right outcome, just slower to
+ * reach if we pretended otherwise.
+ */
+const SHRINKABLE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+/** "report.png" -> "report.jpg", since the bytes really are JPEG now. */
+function asJpgName(name: string): string {
+  return name.replace(/\.[^.]+$/, '') + '.jpg';
+}
+
+/**
+ * One image, scaled down and re-encoded — or the original file, unchanged.
+ *
+ * Why this exists: the upload is base64'd into a single Gemini request, and that
+ * request has a size ceiling. Three 10MB photos are already past it. Shrinking
+ * here cuts a typical phone photo by roughly 10x, which is what makes several
+ * files in one upload comfortable rather than marginal.
+ *
+ * Every failure path returns the ORIGINAL file. A patient's upload must never
+ * be blocked because a canvas trick did not work in their browser.
+ */
+export async function shrinkImage(file: File): Promise<File> {
+  if (!SHRINKABLE_TYPES.includes(file.type)) return file;
+  // Prerendering has no canvas; an older browser may have no createImageBitmap.
+  if (typeof document === 'undefined' || typeof createImageBitmap !== 'function') return file;
+
+  let bitmap: ImageBitmap | null = null;
+  try {
+    // `from-image` applies the EXIF rotation. Without it a portrait photo is
+    // drawn sideways, and a sideways prescription reads far worse.
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+
+    const longest = Math.max(bitmap.width, bitmap.height);
+    if (longest <= MAX_IMAGE_EDGE && file.size <= SHRINK_ABOVE_BYTES) return file;
+
+    const scale = Math.min(1, MAX_IMAGE_EDGE / longest);
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    // White underneath: a transparent PNG would otherwise flatten to black and
+    // take the text with it.
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(bitmap, 0, 0, width, height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', SHRINK_QUALITY),
+    );
+    // A re-encode that saved nothing is not worth the loss of the original.
+    if (!blob || blob.size >= file.size) return file;
+
+    return new File([blob], asJpgName(file.name), {
+      type: 'image/jpeg',
+      lastModified: file.lastModified,
+    });
+  } catch {
+    return file;
+  } finally {
+    bitmap?.close?.();
+  }
+}
+
+/**
+ * Every picked file, shrunk where shrinking helps. PDFs pass straight through —
+ * re-rendering one in the browser costs more than it saves.
+ */
+export async function shrinkForUpload(files: File[]): Promise<File[]> {
+  return Promise.all(files.map((f) => shrinkImage(f)));
+}
 
 @Injectable({ providedIn: 'root' })
 export class ReportAnalysisService {

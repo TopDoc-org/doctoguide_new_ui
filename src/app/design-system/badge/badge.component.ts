@@ -24,7 +24,7 @@ export class BadgeComponent {
 
   protected classes = computed(() => {
     const soft: Record<BadgeTone, string> = {
-      teal: 'bg-teal-500/[12%] text-teal-700',
+      teal: 'bg-teal-500/[12%] text-brand-ink',
       grass: 'bg-grass-500/[12%] text-grass-700',
       success: 'bg-success/[12%] text-success',
       warning: 'bg-warning/[12%] text-warning',

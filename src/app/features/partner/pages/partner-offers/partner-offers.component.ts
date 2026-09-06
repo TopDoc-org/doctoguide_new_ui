@@ -5,11 +5,12 @@ import { OFFER_TEMPLATES } from '../../data/offer-templates';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
+import { CheckboxComponent } from '../../../../design-system/checkbox/checkbox.component';
 
 @Component({
   selector: 'app-partner-offers',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, CheckboxComponent],
   templateUrl: './partner-offers.component.html',
 })
 export class PartnerOffersComponent implements OnInit {

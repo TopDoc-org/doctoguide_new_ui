@@ -91,7 +91,7 @@ import { LegalLayoutComponent } from '../../layouts/legal-layout/legal-layout.co
         <strong>{{ legal.grievanceOfficerEmail }}</strong>.
       </p>
 
-      <p class="mt-6 text-xs text-teal-900/50">
+      <p class="mt-6 text-xs text-muted">
         This document is a draft pending review by a qualified Indian healthcare lawyer
         and does not constitute legal advice. Bracketed items must be completed before
         launch.

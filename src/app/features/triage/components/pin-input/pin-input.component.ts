@@ -48,6 +48,12 @@ import {
         }
       </div>
     `,
+  // Colours are tokens, not literals. This component was written against a
+  // white card (`#fff` box, slate ink, teal-600 accent, red-400 error) and
+  // so had no dark mode: four hard-white boxes stayed hard white while the
+  // auth gate around them went dark, and the `.filled` and error states
+  // kept their light-only red-50 / teal-50 washes. Every value below
+  // resolves identically in light and swaps with [data-theme].
   styles: [
     `
       .pin-input-container {
@@ -66,7 +72,7 @@ import {
         transform: translate(-50%, -50%);
         width: 2px;
         height: 24px;
-        background: #0d9488;
+        background: rgb(var(--teal-600));
         border-radius: 1px;
         pointer-events: none;
         animation: pin-cursor-blink 1s step-end infinite;
@@ -81,10 +87,10 @@ import {
         text-align: center;
         font-size: 1.25rem;
         font-weight: 500;
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        border: 1px solid rgb(var(--border) / 0.1);
         border-radius: 14px;
-        background: #fff;
-        color: #0f172a;
+        background: rgb(var(--surface));
+        color: rgb(var(--text-strong));
         outline: none;
         transition: all 0.2s ease;
         caret-color: transparent;
@@ -101,23 +107,23 @@ import {
         background: transparent;
       }
       .pin-input-container input:focus {
-        border-color: rgba(13, 148, 136, 0.5);
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        border-color: rgb(var(--teal-600) / 0.5);
+        box-shadow: 0 0 0 3px rgb(var(--teal-600) / 0.1);
       }
       .pin-input-container input.filled {
-        border-color: rgba(13, 148, 136, 0.35);
-        background: rgba(240, 253, 250, 0.9);
+        border-color: rgb(var(--teal-600) / 0.35);
+        background: rgb(var(--brand-tint) / 0.9);
       }
       .pin-input-container input:disabled {
         opacity: 0.5;
         cursor: not-allowed;
       }
       .pin-input--error input {
-        border-color: rgba(248, 113, 113, 0.7) !important;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        border-color: rgb(var(--danger) / 0.55) !important;
+        box-shadow: 0 0 0 3px rgb(var(--danger) / 0.1) !important;
       }
       .pin-input--error input.filled {
-        background: rgba(254, 242, 242, 0.9);
+        background: rgb(var(--danger-tint) / 0.9);
       }
       @media (max-width: 380px) {
         .pin-input-container input {

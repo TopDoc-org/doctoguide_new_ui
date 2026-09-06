@@ -1,15 +1,15 @@
 <div class="pin-reset">
   <!-- Step 1: phone -->
   @if (resetStep === 'phone') {
-    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-green-50 text-green-600">
+    <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-success-tint text-success-ink">
       <ds-icon name="chat" />
     </div>
-    <p class="text-center text-sm font-semibold text-teal-900">Reset your PIN</p>
-    <p class="mt-1 text-center text-xs text-teal-900/60">
+    <p class="text-center text-sm font-semibold text-ink">Reset your PIN</p>
+    <p class="mt-1 text-center text-xs text-muted">
       Enter your registered mobile number. We'll send a verification code via WhatsApp.
     </p>
-    <div class="mt-4 flex items-center rounded-lg border border-black/10 px-3 focus-within:border-teal-600">
-      <span class="text-sm text-teal-900/60">+91</span>
+    <div class="mt-4 flex items-center rounded-lg border border-line/10 px-3 focus-within:border-teal-600">
+      <span class="text-sm text-muted">+91</span>
       <input
         [(ngModel)]="resetPhone"
         type="tel"
@@ -21,7 +21,7 @@
         />
       </div>
       @if (resetError) {
-        <p class="mt-2 text-center text-xs text-red-600">{{ resetError }}</p>
+        <p class="mt-2 text-center text-xs text-danger-ink">{{ resetError }}</p>
       }
       <button
         (click)="sendOtp()"
@@ -33,20 +33,20 @@
         }
         {{ resetLoading ? 'Sending…' : 'Send WhatsApp Code' }}
       </button>
-      <button (click)="goBack()" class="mt-3 w-full text-center text-xs font-medium text-teal-700 hover:underline">
+      <button (click)="goBack()" class="mt-3 w-full text-center text-xs font-medium text-brand-ink hover:underline">
         Back to login
       </button>
     }
 
     <!-- Step 2: OTP -->
     @if (resetStep === 'otp') {
-      <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+      <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-tint text-brand-ink-soft">
         <ds-icon name="verified_user" />
       </div>
-      <p class="text-center text-sm font-semibold text-teal-900">Verify your number</p>
-      <p class="mt-1 text-center text-xs text-teal-900/60">
+      <p class="text-center text-sm font-semibold text-ink">Verify your number</p>
+      <p class="mt-1 text-center text-xs text-muted">
         Enter the 6-digit code sent to
-        <strong class="text-teal-900">+91 {{ maskedPhone }}</strong>
+        <strong class="text-ink">+91 {{ maskedPhone }}</strong>
       </p>
       <div class="mt-5">
         <app-pin-input
@@ -57,7 +57,7 @@
           (pinChange)="onOtpChange($event)"
         ></app-pin-input>
       </div>
-      <div class="mt-3 text-center text-xs text-teal-900/60">
+      <div class="mt-3 text-center text-xs text-muted">
         @if (resetResendTimer > 0) {
           <span>Resend code in <strong>{{ resetResendTimer }}s</strong></span>
         }
@@ -66,14 +66,14 @@
             type="button"
             [disabled]="resetLoading"
             (click)="resendOtp()"
-            class="font-medium text-teal-700 hover:underline disabled:opacity-60"
+            class="font-medium text-brand-ink hover:underline disabled:opacity-60"
             >
             Resend Code
           </button>
         }
       </div>
       @if (resetError) {
-        <p class="mt-2 text-center text-xs text-red-600">{{ resetError }}</p>
+        <p class="mt-2 text-center text-xs text-danger-ink">{{ resetError }}</p>
       }
       <button
         (click)="verifyOtp()"
@@ -82,20 +82,20 @@
         >
         {{ resetLoading ? 'Verifying…' : 'Verify Code' }}
       </button>
-      <button (click)="changeNumber()" class="mt-3 w-full text-center text-xs font-medium text-teal-700 hover:underline">
+      <button (click)="changeNumber()" class="mt-3 w-full text-center text-xs font-medium text-brand-ink hover:underline">
         Change number
       </button>
     }
 
     <!-- Step 3: new PIN (create -> confirm) -->
     @if (resetStep === 'pin') {
-      <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+      <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-tint text-brand-ink-soft">
         <ds-icon name="lock" />
       </div>
-      <p class="text-center text-sm font-semibold text-teal-900">
+      <p class="text-center text-sm font-semibold text-ink">
         {{ resetPinSubStep === 'create' ? 'Create new PIN' : 'Confirm your PIN' }}
       </p>
-      <p class="mt-1 text-center text-xs text-teal-900/60">
+      <p class="mt-1 text-center text-xs text-muted">
         {{ resetPinSubStep === 'create' ? "Enter a 4-digit PIN you'll use to sign in." : 'Re-enter your 4-digit PIN to confirm.' }}
       </p>
       <div class="mt-5">
@@ -117,15 +117,15 @@
         }
       </div>
       @if (resetError) {
-        <p class="mt-3 text-center text-xs text-red-600">{{ resetError }}</p>
+        <p class="mt-3 text-center text-xs text-danger-ink">{{ resetError }}</p>
       }
       @if (resetLoading) {
-        <p class="mt-3 text-center text-xs text-teal-900/50">Setting your PIN…</p>
+        <p class="mt-3 text-center text-xs text-muted">Setting your PIN…</p>
       }
       @if (resetPinSubStep === 'confirm' && !resetLoading) {
         <button
           (click)="backToCreatePin()"
-          class="mt-4 w-full text-center text-xs font-medium text-teal-700 hover:underline"
+          class="mt-4 w-full text-center text-xs font-medium text-brand-ink hover:underline"
           >
           Back to create PIN
         </button>
@@ -135,11 +135,11 @@
     <!-- Step 4: success -->
     @if (resetStep === 'success') {
       <div class="py-2 text-center">
-        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-600">
+        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-tint text-success-ink">
           <ds-icon name="check_circle" [size]="28" />
         </div>
-        <p class="text-sm font-semibold text-teal-900">PIN updated!</p>
-        <p class="mt-1 text-xs text-teal-900/60">Your new PIN has been set successfully.</p>
+        <p class="text-sm font-semibold text-ink">PIN updated!</p>
+        <p class="mt-1 text-xs text-muted">Your new PIN has been set successfully.</p>
       </div>
     }
   </div>

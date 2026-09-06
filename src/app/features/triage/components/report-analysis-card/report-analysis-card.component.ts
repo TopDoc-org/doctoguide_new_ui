@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 
 import { ButtonComponent } from '../../../../design-system/button/button.component';
 import { CardComponent } from '../../../../design-system/card/card.component';
@@ -7,6 +7,7 @@ import {
   DoseSlot,
   FoodRelation,
   PrescribedMedicine,
+  PrescriptionDetails,
   ReportAnalysis,
   ReportFinding,
   ReportUrgency,
@@ -16,6 +17,8 @@ import {
 interface DoseSlotView {
   key: DoseSlot;
   label: string;
+  /** Sunrise / sun / sunset / moon — the day read as pictures, not as a table. */
+  icon: string;
   on: boolean;
 }
 
@@ -30,7 +33,7 @@ interface DosingView {
   frequency: string;
   /** "5 days". Empty when unwritten. */
   duration: string;
-  food: { label: string; detail: string } | null;
+  food: { label: string; detail: string; showDetail: boolean } | null;
   instructions: string;
   /** The prescription's own line, kept verbatim under the readout. */
   verbatim: string;
@@ -62,6 +65,16 @@ export class ReportAnalysisCardComponent {
   disclaimer = input('');
   /** True when the same file had already been explained — no allowance spent. */
   cached = input(false);
+  /**
+   * Where this document sits in the upload, 1-based, and how many came back.
+   *
+   * Only meaningful when one upload held several distinct documents: three
+   * cards in a row with three unrelated headlines are unreadable without saying
+   * which is which. A lone document leaves `total` at 1 and no header renders,
+   * so the single-document case looks exactly as it always did.
+   */
+  index = input(1);
+  total = input(1);
 
   /** "Try another photo" — belongs to whoever owns the upload, not the renderer. */
   retake = output<void>();
@@ -70,13 +83,57 @@ export class ReportAnalysisCardComponent {
   protected a = this.analysis;
 
   /**
+   * Which findings have their "what is this test?" panel open, by name.
+   *
+   * Keyed by name rather than index so a card that re-renders with the same
+   * findings keeps whatever the patient had opened. Several can be open at
+   * once: comparing two values is the reason someone opens the second one, and
+   * an accordion that shuts the first would fight that.
+   */
+  private openInfo = signal<ReadonlySet<string>>(new Set());
+
+  protected infoOpen(f: ReportFinding): boolean {
+    return this.openInfo().has(f.name);
+  }
+
+  protected toggleInfo(f: ReportFinding): void {
+    this.openInfo.update((open) => {
+      const next = new Set(open);
+      if (!next.delete(f.name)) next.add(f.name);
+      return next;
+    });
+  }
+
+  /**
+   * Is there anything behind the info button for this finding?
+   *
+   * Analyses stored before these fields existed have none of them, and the
+   * model leaves one empty rather than guessing at a test it does not know. In
+   * both cases the button must not appear at all — a control that opens an
+   * empty panel is worse than no control.
+   */
+  protected hasInfo(f: ReportFinding): boolean {
+    return !!(f.aboutTest || f.rangeMeaning || f.ifLow || f.ifHigh);
+  }
+
+  /** Screen-reader name for the button — "what is X?", not a bare "info". */
+  protected infoLabel(f: ReportFinding): string {
+    return this.infoOpen(f) ? `Hide what ${f.name} means` : `What does ${f.name} mean?`;
+  }
+
+  /** Stable id so the button's aria-controls points at its own panel. */
+  protected infoPanelId(f: ReportFinding): string {
+    return 'finding-info-' + f.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  /**
    * Colour for a finding. Abnormal reads amber, never red — a low haemoglobin is
    * something to look into, and a page of red alarms a patient far past what the
    * number warrants. Red is reserved for `urgency: emergency`.
    */
   protected findingClass(f: ReportFinding): string {
     if (f.status === 'low' || f.status === 'high') {
-      return 'border-amber-300/70 bg-amber-50/60';
+      return 'border-warning-line/70 bg-warning-tint/60';
     }
     return 'border-line/10 bg-surface';
   }
@@ -132,12 +189,37 @@ export class ReportAnalysisCardComponent {
     };
   }
 
-  /** "9.4", "1,50,000", "< 0.01" -> number. Null when there is nothing to plot. */
+  /** "9.4", "1,50,000", "< 0.01", "0,73" -> number. Null when nothing to plot. */
   private toNumber(value: string): number | null {
     if (!value) return null;
-    const m = String(value).replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
-    if (!m) return null;
-    const n = parseFloat(m[0]);
+    const m = String(value).match(ReportAnalysisCardComponent.NUMBER);
+    return m ? this.parseDecimal(m[0]) : null;
+  }
+
+  /** A printed number, either separator convention. Allows "1,50,000" and "2,40". */
+  private static readonly NUMBER = /-?\d+(?:[.,]\d+)*/;
+
+  /**
+   * One printed number, whichever way the lab writes its separators.
+   *
+   * Much of Europe and India prints "0,73" where others print "0.73", and the
+   * same page prints "4,000" meaning four thousand. Stripping every comma read
+   * a normal creatinine of "0,73" as 73 and put the marker off the end of its
+   * own track. Told apart the same way the server does it (documentSafety
+   * parseNumber): two or more commas is grouping, one comma before exactly
+   * three digits is grouping, anything else is a decimal comma.
+   */
+  private parseDecimal(text: string): number | null {
+    let t = text;
+    const lastDot = t.lastIndexOf('.');
+    const lastComma = t.lastIndexOf(',');
+    if (lastDot !== -1 && lastComma !== -1) {
+      t = lastComma > lastDot ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');
+    } else if (lastComma !== -1) {
+      const single = (t.match(/,/g) || []).length === 1;
+      t = single && !/,\d{3}(?!\d)/.test(t) ? t.replace(',', '.') : t.replace(/,/g, '');
+    }
+    const n = parseFloat(t);
     return Number.isFinite(n) ? n : null;
   }
 
@@ -149,26 +231,30 @@ export class ReportAnalysisCardComponent {
     text: string,
   ): { lo: number; hi: number; oneSided: 'upper' | 'lower' | null } | null {
     if (!text) return null;
-    const clean = String(text).replace(/,/g, '').replace(/[–—]/g, '-').trim();
+    // Separators are resolved per number by parseDecimal, not stripped up front:
+    // "2,40-5,70" is two decimals, "4,000 - 11,000" is two grouped thousands,
+    // and telling them apart is exactly what the old blanket strip could not do.
+    const clean = String(text).replace(/[–—]/g, '-').trim();
+    const N = ReportAnalysisCardComponent.NUMBER.source;
 
-    const two = clean.match(/(-?\d+(?:\.\d+)?)\s*(?:-|to)\s*(-?\d+(?:\.\d+)?)/i);
+    const two = clean.match(new RegExp(`(${N})\\s*(?:-|to)\\s*(${N})`, 'i'));
     if (two) {
-      const lo = parseFloat(two[1]);
-      const hi = parseFloat(two[2]);
-      return Number.isFinite(lo) && Number.isFinite(hi) ? { lo, hi, oneSided: null } : null;
+      const lo = this.parseDecimal(two[1]);
+      const hi = this.parseDecimal(two[2]);
+      return lo !== null && hi !== null ? { lo, hi, oneSided: null } : null;
     }
 
-    const upper = clean.match(/^[<≤]\s*(-?\d+(?:\.\d+)?)/);
+    const upper = clean.match(new RegExp(`^[<≤]\\s*(${N})`));
     if (upper) {
-      const hi = parseFloat(upper[1]);
+      const hi = this.parseDecimal(upper[1]);
       // "< 200" reads as "anywhere from zero up to 200".
-      return Number.isFinite(hi) ? { lo: 0, hi, oneSided: 'upper' } : null;
+      return hi !== null ? { lo: 0, hi, oneSided: 'upper' } : null;
     }
 
-    const lower = clean.match(/^[>≥]\s*(-?\d+(?:\.\d+)?)/);
+    const lower = clean.match(new RegExp(`^[>≥]\\s*(${N})`));
     if (lower) {
-      const lo = parseFloat(lower[1]);
-      return Number.isFinite(lo) ? { lo, hi: lo * 2, oneSided: 'lower' } : null;
+      const lo = this.parseDecimal(lower[1]);
+      return lo !== null ? { lo, hi: lo * 2, oneSided: 'lower' } : null;
     }
     return null;
   }
@@ -237,6 +323,7 @@ export class ReportAnalysisCardComponent {
   protected dosing(m: PrescribedMedicine): DosingView {
     const written = m.howToTake || '';
     const slots = m.timesOfDay?.length ? m.timesOfDay : this.parseSlots(written);
+    const dose = (m.dose || '').trim() || this.parseDose(written);
     const relation: FoodRelation =
       m.foodRelation && m.foodRelation !== 'not_stated'
         ? m.foodRelation
@@ -245,8 +332,8 @@ export class ReportAnalysisCardComponent {
     return {
       slots: this.SLOTS.map((slot) => ({ ...slot, on: slots.includes(slot.key) })),
       hasSchedule: slots.length > 0,
-      dose: (m.dose || '').trim() || this.parseDose(written),
-      frequency: this.sentenceCase((m.frequency || '').trim()) || this.frequencyFromSlots(slots),
+      dose: dose,
+      frequency: this.plainFrequency(m.frequency) || this.frequencyFromSlots(slots),
       duration: (m.duration || '').trim() || this.parseDuration(written),
       food: this.foodLabel(relation),
       instructions: (m.specialInstructions || '').trim(),
@@ -254,12 +341,21 @@ export class ReportAnalysisCardComponent {
     };
   }
 
-  /** The day, in the order it happens. Fixed, so every medicine reads alike. */
-  private readonly SLOTS: { key: DoseSlot; label: string }[] = [
-    { key: 'morning', label: 'Morning' },
-    { key: 'afternoon', label: 'Afternoon' },
-    { key: 'evening', label: 'Evening' },
-    { key: 'night', label: 'Night' },
+  /**
+   * The day, in the order it happens. Fixed, so every medicine reads alike.
+   *
+   * The icons are the arc of one day and are only legible AS A SEQUENCE —
+   * sunrise, high sun, sunset, moon. That is why all four always render, even
+   * the ones with no dose: drop the empty ones and the remaining icons stop
+   * being a time of day and become decoration. The label survives as the
+   * `title` and inside the container's `aria-label`, so nothing depends on
+   * reading the picture.
+   */
+  private readonly SLOTS: { key: DoseSlot; label: string; icon: string }[] = [
+    { key: 'morning', label: 'Morning', icon: 'sunrise' },
+    { key: 'afternoon', label: 'Afternoon', icon: 'sun' },
+    { key: 'evening', label: 'Evening', icon: 'sunset' },
+    { key: 'night', label: 'Night', icon: 'moon' },
   ];
 
   /**
@@ -268,18 +364,36 @@ export class ReportAnalysisCardComponent {
    * returns null: the card then says the prescription did not say, which is the
    * honest answer and the one that sends them to ask.
    */
-  private foodLabel(relation: FoodRelation): { label: string; detail: string } | null {
+  private foodLabel(
+    relation: FoodRelation,
+  ): { label: string; detail: string; showDetail: boolean } | null {
     switch (relation) {
+      // `showDetail` is the difference between a detail that adds a FACT and
+      // one that restates the label. "Before food" alone leaves the reader
+      // guessing how long before, so the 30 minutes is spelled out on screen.
+      // "After food" and "With food" say themselves; their detail stays as the
+      // title, and is not worth a line of a card that has five of these.
       case 'before_food':
-        return { label: 'Before food', detail: 'about 30 minutes before the meal' };
+        return {
+          label: 'Before food',
+          detail: 'about 30 minutes before the meal',
+          showDetail: true,
+        };
       case 'after_food':
-        return { label: 'After food', detail: 'soon after the meal, not on an empty stomach' };
+        return {
+          label: 'After food',
+          detail: 'soon after the meal, not on an empty stomach',
+          showDetail: false,
+        };
       case 'with_food':
-        return { label: 'With food', detail: 'during the meal' };
+        return { label: 'With food', detail: 'during the meal', showDetail: false };
       case 'empty_stomach':
         return {
+          // Also a fact, not a restatement: "empty stomach" does not tell a
+          // reader that DRINKING counts too.
           label: 'On an empty stomach',
           detail: 'before eating or drinking anything',
+          showDetail: true,
         };
       default:
         return null;
@@ -317,6 +431,37 @@ export class ReportAnalysisCardComponent {
     if (/\bbd\b|\bbid\b|twice/.test(t)) return ['morning', 'night'];
     if (/\bod\b|\bonce\b|\bdaily\b/.test(t)) return ['morning'];
     return [];
+  }
+
+  /** The non-medicine half of the page. Absent on analyses stored before it. */
+  protected rx(): PrescriptionDetails | null {
+    return this.a().prescription || null;
+  }
+
+  /**
+   * "12 September" -> "on 12 September"; "after 5 days" -> "after 5 days".
+   *
+   * The backend returns the follow-up however the page wrote it, and the two
+   * shapes need different words in front of them. Without this the row reads
+   * "Go back to the doctor 12 September", which is the kind of small wrongness
+   * that makes a patient re-read a line they should be able to act on.
+   *
+   * Anything already starting with its own preposition is left alone, and
+   * anything unrecognised falls through unprefixed rather than being forced
+   * into a phrasing that might not fit.
+   */
+  protected followUpPhrase(raw: string): string {
+    const t = (raw || '').trim();
+    if (!t) return '';
+    if (/^(on|after|in|before|within|every)/i.test(t)) return t;
+    // A bare date or day name takes "on".
+    if (/^\d|^(mon|tue|wed|thu|fri|sat|sun)/i.test(t)) return `on ${t}`;
+    return t;
+  }
+
+  /** True when ANY medicine is uncertain — drives the one shared warning. */
+  protected anyNeedsCheck(): boolean {
+    return (this.a().medicines || []).some((m) => this.medicineNeedsCheck(m));
   }
 
   /** "1 tablet twice a day after food" -> "1 tablet". Empty when unwritten. */
@@ -357,7 +502,11 @@ export class ReportAnalysisCardComponent {
 
   /** "Twice a day", from the slots - a restatement of them, never an addition. */
   private frequencyFromSlots(slots: DoseSlot[]): string {
-    switch (slots.length) {
+    return this.frequencyFromCount(slots.length);
+  }
+
+  private frequencyFromCount(n: number): string {
+    switch (n) {
       case 1:
         return 'Once a day';
       case 2:
@@ -369,6 +518,63 @@ export class ReportAnalysisCardComponent {
       default:
         return '';
     }
+  }
+
+  /**
+   * The API's `frequency` is whatever the prescription said, and prescriptions
+   * say it in code: "1-0-1", "BD", "TDS", "HS". That is precise to a pharmacist
+   * and unreadable to the person actually swallowing the tablet, who is who
+   * this card is written for — "1-0-1" was reaching the screen verbatim.
+   *
+   * Known notation is translated. Anything else that is PURE notation (no
+   * letters at all) is dropped in favour of the wording derived from the slots:
+   * a chip the reader cannot decode is worse than no chip, and the slot grid
+   * directly above it has already said the same thing in words.
+   *
+   * Nothing here invents a frequency — every branch restates what was written.
+   */
+  private plainFrequency(raw: string | undefined): string {
+    const t = (raw || '').trim();
+    if (!t) return '';
+
+    // "1-0-1", "0-0-1", "1-1-1-1", "1/2-0-1": count the doses, not the dashes.
+    const notation = t.replace(/\s/g, '');
+    if (/^\d+(?:[./]\d+)?(?:[-–]\d+(?:[./]\d+)?)+$/.test(notation)) {
+      const taken = notation
+        .split(/[-–]/)
+        .filter((part) => this.numeric(part) > 0).length;
+      return this.frequencyFromCount(taken);
+    }
+
+    const key = t.toLowerCase().replace(/[.\s]/g, '');
+    const spelled: Record<string, string> = {
+      od: 'Once a day',
+      qd: 'Once a day',
+      bd: 'Twice a day',
+      bid: 'Twice a day',
+      tds: 'Three times a day',
+      tid: 'Three times a day',
+      qid: 'Four times a day',
+      qds: 'Four times a day',
+      hs: 'At night',
+      nocte: 'At night',
+      sos: 'Only when needed',
+      prn: 'Only when needed',
+    };
+    if (spelled[key]) return spelled[key];
+
+    // No letters and not a notation we recognise -> say nothing rather than
+    // show the reader a code.
+    if (!/[a-z]/i.test(t)) return '';
+
+    return this.sentenceCase(t);
+  }
+
+  /** "1/2" -> 0.5, "1" -> 1. Halves are written as fractions on prescriptions. */
+  private numeric(part: string): number {
+    const frac = part.match(/^(\d+)\/(\d+)$/);
+    if (frac) return Number(frac[2]) ? Number(frac[1]) / Number(frac[2]) : 0;
+    return parseFloat(part) || 0;
   }
 
   /** Plain-language summary of one medicine's timing, for screen readers. */
@@ -392,6 +598,35 @@ export class ReportAnalysisCardComponent {
         return 'In the usual range';
       default:
         return 'Range not stated';
+    }
+  }
+
+  /**
+   * "Prescription from Dr Rao", or failing a title from the server, the kind of
+   * document this is. Never empty when it is shown — the header only renders
+   * for a multi-document upload, where an unlabelled card is the problem it
+   * exists to solve.
+   */
+  protected docTitle(): string {
+    const given = (this.a().title || '').trim();
+    if (given) return given;
+    return this.documentTypeLabel(this.a().documentType);
+  }
+
+  private documentTypeLabel(type: string): string {
+    switch (type) {
+      case 'lab_report':
+        return 'Lab report';
+      case 'pathology':
+        return 'Biopsy report';
+      case 'imaging':
+        return 'Scan report';
+      case 'discharge':
+        return 'Discharge summary';
+      case 'prescription':
+        return 'Prescription';
+      default:
+        return 'Document';
     }
   }
 

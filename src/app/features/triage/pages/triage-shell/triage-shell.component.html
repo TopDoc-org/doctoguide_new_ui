@@ -14,83 +14,94 @@ plain <button> fixes it with no behaviour change.
   ariaLabel="Account menu">
   <nav class="p-2">
     @if (state.isLoggedIn && state.userMobile) {
-      <p class="truncate px-3 pb-2 text-xs text-teal-900/50">
+      <p class="truncate px-3 pb-2 text-xs text-muted">
         +91 {{ state.userMobile }}
       </p>
     }
     <!-- Shown signed-out too: the page explains itself and gates its own
          upload, so it doubles as a reason to create an account. -->
     <button type="button" (click)="openDocPicker()"
-      class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
-      <ds-icon name="biotech" class="text-teal-600" /> Explain my report
+      class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-brand-tint">
+      <ds-icon name="biotech" class="text-brand-ink-soft" /> Explain my report
     </button>
     @if (state.isLoggedIn) {
       <button type="button" (click)="openProfile()"
-        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
-        <ds-icon name="person" class="text-teal-600" /> Profile
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-brand-tint">
+        <ds-icon name="person" class="text-brand-ink-soft" /> Profile
       </button>
       <button type="button" (click)="openChangePin()"
-        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
-        <ds-icon name="password" class="text-teal-600" /> Change PIN
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-brand-tint">
+        <ds-icon name="password" class="text-brand-ink-soft" /> Change PIN
       </button>
       <button type="button" (click)="showDrawer = false; showHistory = true"
-        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
-        <ds-icon name="history" class="text-teal-600" /> My consults
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-brand-tint">
+        <ds-icon name="history" class="text-brand-ink-soft" /> My consults
       </button>
-      <div class="my-1 border-t border-black/5"></div>
+      <div class="my-1 border-t border-line/5"></div>
       <button type="button" (click)="onLoggedOut()"
-        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-red-600 hover:bg-red-50">
-        <ds-icon name="logout" class="text-red-600" /> Log out
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-danger-ink hover:bg-danger-tint">
+        <ds-icon name="logout" class="text-danger-ink" /> Log out
       </button>
     } @else {
       <button type="button" (click)="showDrawer = false; openAccount()"
-        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-teal-900 hover:bg-teal-50">
-        <ds-icon name="login" class="text-teal-600" /> Log in
+        class="flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-brand-tint">
+        <ds-icon name="login" class="text-brand-ink-soft" /> Log in
       </button>
     }
   </nav>
 </ds-drawer>
 
-<div class="flex h-[100dvh] flex-col bg-cream">
-  <!-- emergency banner -->
-  <div class="bg-red-600 px-4 py-2 text-center text-xs font-medium text-white">
-    <span>{{ emergencySentence }}</span>
+<div class="flex h-[100dvh] flex-col bg-bg">
+  <!-- Standing emergency notice. Kept at FULL saturation deliberately: this is
+       the one line on the screen that must be unmissable, and toning it down
+       to a tint would be a safety change dressed as a design one. What changed
+       is the craft — it sat under the notch on a phone, wrapped to two lines
+       at 11px and had no icon to read at a glance. -->
+  <div class="shrink-0 bg-danger pt-safe-t text-white">
+    <p class="mx-auto flex max-w-2xl items-center justify-center gap-1.5 px-4 py-2 text-center text-xs font-medium short:py-1">
+      <ds-icon name="siren" [size]="14" class="shrink-0" />
+      <span>{{ emergencySentence }}</span>
+    </p>
   </div>
 
   <!-- header -->
-  <header class="flex items-center justify-between gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+  <!-- Solid, not glass. The thread is its own scroll region below this bar, so
+       nothing ever passes under it — glass here would blur the page ground and
+       cost a compositor layer to look like a flat panel. -->
+  <header class="flex shrink-0 items-center justify-between gap-2 border-b border-line/10 bg-surface px-3 py-2.5 sm:px-4 short:py-1.5">
     <div class="flex min-w-0 items-center gap-1">
       <button (click)="openDrawer()" aria-label="Open menu"
-        class="flex shrink-0 items-center rounded-lg p-1.5 text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+        class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-brand-ink transition-colors duration-fast hover:bg-brand-tint hover:text-ink focus-visible:focus-ring">
         <ds-icon name="menu" [size]="22" />
       </button>
       <a (click)="goHome()" aria-label="Go to home" role="link" tabindex="0" (keydown.enter)="goHome()"
         class="flex min-w-0 shrink cursor-pointer flex-col justify-center leading-tight hover:opacity-80 coarse:min-h-[44px]">
-        <span class="flex items-center gap-1 truncate font-heading text-base font-bold text-teal-900 sm:text-lg">
+        <span class="flex items-center gap-1 truncate font-heading text-base font-bold text-ink sm:text-lg">
           <span class="truncate">{{ appName }}</span>
           <ds-icon name="auto_awesome" [size]="15" class="shrink-0 text-teal-500" />
         </span>
-        <span class="flex items-center gap-1 truncate text-[10px] font-medium text-teal-900/50">
+        <span class="flex items-center gap-1 truncate text-[11px] font-medium text-muted short:hidden">
           powered by
-          <span class="font-extrabold"><span style="color:#0a1480">Knoc</span><span style="color:#4fb0f9">Doc</span></span>
+          <span class="font-extrabold"><span class="wm-knoc">Knoc</span><span class="wm-doc">Doc</span></span>
         </span>
       </a>
     </div>
     <!-- actions: icon-only on mobile, icon+label from sm -->
-    <div class="flex shrink-0 items-center gap-1 sm:gap-3">
+    <div class="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+      <ds-theme-toggle />
       <button (click)="openAccount()" [attr.aria-label]="state.isLoggedIn ? 'My consults' : 'Log in'"
-        class="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+        class="flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 text-sm text-brand-ink transition-colors duration-fast hover:bg-brand-tint hover:text-ink focus-visible:focus-ring coarse:min-h-[44px]">
         <ds-icon [name]="state.isLoggedIn ? 'history' : 'login'" [size]="18" />
         <span class="hidden sm:inline">{{ state.isLoggedIn ? 'My consults' : 'Log in' }}</span>
       </button>
       <button (click)="restart()" aria-label="Start a new chat"
-        class="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-teal-600 px-3 py-1.5 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+        class="flex min-h-[40px] items-center gap-1.5 whitespace-nowrap rounded-full border border-teal-600 px-3 xs:px-3.5 text-sm font-semibold text-brand-ink transition-colors duration-fast hover:bg-brand-tint hover:text-ink focus-visible:focus-ring coarse:min-h-[44px]">
         <ds-icon name="add_comment" [size]="18" />
-        New chat
+        <span class="hidden xs:inline">New chat</span>
       </button>
       @if (state.isLoggedIn) {
         <button (click)="onLoggedOut()" aria-label="Log out"
-          class="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+          class="flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 text-sm text-brand-ink transition-colors duration-fast hover:bg-brand-tint hover:text-ink focus-visible:focus-ring coarse:min-h-[44px]">
           <ds-icon name="logout" [size]="18" />
           <span class="hidden sm:inline">Log out</span>
         </button>
@@ -100,9 +111,9 @@ plain <button> fixes it with no behaviour change.
 
   <!-- previous (unsaved) chat banner -->
   @if (hasPrevChat) {
-    <div class="border-b border-amber-200 bg-amber-50 px-4 py-2">
+    <div class="border-b border-warning-line bg-warning-tint px-4 py-2">
       <div class="mx-auto flex max-w-2xl items-center justify-between gap-2">
-        <p class="flex min-w-0 items-center gap-1.5 text-sm text-amber-800">
+        <p class="flex min-w-0 items-center gap-1.5 text-sm text-warning-ink">
           <ds-icon name="history" [size]="18" class="shrink-0" />
           <span class="truncate">You have a previous chat from before.</span>
         </p>
@@ -112,7 +123,7 @@ plain <button> fixes it with no behaviour change.
             Load it
           </button>
           <button (click)="dismissPreviousChat()" type="button" aria-label="Dismiss previous chat"
-            class="grid h-11 w-11 shrink-0 place-items-center rounded text-amber-700/60 hover:text-amber-800">
+            class="grid h-11 w-11 shrink-0 place-items-center rounded text-warning-ink/60 hover:text-warning-ink">
             <ds-icon name="close" [size]="18" />
           </button>
         </div>
@@ -122,13 +133,13 @@ plain <button> fixes it with no behaviour change.
 
   <!-- triage progress -->
   @if (!report && !emergency && progress > 0) {
-    <div class="border-b border-black/5 bg-white px-4 pb-2 pt-2">
+    <div class="border-b border-line/5 bg-surface px-4 pb-2 pt-2">
       <div class="mx-auto max-w-2xl">
-        <div class="mb-1 flex justify-between text-[11px] text-teal-900/60">
+        <div class="mb-1 flex justify-between text-[11px] text-muted">
           <span>Building your health report…</span>
           <span>~{{ stepsLeft }} step{{ stepsLeft === 1 ? '' : 's' }} left</span>
         </div>
-        <div class="h-1.5 w-full rounded-full bg-teal-100">
+        <div class="h-1.5 w-full rounded-full bg-brand-tint-strong">
           <div class="h-1.5 rounded-full bg-teal-600 transition-all duration-500" [style.width.%]="progress"></div>
         </div>
       </div>
@@ -136,8 +147,15 @@ plain <button> fixes it with no behaviour change.
   }
 
   <!-- conversation -->
-  <main class="flex-1 overflow-y-auto px-4 py-5">
-    <div class="mx-auto max-w-2xl space-y-4">
+  <main id="main" class="flex-1 overflow-y-auto px-4 py-5 short:py-3">
+    <h1 class="sr-only">Symptom check</h1>
+    <!-- `justify-end` on a `min-h-full` column bottom-anchors the thread. The
+         opening screen is three short blocks in a tall viewport, and top-
+         anchoring them left a half-screen of dead cream between the last card
+         and the composer — which reads as a page that failed to finish loading.
+         Sitting them just above the composer is also where the conversation
+         will be, so nothing jumps when the first reply lands. -->
+    <div class="mx-auto flex min-h-full max-w-2xl flex-col justify-end space-y-4">
       <!-- chat bubbles -->
       @for (m of messages; track m) {
         @if (m.kind === 'document' && m.analysis) {
@@ -147,31 +165,50 @@ plain <button> fixes it with no behaviour change.
           <!-- id: the analysis is scrolled to its TOP when it lands, not to the
                bottom of the page — see scrollDocumentToTop(). -->
           <div class="space-y-4 animate-fade-up" [attr.id]="'doc-' + m.documentId">
-            <app-report-analysis-card
-              [analysis]="m.analysis"
-              [urgency]="m.documentUrgency || 'routine'" />
-            <!-- A restored card no longer captures the composer on its own (see
-                 restoreDocumentCards) — so it offers the way back in explicitly,
-                 on the report the patient actually means. -->
-            @if (m.canAskAbout && documentContext?.id !== m.documentId) {
+            <!-- One card per document in that upload. `analyses` always holds
+                 at least the one in `analysis`, so a single report renders
+                 exactly as it did before this existed. -->
+            @for (doc of cardsFor(m); track $index) {
+              <app-report-analysis-card
+                [analysis]="doc"
+                [urgency]="doc.urgency || m.documentUrgency || 'routine'"
+                [index]="$index + 1"
+                [total]="cardsFor(m).length" />
+            }
+            <!-- A restored session resumes document mode only for the report the
+                 patient was still sitting on (see documentToResume) — so every
+                 other card offers the way back in explicitly, on the report the
+                 patient actually means. -->
+            @if (m.canAskAbout && activeDocument?.id !== m.documentId) {
               <button type="button" (click)="askAboutThisReport(m)"
-                class="flex items-center gap-2 rounded-xl border border-teal-200 bg-white px-4 py-2.5 text-sm font-medium text-teal-800 hover:border-teal-400 coarse:min-h-[44px]">
-                <ds-icon name="chat" [size]="16" class="text-teal-600" />
+                class="flex items-center gap-2 rounded-xl border border-brand-line bg-surface px-4 py-2.5 text-sm font-medium text-ink-soft hover:border-teal-400 coarse:min-h-[44px]">
+                <ds-icon name="chat" [size]="16" class="text-brand-ink-soft" />
                 Ask about this report
               </button>
             }
           </div>
         } @else {
-          <div class="flex" [ngClass]="m.role === 'user' ? 'justify-end' : 'justify-start'">
+          <div class="flex items-end gap-2" [ngClass]="m.role === 'user' ? 'justify-end' : 'justify-start'">
+            @if (m.role !== 'user') {
+              <!-- Avatar on the FIRST bubble of a run only. `invisible` rather
+                   than removed, so a follow-up bubble keeps the same left edge
+                   as the one it continues — dropping the element would shift
+                   the whole run 36px left and break the column. -->
+              <span aria-hidden="true"
+                class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-tint text-brand-ink-soft ring-1 ring-brand-line"
+                [class.invisible]="$index > 0 && messages[$index - 1].role !== 'user'">
+                <ds-icon name="stethoscope" [size]="15" />
+              </span>
+            }
             <div
               class="max-w-[80%] whitespace-pre-line rounded-2xl px-4 py-2.5 text-[15px] animate-fade-up"
             [ngClass]="m.role === 'user'
-              ? 'bg-teal-600 text-white rounded-br-sm'
-              : 'bg-white text-teal-900 ring-1 ring-black/5 rounded-bl-sm'"
+              ? 'bg-teal-600 text-white rounded-br-sm shadow-e1'
+              : 'bg-surface text-ink border border-line/10 rounded-bl-sm shadow-e1'"
               >
               {{ m.text }}
               @if (m.pending) {
-                <span class="ml-1.5 inline-block align-middle text-teal-600"><ds-spinner [size]="13" /></span>
+                <span class="ml-1.5 inline-block align-middle text-brand-ink-soft"><ds-spinner [size]="13" /></span>
               }
             </div>
           </div>
@@ -182,32 +219,33 @@ plain <button> fixes it with no behaviour change.
            phone. Mirrors the chat's existing consent card rather than a modal:
            uploading your own blood work is not something to slip past someone. -->
       @if (showDocConsent) {
-        <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-          <p class="text-sm font-medium text-teal-900">Before I read your document</p>
-          <label class="mt-3 flex cursor-pointer items-start gap-3">
-            <input type="checkbox" [(ngModel)]="docConsentChecked"
-              class="mt-0.5 h-4 w-4 shrink-0 accent-teal-600" />
-            <span class="text-xs leading-relaxed text-teal-900/70">
+        <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
+          <p class="text-sm font-medium text-ink">Before I read your document</p>
+          <ds-checkbox class="mt-3 block" [(ngModel)]="docConsentChecked">
+            <span class="text-xs leading-relaxed text-content">
               This is my own medical document, and I understand this is an explanation to
               help me understand it — not a diagnosis, and not a substitute for my doctor.
             </span>
-          </label>
-          <p class="mt-2 text-xs text-teal-900/50">
+          </ds-checkbox>
+          <p class="mt-2 text-xs text-muted">
             Your file is read once and then deleted. Only the explanation is saved.
+            @if (!state.isLoggedIn) {
+              <span class="block">You'll be asked to sign in before I read it, so the explanation is saved to your account.</span>
+            }
           </p>
           <div class="mt-3 flex gap-2">
             <button (click)="agreeDocConsent()" [disabled]="!docConsentChecked"
               class="flex-1 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 coarse:min-h-[44px]"
             >Agree &amp; read it</button>
             <button (click)="cancelDocConsent()"
-              class="rounded-xl border border-black/10 px-4 py-2.5 text-sm text-teal-900/70 coarse:min-h-[44px]"
+              class="rounded-xl border border-line/10 px-4 py-2.5 text-sm text-content coarse:min-h-[44px]"
             >Cancel</button>
           </div>
         </div>
       }
 
       @if (uploadError) {
-        <p class="rounded-lg bg-red-50 px-3 py-2 text-center text-sm text-red-600">{{ uploadError }}</p>
+        <p class="rounded-lg bg-danger-tint px-3 py-2 text-center text-sm text-danger-ink">{{ uploadError }}</p>
       }
 
       <!-- Retry for a turn that failed to send. Sits under the thread rather
@@ -218,7 +256,7 @@ plain <button> fixes it with no behaviour change.
           <button
             type="button"
             (click)="retryLastMessage()"
-            class="inline-flex items-center gap-1.5 rounded-full border border-teal-600 px-4 py-2 text-sm font-semibold text-teal-700 hover:bg-teal-50 coarse:min-h-[44px]">
+            class="inline-flex items-center gap-1.5 rounded-full border border-teal-600 px-4 py-2 text-sm font-semibold text-brand-ink hover:bg-brand-tint coarse:min-h-[44px]">
             <ds-icon name="refresh" [size]="16" />
             Try again
           </button>
@@ -241,21 +279,21 @@ plain <button> fixes it with no behaviour change.
                 type="button"
                 (click)="pickOption(opt)"
                 [disabled]="loading"
-                class="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-teal-900/80 hover:border-teal-600 hover:bg-teal-50 hover:text-teal-900 disabled:opacity-50 coarse:min-h-[44px]"
+                class="rounded-full border border-line/10 bg-surface px-4 py-2 text-sm text-content hover:border-teal-600 hover:bg-brand-tint hover:text-ink disabled:opacity-50 coarse:min-h-[44px]"
                 >
                 {{ opt }}
               </button>
             }
           </div>
-          <p class="mt-2 text-xs text-teal-900/60">or type your own answer below</p>
+          <p class="mt-2 text-xs text-muted">or type your own answer below</p>
         </div>
       }
 
       <!-- typing / thinking indicator (normal chat turns) -->
       @if (loading && !generatingReport) {
         <div class="flex justify-start">
-          <div class="flex items-center gap-1.5 rounded-2xl rounded-bl-sm bg-white px-4 py-3 ring-1 ring-black/5">
-            <span class="mr-1 text-xs text-teal-900/50">AI is thinking</span>
+          <div class="flex items-center gap-1.5 rounded-2xl rounded-bl-sm bg-surface px-4 py-3 ring-1 ring-line/10">
+            <span class="mr-1 text-xs text-muted">AI is thinking</span>
             <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:0ms"></span>
             <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:150ms"></span>
             <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:300ms"></span>
@@ -265,10 +303,10 @@ plain <button> fixes it with no behaviour change.
 
       <!-- prominent "creating your report" state (final leg of triage) -->
       @if (generatingReport) {
-        <div class="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-6 text-center shadow-sm ring-1 ring-teal-100 animate-fade-up">
-          <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-teal-200 border-t-teal-600"></div>
-          <p class="font-heading text-lg font-bold text-teal-900">Creating your health report…</p>
-          <p class="mt-1 text-sm text-teal-900/70">Analysing your answers and preparing a personalised summary. This takes a few seconds.</p>
+        <div class="rounded-2xl border border-brand-line bg-gradient-to-br from-brand-tint to-white p-6 text-center shadow-sm ring-1 ring-brand-tint-strong animate-fade-up">
+          <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-brand-line border-t-teal-600"></div>
+          <p class="font-heading text-lg font-bold text-ink">Creating your health report…</p>
+          <p class="mt-1 text-sm text-content">Analysing your answers and preparing a personalised summary. This takes a few seconds.</p>
           <div class="mt-4 flex items-center justify-center gap-1.5">
             <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:0ms"></span>
             <span class="h-2 w-2 animate-bounce rounded-full bg-teal-500" style="animation-delay:150ms"></span>
@@ -279,18 +317,21 @@ plain <button> fixes it with no behaviour change.
 
       <!-- consent gate (before first AI reply) -->
       @if (showConsent) {
-        <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-          <p class="text-[15px] font-medium text-teal-900">Before I reply, please confirm — it's fast, safe and free.</p>
-          <label class="mt-3 flex items-start gap-2 text-sm text-teal-900/80">
-            <input type="checkbox" [(ngModel)]="consentChecked" class="mt-1" />
-            <span>
-              I confirm I am 18 or older. I agree to the <a routerLink="/terms" target="_blank" class="font-medium text-teal-700 underline">Terms of Use</a>
+        <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
+          <p class="text-[15px] font-medium text-ink">Before I reply, please confirm — it's fast, safe and free.</p>
+          <!-- The consent copy carries links, so it is projected rather than
+               passed as `label`. ds-checkbox renders the <label> itself. -->
+          <ds-checkbox class="mt-3 block" [(ngModel)]="consentChecked">
+            <span class="text-sm text-content">
+              I confirm I am 18 or older. I agree to the <a routerLink="/terms" target="_blank" class="font-medium text-brand-ink underline"
+                 (click)="$event.stopPropagation()">Terms of Use</a>
               and will discuss all output with a doctor. {{ appName }} is an AI health-information assistant,
               not a licensed physician, and does not practise medicine or provide medical advice.
               The health information I share is processed to generate my summary as described in the
-              <a routerLink="/privacy" target="_blank" class="font-medium text-teal-700 underline">Privacy Policy</a>.
+              <a routerLink="/privacy" target="_blank" class="font-medium text-brand-ink underline"
+                 (click)="$event.stopPropagation()">Privacy Policy</a>.
             </span>
-          </label>
+          </ds-checkbox>
           <button
             (click)="agreeConsent()" [disabled]="!consentChecked"
             class="mt-3 w-full rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 coarse:min-h-[44px]"
@@ -300,19 +341,19 @@ plain <button> fixes it with no behaviour change.
 
       <!-- age/sex quick input (shown until age provided) -->
       @if (needAgeSex && !loading) {
-        <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+        <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
           <!-- logged-in: who is the consult for? -->
           @if (askConsultFor && consultFor === null) {
-            <p class="mb-3 text-sm text-teal-900/80">Who is this consultation for?</p>
+            <p class="mb-3 text-sm text-content">Who is this consultation for?</p>
             <div class="flex gap-2">
-              <button (click)="chooseSelf()" class="flex-1 rounded-lg border border-black/10 py-2 text-sm text-teal-900/70 hover:border-teal-600 coarse:min-h-[44px]">Myself</button>
-              <button (click)="chooseOther()" class="flex-1 rounded-lg border border-black/10 py-2 text-sm text-teal-900/70 hover:border-teal-600 coarse:min-h-[44px]">Someone else</button>
+              <button (click)="chooseSelf()" class="flex-1 rounded-lg border border-line/10 py-2 text-sm text-content hover:border-teal-600 coarse:min-h-[44px]">Myself</button>
+              <button (click)="chooseOther()" class="flex-1 rounded-lg border border-line/10 py-2 text-sm text-content hover:border-teal-600 coarse:min-h-[44px]">Someone else</button>
             </div>
           }
           <!-- self + saved details: confirm or edit -->
           @if (consultFor === 'self' && !editingDetails) {
-            <p class="mb-1 text-sm text-teal-900/80">Are these details still correct?</p>
-            <p class="mb-3 text-sm font-medium text-teal-900">
+            <p class="mb-1 text-sm text-content">Are these details still correct?</p>
+            <p class="mb-3 text-sm font-medium text-ink">
               <!-- Guarded: a missing age must never render as a bare "yrs". -->
               @if (age != null) {
                 <span>{{ age }} yrs</span>
@@ -326,61 +367,75 @@ plain <button> fixes it with no behaviour change.
             </p>
             <div class="flex gap-2">
               <button (click)="confirmSelf()" class="flex-1 rounded-lg bg-teal-600 py-2 text-sm font-semibold text-white hover:bg-teal-700 coarse:min-h-[44px]">Yes, that's me</button>
-              <button (click)="editSelf()" class="rounded-lg border border-black/10 px-4 py-2 text-sm text-teal-900/70 coarse:min-h-[44px]">Edit</button>
+              <button (click)="editSelf()" class="rounded-lg border border-line/10 px-4 py-2 text-sm text-content coarse:min-h-[44px]">Edit</button>
             </div>
             @if (ageError) {
-              <p class="mt-2 text-xs text-red-600">{{ ageError }}</p>
+              <p class="mt-2 text-xs text-danger-ink">{{ ageError }}</p>
             }
           }
           <!-- raw inputs: editing self, someone else, or an anonymous user -->
           @if (editingDetails || !askConsultFor) {
-            <div class="mb-3 flex gap-2">
-              <button (click)="sex = 'female'" class="flex-1 rounded-lg border py-2 text-sm coarse:min-h-[44px]"
-              [ngClass]="sex === 'female' ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-black/10 text-teal-900/70'">Female</button>
-              <button (click)="sex = 'male'" class="flex-1 rounded-lg border py-2 text-sm coarse:min-h-[44px]"
-              [ngClass]="sex === 'male' ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-black/10 text-teal-900/70'">Male</button>
+            <fieldset class="border-0 p-0">
+              <legend class="mb-2 text-sm text-content">A couple of details, so the guidance fits.</legend>
+            <div class="mb-3 flex gap-2" role="radiogroup" aria-label="Sex">
+              <button (click)="sex = 'female'" [attr.aria-pressed]="sex === 'female'" class="flex-1 rounded-lg border py-2 text-sm coarse:min-h-[44px]"
+              [ngClass]="sex === 'female' ? 'border-teal-600 bg-brand-tint text-ink' : 'border-line/10 text-content'">Female</button>
+              <button (click)="sex = 'male'" [attr.aria-pressed]="sex === 'male'" class="flex-1 rounded-lg border py-2 text-sm coarse:min-h-[44px]"
+              [ngClass]="sex === 'male' ? 'border-teal-600 bg-brand-tint text-ink' : 'border-line/10 text-content'">Male</button>
             </div>
             <div class="flex gap-2">
-              <input type="number" min="18" [(ngModel)]="age" placeholder="Age (18+)"
-                class="flex-1 rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-teal-600 coarse:min-h-[44px]" />
+              <label for="triage-age" class="sr-only">Age in years (18 or over)</label>
+              <input id="triage-age" type="number" min="18" inputmode="numeric" [(ngModel)]="age" placeholder="Age (18+)"
+                [attr.aria-invalid]="ageError ? 'true' : null"
+                [attr.aria-describedby]="ageError ? 'triage-age-error' : null"
+                class="flex-1 rounded-lg border border-line/10 bg-surface px-3 py-2 text-sm text-content outline-none focus:border-teal-600 coarse:min-h-[44px]" />
                 <button (click)="submitDetails()" class="rounded-lg bg-teal-600 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-700 coarse:min-h-[44px]">Submit</button>
               </div>
               @if (ageError) {
-                <p class="mt-2 text-xs text-red-600">{{ ageError }}</p>
+                <p id="triage-age-error" role="alert" class="mt-2 text-xs text-danger-ink">{{ ageError }}</p>
               }
+            </fieldset>
             }
           </div>
         }
 
-        <!-- Report reader entry, on the opening screen only. Someone who has
-             started describing symptoms is mid-consult and doesn't need a
-             second door in front of them; the account drawer still has it. -->
-        @if (!emergency && !report && !showUploadPanel && messages.length <= 1) {
+        <!-- Report reader entry. Shown in ONE window: after the age/sex answer
+             and before the first symptom — see `showReportEntry`. It used to
+             appear beside the age/sex card, where it competed with the question
+             the user had just been asked to answer. -->
+        @if (showReportEntry) {
           <button type="button" (click)="openDocPicker()"
-            class="flex w-full items-center gap-3 rounded-2xl border border-teal-200 bg-white p-4 text-left shadow-sm transition-shadow hover:shadow-md coarse:min-h-[44px]">
-            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-600">
+            class="flex w-full items-center gap-3 rounded-2xl border border-brand-line bg-surface p-4 text-left shadow-sm transition-shadow hover:shadow-md coarse:min-h-[44px]">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-tint text-brand-ink-soft">
               <ds-icon name="biotech" [size]="22" />
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex flex-wrap items-center gap-2">
-                <span class="rounded-full bg-teal-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">New</span>
-                <span class="text-sm font-semibold text-teal-900">Understand your reports better</span>
+                <span class="rounded-full bg-teal-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">New</span>
+                <span class="text-sm font-semibold text-ink">Understand your reports better</span>
               </span>
-              <span class="mt-1 block text-xs leading-relaxed text-teal-900/60">
+              <span class="mt-1 block text-xs leading-relaxed text-muted">
                 No more doubts about a prescription — which medicine, when, and before or after food.
                 Upload a report or prescription and we'll explain it in plain words.
               </span>
             </span>
-            <ds-icon name="chevron_right" [size]="18" class="shrink-0 text-teal-900/30" />
+            <ds-icon name="chevron_right" [size]="18" class="shrink-0 text-muted" />
           </button>
+
+          <!-- The card is an offer, not a step. Said out loud, because a card
+               with an arrow on an otherwise empty screen reads as the only way
+               forward — and the consult, not the upload, is the main path. -->
+          <p class="mt-2 text-center text-sm text-muted">
+            Or just type your symptom below — that works too.
+          </p>
         }
 
         <!-- emergency card -->
         @if (emergency) {
-          <div class="rounded-2xl border-2 border-red-500 bg-red-50 p-5 text-center">
-            <ds-icon name="emergency" [size]="32" class="text-red-600" />
-            <p class="mt-2 font-heading text-lg font-bold text-red-700">Seek urgent care now</p>
-            <p class="mt-1 text-sm text-red-700/80">
+          <div class="rounded-2xl border-2 border-red-500 bg-danger-tint p-5 text-center">
+            <ds-icon name="emergency" [size]="32" class="text-danger-ink" />
+            <p class="mt-2 font-heading text-lg font-bold text-danger-ink">Seek urgent care now</p>
+            <p class="mt-1 text-sm text-danger-ink/80">
               Call {{ emergencyNumbersText }} now, or go to the nearest emergency room.
             </p>
             <!-- One button per DISTINCT number: countries where the all-emergencies
@@ -392,12 +447,12 @@ plain <button> fixes it with no behaviour change.
                     [href]="'tel:' + n"
             [class]="first
               ? 'rounded-full bg-red-600 px-5 py-2 text-sm font-semibold text-white'
-              : 'rounded-full border border-red-600 px-5 py-2 text-sm font-semibold text-red-700'"
+              : 'rounded-full border border-red-600 px-5 py-2 text-sm font-semibold text-danger-ink'"
                   >Call {{ n }}</a>
                 }
               </div>
             }
-            <button (click)="continueWithReport()" class="mt-3 text-sm font-medium text-red-700/70 underline underline-offset-2 hover:text-red-800">
+            <button (click)="continueWithReport()" class="mt-3 text-sm font-medium text-danger-ink/70 underline underline-offset-2 hover:text-danger-ink">
               Not an emergency? Continue with my report
             </button>
           </div>
@@ -406,74 +461,90 @@ plain <button> fixes it with no behaviour change.
         <!-- report card -->
         <!-- hidden while amending: the old report disappears until the updated one lands -->
         @if (report && !amending) {
-          <div #reportTop class="scroll-mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 animate-fade-up">
+          <div #reportTop class="scroll-mt-4 rounded-xl bg-surface p-4 shadow-e1 ring-1 ring-line/10 animate-fade-up sm:p-5">
             <!-- header -->
-            <div class="flex items-start justify-between">
-              <div>
-                <h2 class="font-display text-2xl font-semibold text-teal-900">Your Health Summary</h2>
-                <p class="text-xs text-teal-900/50">{{ report.generatedAt | date:'medium' }}</p>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="font-display text-2xl font-semibold text-ink">Your Health Summary</h2>
+                <p class="text-xs text-muted">{{ report.generatedAt | date:'medium' }}</p>
               </div>
-              <button (click)="shareReport()" class="flex items-center gap-1 text-sm text-teal-700 hover:text-teal-900">
-                <ds-icon name="ios_share" [size]="16" /> Share
+              <button (click)="shareReport()"
+                class="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full border border-brand-line px-3.5 text-sm font-semibold text-brand-ink transition-colors duration-fast hover:bg-brand-tint focus-visible:focus-ring coarse:min-h-[44px]">
+                <ds-icon name="ios_share" [size]="16" />Share
               </button>
             </div>
             <!-- 1. Urgency first: the most important thing must be visible immediately,
             with wording driven by the triage level rather than the differential. -->
             @if (report.urgency; as urg) {
+              <!-- The verdict. It was a 12px-padded tinted strip that sat at the
+                   same visual weight as "What you've told us" three blocks
+                   below it — on a page whose entire purpose is to answer "how
+                   worried should I be". Now: a solid 4px rail in the urgency
+                   colour, a filled icon chip, and a headline a step up in size.
+                   The colour still never carries the meaning alone (icon +
+                   wording do), which is what keeps it readable for the ~8% of
+                   men who cannot separate the red and the green. -->
               <div
-                class="mt-3 flex items-start gap-2 rounded-xl p-3"
+                class="mt-4 flex items-start gap-3 overflow-hidden rounded-xl border-l-4 p-3.5 sm:p-4"
              [ngClass]="{
-               'bg-red-50 ring-1 ring-red-200': urg.level === 'emergency',
-               'bg-amber-50 ring-1 ring-amber-200': urg.level === 'urgent',
-               'bg-teal-50 ring-1 ring-teal-200': urg.level === 'routine'
+               'bg-danger-tint border-danger ring-1 ring-danger-line': urg.level === 'emergency',
+               'bg-warning-tint border-warning ring-1 ring-warning-line': urg.level === 'urgent',
+               'bg-brand-tint border-teal-600 ring-1 ring-brand-line': urg.level === 'routine'
              }">
-                <ds-icon [name]="urg.level === 'routine' ? 'event_available' : 'priority_high'" [ngClass]="{ 'text-red-600': urg.level === 'emergency', 'text-amber-600': urg.level === 'urgent', 'text-teal-600': urg.level === 'routine' }" />
-                <div>
-                  <p class="font-heading font-semibold"
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+             [ngClass]="{
+               'bg-danger-tint-strong text-danger-ink': urg.level === 'emergency',
+               'bg-warning-tint-strong text-warning-ink': urg.level === 'urgent',
+               'bg-brand-tint-strong text-brand-ink': urg.level === 'routine'
+             }">
+                  <ds-icon [name]="urg.level === 'routine' ? 'event_available' : 'priority_high'" [size]="20" />
+                </span>
+                <div class="min-w-0">
+                  <p class="font-heading text-base font-bold leading-snug"
                [ngClass]="{
-                 'text-red-800': urg.level === 'emergency',
-                 'text-amber-800': urg.level === 'urgent',
-                 'text-teal-900': urg.level === 'routine'
+                 'text-danger-ink': urg.level === 'emergency',
+                 'text-warning-ink': urg.level === 'urgent',
+                 'text-ink': urg.level === 'routine'
                }">{{ urgencyHeadline }}</p>
-                  <p class="mt-0.5 text-sm text-teal-900/75">{{ urg.reason }}</p>
+                  <p class="mt-1 text-sm text-content">{{ urg.reason }}</p>
                 </div>
               </div>
             }
-            <p class="mt-3 text-[15px] text-teal-900/80">{{ report.summary }}</p>
+            <p class="mt-3 text-[15px] text-content">{{ report.summary }}</p>
             <!-- 3. Why we're being cautious -->
             @if (report.whyConcerned) {
-              <div class="mt-3 rounded-xl border-l-2 border-teal-300 bg-teal-50/60 py-2 pl-3">
-                <p class="font-heading text-sm font-semibold text-teal-900">Why we're being cautious</p>
-                <p class="mt-1 text-sm text-teal-900/80">{{ report.whyConcerned }}</p>
+              <div class="mt-3 rounded-xl border-l-2 border-teal-300 bg-brand-tint/60 py-2 pl-3">
+                <p class="font-heading text-sm font-semibold text-ink">Why we're being cautious</p>
+                <p class="mt-1 text-sm text-content">{{ report.whyConcerned }}</p>
               </div>
             }
             <!-- 4. What you've told us — only what the patient actually said -->
             @if (report.whatYouToldUs?.length) {
               <div class="mt-3">
-                <p class="font-heading text-sm font-semibold text-teal-900">What you've told us</p>
+                <p class="font-heading text-sm font-semibold text-ink">What you've told us</p>
                 <ul class="mt-1 space-y-1">
                   @for (b of report.whatYouToldUs; track $index) {
-                    <li class="flex gap-2 text-sm text-teal-900/80">
+                    <li class="flex gap-2 text-sm text-content">
                       <span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-400"></span>{{ b }}
                     </li>
                   }
                 </ul>
               </div>
             }
-            <p class="mt-2 text-sm italic text-teal-900/60">A doctor can give you personalised guidance — and peace of mind.</p>
+            <p class="mt-2 text-sm italic text-muted">A doctor can give you personalised guidance — and peace of mind.</p>
             <!-- continue to a licensed doctor -->
-            <div class="mt-4 rounded-xl bg-teal-50 p-4">
-              <p class="font-heading font-semibold text-teal-900">Continue with {{ specialistLabel }}</p>
+            <div class="mt-4 rounded-xl bg-brand-tint p-4">
+              <p class="font-heading font-semibold text-ink">Continue with {{ specialistLabel }}</p>
               @if (selectedSpecialty) {
-                <p class="mt-0.5 text-xs text-teal-900/60">
-                  Recommended specialist for your symptoms: <span class="font-semibold text-teal-700">{{ selectedSpecialty }}</span>
+                <p class="mt-0.5 text-xs text-muted">
+                  Recommended specialist for your symptoms: <span class="font-semibold text-brand-ink">{{ selectedSpecialty }}</span>
                 </p>
               }
               @if (multiSpecialist) {
-                <p class="mt-0.5 text-xs text-teal-900/60">
+                <p class="mt-0.5 text-xs text-muted">
                   Also recommended:
                   @for (o of otherSpecialists; track o.specialty; let last = $last) {
-                    <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-teal-700 underline">{{ o.specialty }}</button>@if (!last) {
+                    <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-brand-ink underline">{{ o.specialty }}</button>@if (!last) {
                     <span>, </span>
                   }
                 }
@@ -482,8 +553,8 @@ plain <button> fixes it with no behaviour change.
             <ul class="mt-2 space-y-1.5">
               @for (b of ['Find ' + specialistLabel + ' near you','A doctor reviews your concerns and next steps','Get a referral or tests advised, if needed','Your summary is ready to share with any doctor']; track b) {
                 <li
-                  class="flex items-start gap-2 text-sm text-teal-900/80">
-                  <ds-icon name="check_circle" [size]="16" class="text-teal-600" />{{ b }}
+                  class="flex items-start gap-2 text-sm text-content">
+                  <ds-icon name="check_circle" [size]="16" class="text-brand-ink-soft" />{{ b }}
                 </li>
               }
             </ul>
@@ -492,39 +563,39 @@ plain <button> fixes it with no behaviour change.
             </button>
           </div>
           <!-- Assessment & Plan -->
-          <button (click)="reportOpen.causes = !reportOpen.causes" class="mt-4 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
-            <span class="font-heading font-semibold text-teal-900">Summary &amp; things to discuss</span>
-            <ds-icon [name]="reportOpen.causes ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+          <button (click)="reportOpen.causes = !reportOpen.causes" class="mt-4 flex w-full items-center justify-between border-t border-line/5 pt-3 text-left">
+            <span class="font-heading font-semibold text-ink">Summary &amp; things to discuss</span>
+            <ds-icon [name]="reportOpen.causes ? 'expand_less' : 'expand_more'" class="text-brand-ink-soft" />
           </button>
           @if (reportOpen.causes) {
             <div class="mt-2 space-y-3">
               @if (report.assessmentIntro) {
-                <p class="text-sm text-teal-900/70">{{ report.assessmentIntro }}</p>
+                <p class="text-sm text-content">{{ report.assessmentIntro }}</p>
               }
-              <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Possible areas to discuss with a doctor</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-muted">Possible areas to discuss with a doctor</p>
               <div class="space-y-2">
                 @for (c of report.possibleCauses; track c; let i = $index) {
-                  <div class="rounded-lg bg-teal-50 px-3 py-2">
+                  <div class="rounded-lg bg-brand-tint px-3 py-2">
                     <div class="flex items-center justify-between">
-                      <span class="text-sm font-semibold text-teal-900">{{ i + 1 }}. {{ c.cause }}</span>
-                      <span class="text-xs uppercase text-teal-600">{{ c.likelihood }}</span>
+                      <span class="text-sm font-semibold text-ink">{{ i + 1 }}. {{ c.cause }}</span>
+                      <span class="text-xs uppercase text-brand-ink-soft">{{ c.likelihood }}</span>
                     </div>
                     @if (c.note) {
-                      <p class="mt-0.5 text-xs text-teal-900/70">{{ c.note }}</p>
+                      <p class="mt-0.5 text-xs text-content">{{ c.note }}</p>
                     }
                   </div>
                 }
               </div>
               @if (report.plan) {
                 <div>
-                  <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Topics a doctor may explore</p>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-muted">Topics a doctor may explore</p>
                   @if (report.plan.labs?.length) {
                     <div class="mt-2">
-                      <p class="text-sm font-semibold text-teal-900">Tests a doctor might discuss</p>
+                      <p class="text-sm font-semibold text-ink">Tests a doctor might discuss</p>
                       <ul class="mt-1 space-y-1">
                         @for (l of report.plan.labs; track $index) {
-                          <li class="flex items-start gap-2 text-sm text-teal-900/80">
-                            <ds-icon name="science" [size]="14" class="text-teal-600" />
+                          <li class="flex items-start gap-2 text-sm text-content">
+                            <ds-icon name="science" [size]="14" class="text-brand-ink-soft" />
                             <span><b>{{ l.name }}</b>@if (l.why) {
                             <span> — {{ l.why }}</span>
                           }</span>
@@ -535,11 +606,11 @@ plain <button> fixes it with no behaviour change.
                 }
                 @if (report.plan.imaging?.length) {
                   <div class="mt-2">
-                    <p class="text-sm font-semibold text-teal-900">Imaging a doctor might discuss</p>
+                    <p class="text-sm font-semibold text-ink">Imaging a doctor might discuss</p>
                     <ul class="mt-1 space-y-1">
                       @for (im of report.plan.imaging; track $index) {
-                        <li class="flex items-start gap-2 text-sm text-teal-900/80">
-                          <ds-icon name="biotech" [size]="14" class="text-teal-600" />
+                        <li class="flex items-start gap-2 text-sm text-content">
+                          <ds-icon name="biotech" [size]="14" class="text-brand-ink-soft" />
                           <span><b>{{ im.name }}</b>@if (im.why) {
                           <span> — {{ im.why }}</span>
                         }</span>
@@ -550,11 +621,11 @@ plain <button> fixes it with no behaviour change.
               }
               @if (report.plan.management?.length) {
                 <div class="mt-2">
-                  <p class="text-sm font-semibold text-teal-900">Self-care &amp; home remedies you can try</p>
+                  <p class="text-sm font-semibold text-ink">Self-care &amp; home remedies you can try</p>
                   <ul class="mt-1 space-y-1">
                     @for (m of report.plan.management; track $index) {
-                      <li class="flex items-start gap-2 text-sm text-teal-900/80">
-                        <ds-icon name="healing" [size]="14" class="text-teal-600" />{{ m }}
+                      <li class="flex items-start gap-2 text-sm text-content">
+                        <ds-icon name="healing" [size]="14" class="text-brand-ink-soft" />{{ m }}
                       </li>
                     }
                   </ul>
@@ -562,14 +633,14 @@ plain <button> fixes it with no behaviour change.
               }
               @if (report.plan.referral) {
                 <div class="mt-2">
-                  <p class="text-sm font-semibold text-teal-900">Referral</p>
-                  <p class="mt-0.5 text-sm text-teal-900/80">{{ report.plan.referral }}</p>
+                  <p class="text-sm font-semibold text-ink">Referral</p>
+                  <p class="mt-0.5 text-sm text-content">{{ report.plan.referral }}</p>
                 </div>
               }
               @if (report.plan.whenToSeekUrgent) {
-                <div class="mt-2 rounded-lg border border-red-300 bg-red-50 p-2">
-                  <p class="text-sm font-semibold text-red-700">When to seek urgent care</p>
-                  <p class="mt-0.5 text-sm text-red-700/90">{{ report.plan.whenToSeekUrgent }}</p>
+                <div class="mt-2 rounded-lg border border-red-300 bg-danger-tint p-2">
+                  <p class="text-sm font-semibold text-danger-ink">When to seek urgent care</p>
+                  <p class="mt-0.5 text-sm text-danger-ink/90">{{ report.plan.whenToSeekUrgent }}</p>
                 </div>
               }
             </div>
@@ -577,23 +648,23 @@ plain <button> fixes it with no behaviour change.
         </div>
       }
       <!-- SOAP -->
-      <button (click)="reportOpen.soap = !reportOpen.soap" class="mt-3 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
-        <span class="font-heading font-semibold text-teal-900">Clinical SOAP note (for your doctor)</span>
-        <ds-icon [name]="reportOpen.soap ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+      <button (click)="reportOpen.soap = !reportOpen.soap" class="mt-3 flex w-full items-center justify-between border-t border-line/5 pt-3 text-left">
+        <span class="font-heading font-semibold text-ink">Clinical SOAP note (for your doctor)</span>
+        <ds-icon [name]="reportOpen.soap ? 'expand_less' : 'expand_more'" class="text-brand-ink-soft" />
       </button>
       @if (reportOpen.soap) {
-        <div class="mt-2 space-y-3 text-sm text-teal-900/80">
+        <div class="mt-2 space-y-3 text-sm text-content">
           @for (s of [
             {label:'Subjective', val: report.soap.subjective},
             {label:'Objective', val: report.soap.objective},
             {label:'Assessment', val: report.soap.assessment},
             {label:'Plan', val: report.soap.plan}]; track s.label) {
             <div>
-              <p class="font-semibold text-teal-900">{{ s.label }}</p>
+              <p class="font-semibold text-ink">{{ s.label }}</p>
               <ul class="mt-0.5 space-y-0.5">
                 @for (line of toBullets(s.val); track $index) {
                   <li class="flex items-start gap-2">
-                    <span class="text-teal-600">•</span>{{ line }}
+                    <span class="text-brand-ink-soft">•</span>{{ line }}
                   </li>
                 }
               </ul>
@@ -604,12 +675,12 @@ plain <button> fixes it with no behaviour change.
       <!-- 7. Information that could change the assessment -->
       @if (report.missingInfo?.length) {
         <div class="mt-3 rounded-xl bg-black/[0.02] p-3">
-          <p class="font-heading text-sm font-semibold text-teal-900">Information that could change the assessment</p>
-          <p class="mt-0.5 text-xs text-teal-900/55">Not assessed through chat — a clinician would check these.</p>
+          <p class="font-heading text-sm font-semibold text-ink">Information that could change the assessment</p>
+          <p class="mt-0.5 text-xs text-muted">Not assessed through chat — a clinician would check these.</p>
           <ul class="mt-2 space-y-1">
             @for (m of report.missingInfo; track $index) {
-              <li class="flex gap-2 text-sm text-teal-900/75">
-                <ds-icon name="remove" [size]="14" class="text-teal-900/30" />{{ m }}
+              <li class="flex gap-2 text-sm text-content">
+                <ds-icon name="remove" [size]="14" class="text-muted" />{{ m }}
               </li>
             }
           </ul>
@@ -617,21 +688,21 @@ plain <button> fixes it with no behaviour change.
       }
       <!-- AI confidence accordion (collapsed by default; absent on older reports) -->
       @if (report.confidence; as conf) {
-        <button (click)="reportOpen.confidence = !reportOpen.confidence" class="mt-3 flex w-full items-center justify-between border-t border-black/5 pt-3 text-left">
-          <span class="font-heading font-semibold text-teal-900">Assessment completeness</span>
+        <button (click)="reportOpen.confidence = !reportOpen.confidence" class="mt-3 flex w-full items-center justify-between border-t border-line/5 pt-3 text-left">
+          <span class="font-heading font-semibold text-ink">Assessment completeness</span>
           <span class="flex items-center gap-2">
             <span class="rounded-full px-2.5 py-0.5 text-xs font-bold"
                     [ngClass]="{
-                      'bg-red-100 text-red-700': conf.level === 'low',
-                      'bg-amber-100 text-amber-700': conf.level === 'moderate',
-                      'bg-teal-100 text-teal-700': conf.level === 'high'
+                      'bg-danger-tint-strong text-danger-ink': conf.level === 'low',
+                      'bg-warning-tint-strong text-warning-ink': conf.level === 'moderate',
+                      'bg-brand-tint-strong text-brand-ink': conf.level === 'high'
                     }">{{ completenessLabel }}</span>
-            <ds-icon [name]="reportOpen.confidence ? 'expand_less' : 'expand_more'" class="text-teal-600" />
+            <ds-icon [name]="reportOpen.confidence ? 'expand_less' : 'expand_more'" class="text-brand-ink-soft" />
           </span>
         </button>
         @if (reportOpen.confidence) {
           <div class="mt-2">
-            <p class="mb-2 text-xs text-teal-900/60">This reflects how much information was available during the conversation. It is not the probability that a diagnosis is correct.</p>
+            <p class="mb-2 text-xs text-muted">This reflects how much information was available during the conversation. It is not the probability that a diagnosis is correct.</p>
             <div class="h-1.5 w-full overflow-hidden rounded-full bg-black/5">
               <div class="h-full rounded-full"
                    [ngClass]="{
@@ -644,55 +715,55 @@ plain <button> fixes it with no behaviour change.
             @if (conf.factors?.length) {
               <ul class="mt-2 space-y-0.5">
                 @for (f of conf.factors; track $index) {
-                  <li class="flex items-start gap-2 text-sm text-teal-900/80">
-                    <span class="text-teal-600">•</span>{{ f }}
+                  <li class="flex items-start gap-2 text-sm text-content">
+                    <span class="text-brand-ink-soft">•</span>{{ f }}
                   </li>
                 }
               </ul>
             }
             @if (conf.missing?.length) {
               <div class="mt-2">
-                <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">What could change this assessment</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted">What could change this assessment</p>
                 <ul class="mt-1 space-y-0.5">
                   @for (m of conf.missing; track $index) {
-                    <li class="flex items-start gap-2 text-sm text-teal-900/80">
-                      <span class="text-teal-600">•</span>{{ m }}
+                    <li class="flex items-start gap-2 text-sm text-content">
+                      <span class="text-brand-ink-soft">•</span>{{ m }}
                     </li>
                   }
                 </ul>
               </div>
             }
-            <p class="mt-2 text-xs text-teal-900/50">This reflects the AI's own estimate of how well the interview supports this summary — not diagnostic certainty.</p>
+            <p class="mt-2 text-xs text-muted">This reflects the AI's own estimate of how well the interview supports this summary — not diagnostic certainty.</p>
           </div>
         }
       }
       <!-- suggested specialist(s) + downloads -->
       @if (!multiSpecialist) {
-        <div class="mt-4 rounded-lg bg-teal-900 px-4 py-3 text-white">
+        <div class="mt-4 rounded-lg bg-ink px-4 py-3 text-surface">
           <p class="text-sm">Suggested specialist</p>
           <p class="font-heading text-lg font-bold">{{ selectedSpecialty || report.suggestedSpecialty }}</p>
         </div>
       }
       <!-- multiple specialists: selectable cards, primary preselected -->
       @if (multiSpecialist) {
-        <div class="mt-4 rounded-lg bg-teal-900 px-4 py-3 text-white">
+        <div class="mt-4 rounded-lg bg-ink px-4 py-3 text-surface">
           <p class="text-sm">Suggested specialists</p>
           <p class="mt-0.5 text-xs text-white/70">Based on your symptoms, either can help. Pick one to continue:</p>
           <div class="mt-2 space-y-2">
             @for (s of specialists; track s.specialty) {
               <button (click)="selectSpecialist(s.specialty)"
                 class="block w-full rounded-xl border-2 p-3 text-left transition-colors"
-                [ngClass]="s.specialty === selectedSpecialty ? 'border-teal-300 bg-white text-teal-900' : 'border-white/30 bg-transparent text-white hover:border-white/60'">
+                [ngClass]="s.specialty === selectedSpecialty ? 'border-teal-300 bg-surface text-ink' : 'border-white/30 bg-transparent text-white hover:border-white/60'">
                 <span class="flex items-center gap-2">
-                  <ds-icon [name]="s.specialty === selectedSpecialty ? 'radio_button_checked' : 'radio_button_unchecked'" [size]="18" [ngClass]="s.specialty === selectedSpecialty ? 'text-teal-600' : 'text-white/60'" />
+                  <ds-icon [name]="s.specialty === selectedSpecialty ? 'radio_button_checked' : 'radio_button_unchecked'" [size]="18" [ngClass]="s.specialty === selectedSpecialty ? 'text-brand-ink-soft' : 'text-white/60'" />
                   <span class="font-heading font-bold">{{ s.specialty }}</span>
                   @if (s.primary) {
-                    <span class="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">Primary</span>
+                    <span class="rounded bg-warning-tint-strong px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-warning-ink">Primary</span>
                   }
                 </span>
                 @if (s.why) {
                   <span class="mt-1 block pl-6 text-xs"
-                  [ngClass]="s.specialty === selectedSpecialty ? 'text-teal-900/70' : 'text-white/70'">{{ s.why }}</span>
+                  [ngClass]="s.specialty === selectedSpecialty ? 'text-content' : 'text-white/70'">{{ s.why }}</span>
                 }
               </button>
             }
@@ -700,56 +771,57 @@ plain <button> fixes it with no behaviour change.
         </div>
       }
       <div class="mt-3 flex flex-col gap-2 sm:flex-row">
-        <button (click)="downloadPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+        <button (click)="downloadPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint">
           <ds-icon name="download" [size]="18" /> Download report (PDF)
         </button>
-        <button (click)="downloadSoapPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+        <button (click)="downloadSoapPdf()" class="flex w-full items-center justify-center gap-1 rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint">
           <ds-icon name="description" [size]="18" /> Download SOAP note (PDF)
         </button>
       </div>
       <!-- prominent closing call-to-action -->
-      <div class="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-center">
-        <ds-icon name="medical_services" [size]="26" class="text-teal-600" />
-        <p class="font-heading font-bold text-teal-900">This is not a diagnosis</p>
-        <p class="mt-1 text-sm text-teal-900/70">These are possibilities to discuss with a doctor. A licensed {{ selectedSpecialty || report.suggestedSpecialty }} can examine you, discuss your symptoms, and advise the right next steps for you.</p>
+      <div class="mt-4 rounded-xl border border-brand-line bg-brand-tint p-4 text-center">
+        <ds-icon name="medical_services" [size]="26" class="text-brand-ink-soft" />
+        <p class="font-heading font-bold text-ink">This is not a diagnosis</p>
+        <p class="mt-1 text-sm text-content">These are possibilities to discuss with a doctor. A licensed {{ selectedSpecialty || report.suggestedSpecialty }} can examine you, discuss your symptoms, and advise the right next steps for you.</p>
         <button (click)="connectDoctor()" class="mt-3 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold text-white hover:bg-teal-700">
           {{ urgencyCta }} →
         </button>
       </div>
       <!-- report feedback (anonymous, tied to session) -->
-      <div class="mt-4 border-t border-black/5 pt-4">
+      <div class="mt-4 border-t border-line/5 pt-4">
         @if (!state.feedbackSubmitted) {
-          <p class="font-heading font-semibold text-teal-900">Share your feedback</p>
-          <p class="mt-1 text-sm text-teal-900/70">How helpful was this health summary?</p>
+          <p class="font-heading font-semibold text-ink">Share your feedback</p>
+          <p class="mt-1 text-sm text-content">How helpful was this health summary?</p>
           <div class="mt-2 flex items-center gap-1">
             @for (n of [1,2,3,4,5]; track n) {
               <button type="button" (click)="setFeedbackRating(n)" [attr.aria-label]="n + ' star'" class="leading-none">
-                <ds-icon [name]="n <= feedbackRating ? 'star' : 'star_border'" [size]="30" class="text-amber-500" />
+                <ds-icon [name]="n <= feedbackRating ? 'star' : 'star_border'" [size]="30"
+                  class="text-warning-ink-soft" [ngClass]="n <= feedbackRating ? '[&_svg]:fill-current' : '[&_svg]:fill-none'" />
               </button>
             }
           </div>
           <textarea [(ngModel)]="feedbackText" rows="2" placeholder="Anything we can improve? (optional)"
-          class="mt-3 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600 coarse:min-h-[44px]"></textarea>
+          class="mt-3 w-full rounded-lg border border-line/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600 coarse:min-h-[44px]"></textarea>
           <button (click)="submitFeedback()" [disabled]="feedbackRating < 1"
             class="mt-2 w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60">
             Submit feedback
           </button>
         } @else {
-          <p class="flex items-center gap-1.5 text-sm font-medium text-teal-700">
+          <p class="flex items-center gap-1.5 text-sm font-medium text-brand-ink">
             <ds-icon name="check_circle" [size]="18" /> Thanks for helping us improve.
           </p>
         }
       </div>
       <!-- Growth ask: deliberately quiet, and placed after the report and the
       feedback prompt so it never competes with the health information. -->
-      <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-black/5 pt-4 text-sm text-teal-900/60">
+      <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-line/5 pt-4 text-sm text-muted">
         <span>We're a small team. Following us helps more people find us.</span>
         <a
           [href]="instagramUrl"
           target="_blank"
           rel="noopener"
           (click)="trackInstagramFollow()"
-          class="inline-flex items-center gap-1.5 font-medium text-teal-700 hover:text-teal-800 hover:underline"
+          class="inline-flex items-center gap-1.5 font-medium text-brand-ink hover:text-ink-soft hover:underline"
           >
           <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -767,35 +839,35 @@ plain <button> fixes it with no behaviour change.
            patient never leaves it to hand over a document. -->
       @if (showUploadPanel) {
         <div class="space-y-3 animate-fade-up">
-          <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+          <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
             <div class="flex items-start gap-3">
-              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-tint text-brand-ink">
                 <ds-icon name="biotech" [size]="20" />
               </span>
               <div class="min-w-0 flex-1">
-                <h3 class="font-heading text-base font-semibold text-teal-900">
+                <h3 class="font-heading text-base font-semibold text-ink">
                   Upload a report or prescription, get it in plain words
                 </h3>
-                <p class="mt-1 text-sm text-teal-900/70">
+                <p class="mt-1 text-sm text-content">
                   A blood test, a scan report, a discharge summary — or a prescription you
                   can't quite read. We'll explain what was measured, what's outside the
                   usual range, and what each medicine is for.
                 </p>
-                <p class="mt-2 text-xs text-teal-900/50">
+                <p class="mt-2 text-xs text-muted">
                   Your file is read once and then deleted. Only the explanation is saved.
                 </p>
               </div>
               <button type="button" (click)="closeUploadPanel()" aria-label="Close"
-                class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-teal-900/40 hover:bg-teal-50 hover:text-teal-900">
+                class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-tint hover:text-ink">
                 <ds-icon name="close" [size]="16" />
               </button>
             </div>
 
             <label
-              class="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-teal-200 px-4 py-7 text-center transition-colors hover:border-teal-400 hover:bg-teal-50/40">
-              <ds-icon name="description" [size]="26" class="text-teal-600" />
-              <span class="font-medium text-teal-900">Choose a PDF or photo</span>
-              <span class="text-xs text-teal-900/50">Up to 3 files, 10MB each</span>
+              class="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand-line px-4 py-7 text-center transition-colors hover:border-teal-400 hover:bg-brand-tint/40">
+              <ds-icon name="description" [size]="26" class="text-brand-ink-soft" />
+              <span class="font-medium text-ink">Choose a PDF or photo</span>
+              <span class="text-xs text-muted">Up to 3 files, 10MB each</span>
               <input type="file" class="hidden" accept="application/pdf,image/*" multiple
                 (change)="onComposerAttach($event)" />
             </label>
@@ -809,22 +881,22 @@ plain <button> fixes it with no behaviour change.
 
 <!-- composer (chat) — hidden once the report is ready -->
 @if (!consultComplete) {
-  <footer class="border-t border-black/5 bg-white px-3 py-2 sm:px-4 sm:py-3" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+  <footer class="shrink-0 border-t border-line/10 bg-surface px-3 pt-2 sm:px-4 sm:pt-3 pb-[max(0.75rem,var(--safe-bottom))]">
     <!-- Which conversation the composer is talking to. Explicit and dismissible,
          because the alternative is guessing whether "is that bad?" is about the
          report or about their symptoms - and guessing wrong files a question
          into the triage interview. -->
-    @if (documentContext) {
-      <div class="mx-auto mb-2 flex max-w-2xl items-center gap-2 rounded-full bg-teal-50 px-3 py-1.5">
-        <ds-icon name="description" [size]="14" class="shrink-0 text-teal-700" />
-        <span class="min-w-0 flex-1 truncate text-xs text-teal-900">
-          Asking about <span class="font-medium">{{ documentContext.fileName }}</span>
+    @if (activeDocument; as activeDoc) {
+      <div class="mx-auto mb-2 flex max-w-2xl items-center gap-2 rounded-full bg-brand-tint px-3 py-1.5">
+        <ds-icon name="description" [size]="14" class="shrink-0 text-brand-ink" />
+        <span class="min-w-0 flex-1 truncate text-xs text-ink">
+          Asking about <span class="font-medium">{{ activeDoc.fileName }}</span>
         </span>
         <!-- Named, not just an ×: the way out of report mode is "talk about my
              symptoms instead", which is the thing the patient actually wants
              when they stop asking about the paperwork. -->
         <button type="button" (click)="clearDocumentContext()"
-          class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium text-teal-700 hover:bg-teal-100 coarse:min-h-[44px]">
+          class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium text-brand-ink hover:bg-brand-tint-strong coarse:min-h-[44px]">
           Symptoms instead
         </button>
       </div>
@@ -833,7 +905,7 @@ plain <button> fixes it with no behaviour change.
       <!-- Attach a report. Picking here hands the file to the report reader,
            which owns the explanation UI — the chat stays a conversation. -->
       <label [attr.aria-disabled]="emergency"
-        class="flex h-12 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-teal-700 hover:bg-teal-50 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+        class="grid h-12 w-12 shrink-0 cursor-pointer place-items-center rounded-full text-brand-ink transition-colors duration-fast hover:bg-brand-tint aria-disabled:pointer-events-none aria-disabled:opacity-45"
         title="Upload a report or prescription">
         <ds-icon name="attach_file" [size]="22" />
         <span class="sr-only">Upload a report or prescription</span>
@@ -844,30 +916,30 @@ plain <button> fixes it with no behaviour change.
            describing symptoms — usually two or three sentences — type into a
            slit that hid everything but the last line. -->
       <textarea #composer [(ngModel)]="input" (input)="autoGrow(composer)" (keydown.enter)="onEnter($event)"
-        [disabled]="emergency" rows="2" [placeholder]="documentContext ? 'Ask about your report…' : composerPlaceholder"
+        [disabled]="emergency" rows="2" [placeholder]="activeDocument ? 'Ask about your report…' : composerPlaceholder"
         aria-label="Your message"
-      class="min-h-[60px] max-h-60 flex-1 resize-none overflow-y-auto rounded-2xl border border-black/10 px-4 py-3 text-base leading-relaxed outline-none focus:border-teal-600 disabled:bg-gray-100"></textarea>
+      class="min-h-[60px] max-h-60 flex-1 resize-none overflow-y-auto rounded-2xl border border-line/10 bg-surface-2/60 px-4 py-3 text-base leading-relaxed text-content outline-none transition-colors duration-fast placeholder:text-muted focus:border-teal-600 focus:bg-surface disabled:opacity-60 short:min-h-[44px] short:py-2 short:max-h-28"></textarea>
       <button (click)="submitInput()" [disabled]="emergency || loading" aria-label="Send message"
-        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50">
+        class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-teal-600 text-white shadow-e1 transition-all duration-fast ease-standard hover:bg-teal-700 active:scale-[.94] focus-visible:focus-ring disabled:opacity-45 disabled:shadow-none">
         <ds-icon name="send" [size]="22" />
       </button>
     </div>
-    <p class="mx-auto mt-1.5 max-w-2xl text-center text-[10px] text-teal-900/40">
+    <p class="mx-auto mt-2 max-w-2xl text-center text-[11px] leading-snug text-muted short:mt-1">
       AI assistant, not a licensed physician. Not medical advice, diagnosis, or prescriptions.
-      <a routerLink="/disclaimer" class="underline hover:text-teal-600">Disclaimer</a>
+      <a routerLink="/disclaimer" class="underline underline-offset-2 hover:text-brand-ink-soft focus-visible:focus-ring">Disclaimer</a>
       ·
-      <a routerLink="/privacy" class="underline hover:text-teal-600">Privacy</a>
+      <a routerLink="/privacy" class="underline underline-offset-2 hover:text-brand-ink-soft focus-visible:focus-ring">Privacy</a>
       ·
-      <a routerLink="/terms" class="underline hover:text-teal-600">Terms</a>
+      <a routerLink="/terms" class="underline underline-offset-2 hover:text-brand-ink-soft focus-visible:focus-ring">Terms</a>
     </p>
   </footer>
 }
 
 <!-- consultation complete — chat locked, continue with a doctor -->
 @if (consultComplete) {
-  <footer class="border-t border-black/5 bg-white px-3 py-3 sm:px-4" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+  <footer class="shrink-0 border-t border-line/10 bg-surface px-3 pt-3 sm:px-4 pb-[max(0.75rem,var(--safe-bottom))]">
     <div class="mx-auto max-w-2xl">
-      <p class="text-center text-[13px] font-medium text-teal-900 sm:text-sm">
+      <p class="text-center text-[13px] font-medium text-ink sm:text-sm">
         Your report is ready. Continue with {{ specialistLabel }}.
       </p>
       <div class="mt-2.5 flex flex-col gap-2 sm:flex-row">
@@ -876,11 +948,11 @@ plain <button> fixes it with no behaviour change.
           <ds-icon name="medical_services" [size]="18" /> Connect with {{ specialistLabel }}
         </button>
         <button (click)="startAmend()"
-          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 sm:w-auto">
+          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint sm:w-auto">
           <ds-icon name="edit_note" [size]="18" /> Add or correct details
         </button>
         <button (click)="restart()"
-          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 sm:w-auto">
+          class="flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-teal-600 px-4 py-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint sm:w-auto">
           <ds-icon name="refresh" [size]="18" /> New chat
         </button>
       </div>
@@ -891,27 +963,27 @@ plain <button> fixes it with no behaviour change.
 <!-- location prompt modal -->
 @if (askCity) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <div class="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
       <div class="flex items-center justify-between">
-        <h3 class="font-heading text-lg font-bold text-teal-900">Where should I look?</h3>
+        <h3 class="font-heading text-lg font-bold text-ink">Where should I look?</h3>
         <button (click)="closeLocationPrompt()" type="button" aria-label="Close"
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-teal-900/50 hover:bg-teal-50 hover:text-teal-900">
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-tint hover:text-ink">
           <ds-icon name="close" />
         </button>
       </div>
-      <p class="mt-1 text-sm text-teal-900/60">
+      <p class="mt-1 text-sm text-muted">
         Enter your city/area to find {{ selectedSpecialty || 'doctors' }} nearby.
       </p>
       <div class="mt-3 flex gap-2">
         <input [ngModel]="city" (ngModelChange)="onCityInput($event)" (keyup.enter)="submitCity()"
           placeholder="e.g. Balasore, Odisha" autocomplete="off" role="combobox" aria-autocomplete="list"
           [attr.aria-expanded]="citySuggestions.length > 0" aria-controls="city-suggestions"
-          class="flex-1 rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600" autofocus />
+          class="flex-1 rounded-lg border border-line/10 px-3 py-2.5 text-sm outline-none focus:border-teal-600" autofocus />
           <button (click)="submitCity()" class="rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white coarse:min-h-[44px]">Search</button>
         </div>
         <!-- city/area suggestions (debounced; the field still works if they fail) -->
         @if (suggestLoading) {
-          <p class="mt-2 flex items-center gap-1.5 text-xs text-teal-900/50">
+          <p class="mt-2 flex items-center gap-1.5 text-xs text-muted">
             <svg class="h-3.5 w-3.5 shrink-0 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
               <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
@@ -921,23 +993,23 @@ plain <button> fixes it with no behaviour change.
         }
         @if (citySuggestions.length) {
           <ul id="city-suggestions" role="listbox"
-            class="mt-2 max-h-56 overflow-y-auto rounded-lg border border-black/10 bg-white">
+            class="mt-2 max-h-56 overflow-y-auto rounded-lg border border-line/10 bg-surface">
             @for (p of citySuggestions; track p) {
               <li role="option" [attr.aria-selected]="false">
                 <button type="button" (click)="pickPlace(p)"
-                  class="flex w-full items-start gap-2 border-b border-black/5 px-3 py-2.5 text-left text-sm text-teal-900 last:border-0 hover:bg-teal-50 coarse:min-h-[44px]">
-                  <ds-icon name="place" [size]="16" class="mt-0.5 shrink-0 text-teal-600" />
+                  class="flex w-full items-start gap-2 border-b border-line/5 px-3 py-2.5 text-left text-sm text-ink last:border-0 hover:bg-brand-tint coarse:min-h-[44px]">
+                  <ds-icon name="place" [size]="16" class="mt-0.5 shrink-0 text-brand-ink-soft" />
                   <span class="min-w-0">{{ p.label }}</span>
                 </button>
               </li>
             }
           </ul>
         }
-        <button (click)="useMyLocation()" class="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-teal-600 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-50 coarse:min-h-[44px]">
+        <button (click)="useMyLocation()" class="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-teal-600 py-2.5 text-sm font-semibold text-brand-ink hover:bg-brand-tint coarse:min-h-[44px]">
           <ds-icon name="my_location" [size]="16" /> Use my current location
         </button>
         @if (locError) {
-          <p class="mt-2 text-xs text-red-600">{{ locError }}</p>
+          <p class="mt-2 text-xs text-danger-ink">{{ locError }}</p>
         }
       </div>
     </div>
@@ -946,19 +1018,19 @@ plain <button> fixes it with no behaviour change.
   <!-- doctor results screen — a place of its own, so the patient never has to
   scroll back through the whole health summary to reach a phone number -->
   @if (showDoctors) {
-    <div class="fixed inset-0 z-40 flex flex-col bg-cream">
-      <header class="flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+    <div class="fixed inset-0 z-40 flex flex-col bg-bg">
+      <header class="flex items-center gap-2 border-b border-line/5 bg-surface px-3 py-3 sm:px-4">
         <button (click)="closeDoctors()" aria-label="Back to my health summary"
-          class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-teal-700 hover:bg-teal-50 coarse:min-h-[44px]">
+          class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-brand-ink hover:bg-brand-tint coarse:min-h-[44px]">
           <ds-icon name="arrow_back" [size]="22" />
         </button>
         <div class="min-w-0 flex-1">
           <!-- One line each, both truncating: a long specialty or a long area name
           must never wrap the header into the "Change area" button. -->
-          <p class="truncate font-heading text-[15px] font-bold leading-tight text-teal-900 sm:text-base">
+          <p class="truncate font-heading text-[15px] font-bold leading-tight text-ink sm:text-base">
             {{ selectedSpecialty || 'Doctors' }}
           </p>
-          <p class="truncate text-xs text-teal-900/55" aria-live="polite">
+          <p class="truncate text-xs text-muted" aria-live="polite">
             @if (searchAreaShort) {
               <span>{{ searchAreaShort }}</span>
             }
@@ -974,34 +1046,34 @@ plain <button> fixes it with no behaviour change.
           </p>
         </div>
         <button (click)="searchAnotherArea()" aria-label="Search in another area"
-          class="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50 coarse:min-h-[44px]">
+          class="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint coarse:min-h-[44px]">
           <ds-icon name="edit_location_alt" [size]="18" />
           <span class="hidden xs:inline">Change area</span>
         </button>
       </header>
-      <main class="flex-1 overflow-y-auto px-4 py-4" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+      <div class="flex-1 overflow-y-auto px-4 pt-4 pb-[max(1rem,var(--safe-bottom))]">
         <div class="mx-auto max-w-2xl space-y-4">
           @if (locError && !doctorsLoading) {
-            <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ locError }}</p>
+            <p class="rounded-lg bg-danger-tint px-3 py-2 text-sm text-danger-ink">{{ locError }}</p>
           }
           <!-- Said once for the whole screen — it used to repeat above the partner
           card, above the list, and again at the bottom. -->
           @if (hasDoctorResults && !doctorsLoading) {
-            <p class="text-xs leading-snug text-teal-900/55">
+            <p class="text-xs leading-snug text-muted">
               Listings come from Google and OpenStreetMap. We don't verify or endorse practitioners — please check a doctor's registration before consulting.
             </p>
           }
           <!-- nothing at all came back -->
           @if (doctorsSearched && !doctorsLoading && !hasDoctorResults && !locError) {
             <div
-              class="rounded-2xl bg-white p-5 text-center ring-1 ring-black/5">
-              <ds-icon name="location_off" [size]="34" class="text-teal-900/30" />
-              <p class="mt-1 font-heading font-semibold text-teal-900">
+              class="rounded-2xl bg-surface p-5 text-center ring-1 ring-line/10">
+              <ds-icon name="location_off" [size]="34" class="text-muted" />
+              <p class="mt-1 font-heading font-semibold text-ink">
                 No {{ selectedSpecialty || 'doctors' }} found@if (lastSearchPlace) {
                 <span> in {{ lastSearchPlace }}</span>
               }
             </p>
-            <p class="mt-1 text-sm text-teal-900/60">Try a nearby city, a larger city, or your pincode.</p>
+            <p class="mt-1 text-sm text-muted">Try a nearby city, a larger city, or your pincode.</p>
           </div>
         }
         <!-- doctor discovery loading. The spinner is inline SVG on purpose: the icon
@@ -1011,7 +1083,7 @@ plain <button> fixes it with no behaviour change.
           <div class="space-y-3" role="status" aria-live="polite">
             <!-- The header already names the specialty and the area, so this line
             carries the one thing it can't: how long this is likely to take. -->
-            <div class="flex items-start gap-2 text-sm text-teal-900/70">
+            <div class="flex items-start gap-2 text-sm text-content">
               <svg class="mt-0.5 h-[18px] w-[18px] shrink-0 text-teal-500 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
                 <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
@@ -1020,19 +1092,19 @@ plain <button> fixes it with no behaviour change.
             </div>
             <!-- Same footprint as a real result card, so nothing jumps on arrival. -->
             @for (s of [1,2,3]; track s) {
-              <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+              <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
                 <div class="flex items-start gap-3">
-                  <div class="h-11 w-11 shrink-0 rounded-full bg-teal-100 motion-safe:animate-pulse"></div>
+                  <div class="h-11 w-11 shrink-0 rounded-full bg-brand-tint-strong motion-safe:animate-pulse"></div>
                   <div class="min-w-0 flex-1 space-y-2">
-                    <div class="h-3.5 w-1/2 rounded bg-teal-100 motion-safe:animate-pulse"></div>
-                    <div class="h-2.5 w-3/4 rounded bg-teal-50 motion-safe:animate-pulse"></div>
-                    <div class="h-2.5 w-2/5 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+                    <div class="h-3.5 w-1/2 rounded bg-brand-tint-strong motion-safe:animate-pulse"></div>
+                    <div class="h-2.5 w-3/4 rounded bg-brand-tint motion-safe:animate-pulse"></div>
+                    <div class="h-2.5 w-2/5 rounded bg-brand-tint motion-safe:animate-pulse"></div>
                   </div>
                 </div>
                 <div class="mt-3 flex gap-4">
-                  <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
-                  <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
-                  <div class="h-3 w-12 rounded bg-teal-50 motion-safe:animate-pulse"></div>
+                  <div class="h-3 w-12 rounded bg-brand-tint motion-safe:animate-pulse"></div>
+                  <div class="h-3 w-12 rounded bg-brand-tint motion-safe:animate-pulse"></div>
+                  <div class="h-3 w-12 rounded bg-brand-tint motion-safe:animate-pulse"></div>
                 </div>
               </div>
             }
@@ -1041,27 +1113,27 @@ plain <button> fixes it with no behaviour change.
         <!-- affiliate-first: partner clinic(s) + offer -->
         @if (affiliateDoctors.length && !doctorsLoading) {
           <div class="space-y-3">
-            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-700">
+            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning-ink">
               <ds-icon name="verified" [size]="16" />
               Partner clinic
             </p>
             <!-- clinic-wide offer banner -->
             @if (affiliateOffer) {
-              <div class="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5">
-                <ds-icon name="local_offer" [size]="16" class="shrink-0 text-amber-600" />
+              <div class="flex items-start gap-2 rounded-xl border border-warning-line bg-warning-tint px-3 py-2.5">
+                <ds-icon name="local_offer" [size]="16" class="shrink-0 text-warning-ink-soft" />
                 <div class="min-w-0">
-                  <p class="text-sm font-semibold text-amber-800">{{ affiliateOffer.title }}@if (affiliateOffer.discountText) {
+                  <p class="text-sm font-semibold text-warning-ink">{{ affiliateOffer.title }}@if (affiliateOffer.discountText) {
                     <span> — {{ affiliateOffer.discountText }}</span>
                   }</p>
                   @if (affiliateOffer.description) {
-                    <p class="text-xs text-amber-700/80">{{ affiliateOffer.description }}</p>
+                    <p class="text-xs text-warning-ink/80">{{ affiliateOffer.description }}</p>
                   }
                 </div>
               </div>
             }
             @for (p of affiliateDoctors; track p) {
-              <div class="rounded-2xl border-2 border-amber-400 bg-white p-4">
-                <div class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
+              <div class="rounded-2xl border-2 border-amber-400 bg-surface p-4">
+                <div class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-warning-ink-soft">
                   <ds-icon name="handshake" [size]="16" /> Partner clinic
                 </div>
                 <div class="mt-2 flex items-start gap-3">
@@ -1070,28 +1142,28 @@ plain <button> fixes it with no behaviour change.
                   <div class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-2">
                       <div class="min-w-0">
-                        <p class="font-heading font-bold text-teal-900">{{ p.name }}</p>
+                        <p class="font-heading font-bold text-ink">{{ p.name }}</p>
                         @if (p.clinicName) {
-                          <p class="text-xs text-teal-900/60">{{ p.clinicName }}</p>
+                          <p class="text-xs text-muted">{{ p.clinicName }}</p>
                         }
                       </div>
                       @if (p.rating) {
-                        <div class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                        <div class="flex shrink-0 items-center gap-1 text-sm text-warning-ink-soft">
                           <ds-icon name="star" [size]="16" />{{ p.rating }}
                           @if (p.userRatingsTotal) {
-                            <span class="text-xs text-teal-900/40">({{ p.userRatingsTotal }})</span>
+                            <span class="text-xs text-muted">({{ p.userRatingsTotal }})</span>
                           }
                         </div>
                       }
                     </div>
                     @if (p.specialty) {
-                      <p class="mt-0.5 text-sm text-teal-900/70">{{ p.specialty }}</p>
+                      <p class="mt-0.5 text-sm text-content">{{ p.specialty }}</p>
                     }
                     @if (p.address) {
-                      <p class="mt-1 text-xs text-teal-900/60"><ds-icon name="place" [size]="14" class="align-middle" /> {{ p.address }}</p>
+                      <p class="mt-1 text-xs text-muted"><ds-icon name="place" [size]="14" class="align-middle" /> {{ p.address }}</p>
                     }
                     @if (p.offer?.discountText) {
-                      <span class="mt-1.5 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                      <span class="mt-1.5 inline-block rounded-full bg-warning-tint-strong px-2 py-0.5 text-[11px] font-semibold text-warning-ink">
                         {{ p.offer?.discountText }}
                       </span>
                     }
@@ -1100,7 +1172,7 @@ plain <button> fixes it with no behaviour change.
                 <div class="mt-3 flex flex-wrap gap-2">
                   <a [href]="p.phone ? 'tel:' + p.phone : null" [class.opacity-40]="!p.phone"
                     [attr.aria-label]="'Call ' + p.name"
-                    class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-xs font-semibold text-teal-700 transition-colors duration-150 hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1">
+                    class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-xs font-semibold text-brand-ink transition-colors duration-150 hover:bg-brand-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1">
                     <ds-icon name="call" [size]="16" /> Call
                   </a>
                   <a [href]="p.bookingUrl || p.website || p.mapsUrl || null" [class.opacity-40]="!(p.bookingUrl || p.website || p.mapsUrl)"
@@ -1112,17 +1184,17 @@ plain <button> fixes it with no behaviour change.
               </div>
             }
             @if (doctors.length) {
-              <p class="pt-1 text-xs font-semibold uppercase tracking-wide text-teal-900/50">Other doctors nearby</p>
+              <p class="pt-1 text-xs font-semibold uppercase tracking-wide text-muted">Other doctors nearby</p>
             }
           </div>
         }
         @if (doctors.length) {
           <div class="space-y-3">
             @if (multiSpecialist) {
-              <p class="text-xs text-teal-900/60">
+              <p class="text-xs text-muted">
                 Also recommended:
                 @for (o of otherSpecialists; track o.specialty; let last = $last) {
-                  <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-teal-700 underline">show {{ o.specialty }}s</button>@if (!last) {
+                  <button (click)="selectSpecialist(o.specialty)" class="font-semibold text-brand-ink underline">show {{ o.specialty }}s</button>@if (!last) {
                   <span>, </span>
                 }
               }
@@ -1131,7 +1203,7 @@ plain <button> fixes it with no behaviour change.
           <!-- Listings often omit the specialty, so say what we could and couldn't
           confirm rather than implying the area has no such doctor. -->
           @if (!hasSpecialtyMatch) {
-            <p class="flex items-start gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p class="flex items-start gap-1.5 rounded-lg bg-warning-tint px-3 py-2 text-xs text-warning-ink">
               <ds-icon name="info" [size]="14" class="shrink-0" />
               <span>No listing here states {{ selectedSpecialty || 'this specialty' }} — check when you call, or try a larger city.</span>
             </p>
@@ -1140,10 +1212,10 @@ plain <button> fixes it with no behaviour change.
           verified the specialty; otherwise amber + "Best rated", so the card
           never implies an endorsement we can't back. -->
           @if (topPick; as rec) {
-            <div class="rounded-2xl border-2 bg-white p-4"
-              [ngClass]="topPickVerified ? 'border-teal-500' : 'border-amber-200'">
+            <div class="rounded-2xl border-2 bg-surface p-4"
+              [ngClass]="topPickVerified ? 'border-teal-500' : 'border-warning-line'">
               <div class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide"
-                [ngClass]="topPickVerified ? 'text-teal-700' : 'text-amber-700'">
+                [ngClass]="topPickVerified ? 'text-brand-ink' : 'text-warning-ink'">
                 <ds-icon [name]="topPickVerified ? 'recommend' : (rec.rating ? 'star' : 'near_me')" [size]="16" />
                 {{ topPickLabel }}
               </div>
@@ -1152,37 +1224,37 @@ plain <button> fixes it with no behaviour change.
                 [style.background]="avatarColor(rec.name)">{{ initials(rec.name) }}</div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-start justify-between gap-2">
-                    <p class="font-heading font-bold text-teal-900">{{ rec.name }}</p>
+                    <p class="font-heading font-bold text-ink">{{ rec.name }}</p>
                     @if (rec.rating) {
-                      <div class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                      <div class="flex shrink-0 items-center gap-1 text-sm text-warning-ink-soft">
                         <ds-icon name="star" [size]="16" />{{ rec.rating }}
                         @if (rec.userRatingsTotal) {
-                          <span class="text-xs text-teal-900/40">({{ rec.userRatingsTotal }})</span>
+                          <span class="text-xs text-muted">({{ rec.userRatingsTotal }})</span>
                         }
                       </div>
                     }
                   </div>
-                  <p class="mt-0.5 text-sm text-teal-900/70">{{ recommendReason(rec) }}</p>
+                  <p class="mt-0.5 text-sm text-content">{{ recommendReason(rec) }}</p>
                   @if (!topPickVerified) {
-                    <span class="mt-1.5 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    <span class="mt-1.5 inline-block rounded-full bg-warning-tint-strong px-2 py-0.5 text-[11px] font-semibold text-warning-ink">
                       Specialty not verified
                     </span>
                   }
                   @if (rec.address) {
-                    <p class="mt-1 text-xs text-teal-900/60"><ds-icon name="place" [size]="14" class="align-middle" /> {{ rec.address }}</p>
+                    <p class="mt-1 text-xs text-muted"><ds-icon name="place" [size]="14" class="align-middle" /> {{ rec.address }}</p>
                   }
                   @if (rec.hours) {
-                    <p class="mt-0.5 text-xs text-teal-900/60"><ds-icon name="schedule" [size]="14" class="align-middle" /> {{ rec.hours }}</p>
+                    <p class="mt-0.5 text-xs text-muted"><ds-icon name="schedule" [size]="14" class="align-middle" /> {{ rec.hours }}</p>
                   }
                   @if (rec.openNow === true) {
-                    <span class="mt-1.5 inline-block rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Open now</span>
+                    <span class="mt-1.5 inline-block rounded-full bg-success-tint-strong px-2 py-0.5 text-[11px] font-semibold text-success-ink">Open now</span>
                   }
                   @if (rec.openNow === false) {
-                    <span class="mt-1.5 inline-block rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">Closed now</span>
+                    <span class="mt-1.5 inline-block rounded-full bg-danger-tint-strong px-2 py-0.5 text-[11px] font-semibold text-danger-ink">Closed now</span>
                   }
                 </div>
               </div>
-              <p class="mt-3 text-xs text-teal-900/60">
+              <p class="mt-3 text-xs text-muted">
                 How to book: {{ rec.phone ? 'call the clinic' : 'visit or check the listing' }}{{ rec.website ? ', book on their website' : '' }}, or get directions and go in.
               </p>
               <!-- Wraps instead of squeezing: at 320px three columns clipped the
@@ -1199,14 +1271,14 @@ plain <button> fixes it with no behaviour change.
                   <a [href]="rec.website" target="_blank" rel="noopener"
                     [attr.aria-label]="'Book online with ' + rec.name"
                     class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                    [ngClass]="rec.phone ? 'border border-teal-600 text-teal-700 hover:bg-teal-50' : 'bg-teal-600 text-white hover:bg-teal-700'">
+                    [ngClass]="rec.phone ? 'border border-teal-600 text-brand-ink hover:bg-brand-tint' : 'bg-teal-600 text-white hover:bg-teal-700'">
                     <ds-icon name="event" [size]="16" /> Book online
                   </a>
                 }
                 <a [href]="rec.mapsUrl" target="_blank" rel="noopener"
                   [attr.aria-label]="'Directions to ' + rec.name"
                   class="flex min-h-[44px] min-w-[7.5rem] flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-1"
-                  [ngClass]="(rec.phone || rec.website) ? 'border border-teal-600 text-teal-700 hover:bg-teal-50' : 'bg-teal-600 text-white hover:bg-teal-700'">
+                  [ngClass]="(rec.phone || rec.website) ? 'border border-teal-600 text-brand-ink hover:bg-brand-tint' : 'bg-teal-600 text-white hover:bg-teal-700'">
                   <ds-icon name="directions" [size]="16" /> Directions
                 </a>
               </div>
@@ -1214,37 +1286,37 @@ plain <button> fixes it with no behaviour change.
           }
           <!-- other options -->
           @if (topPick && doctors.length > 1) {
-            <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">More options nearby</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-muted">More options nearby</p>
           }
           @for (d of doctors; track d) {
             @if (d !== topPick) {
-              <div class="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+              <div class="rounded-2xl bg-surface p-4 ring-1 ring-line/10">
                 <div class="flex items-start gap-3">
                   <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
                   [style.background]="avatarColor(d.name)">{{ initials(d.name) }}</div>
                   <div class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-2">
                       <div>
-                        <p class="font-heading font-semibold text-teal-900">{{ d.name }}</p>
+                        <p class="font-heading font-semibold text-ink">{{ d.name }}</p>
                         @if (!d.matchesSpecialty) {
-                          <p class="text-[11px] text-amber-700">Specialty not verified</p>
+                          <p class="text-[11px] text-warning-ink">Specialty not verified</p>
                         }
                         @if (d.address) {
-                          <p class="mt-0.5 text-xs text-teal-900/60">
+                          <p class="mt-0.5 text-xs text-muted">
                             <ds-icon name="place" [size]="14" class="align-middle" /> {{ d.address }}
                           </p>
                         }
                         @if (d.hours) {
-                          <p class="text-xs text-teal-900/60">
+                          <p class="text-xs text-muted">
                             <ds-icon name="schedule" [size]="14" class="align-middle" /> {{ d.hours }}
                           </p>
                         }
                       </div>
                       @if (d.rating) {
-                        <div class="flex shrink-0 items-center gap-1 text-sm text-amber-600">
+                        <div class="flex shrink-0 items-center gap-1 text-sm text-warning-ink-soft">
                           <ds-icon name="star" [size]="16" />{{ d.rating }}
                           @if (d.userRatingsTotal) {
-                            <span class="text-xs text-teal-900/40">({{ d.userRatingsTotal }})</span>
+                            <span class="text-xs text-muted">({{ d.userRatingsTotal }})</span>
                           }
                         </div>
                       }
@@ -1252,17 +1324,17 @@ plain <button> fixes it with no behaviour change.
                     <!-- Padded so each link clears a 40px tap target on a phone. -->
                     <div class="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1">
                       @if (d.phone) {
-                        <a [href]="'tel:' + d.phone" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+                        <a [href]="'tel:' + d.phone" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-ink hover:bg-brand-tint hover:text-ink coarse:min-h-[44px]">
                           <ds-icon name="call" [size]="16" /> Call
                         </a>
                       }
                       @if (d.website) {
-                        <a [href]="d.website" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+                        <a [href]="d.website" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-ink hover:bg-brand-tint hover:text-ink coarse:min-h-[44px]">
                           <ds-icon name="event" [size]="16" /> Book
                         </a>
                       }
                       @if (d.mapsUrl) {
-                        <a [href]="d.mapsUrl" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+                        <a [href]="d.mapsUrl" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-ink hover:bg-brand-tint hover:text-ink coarse:min-h-[44px]">
                           <ds-icon name="place" [size]="16" /> Maps
                         </a>
                       }
@@ -1281,34 +1353,34 @@ plain <button> fixes it with no behaviour change.
       @if (doctorsSearched && !hasSpecialtyMatch && !doctorsLoading) {
         <button
           (click)="searchAnotherArea()"
-          class="mt-1 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-teal-700 hover:bg-teal-50">
+          class="mt-1 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg border border-teal-600 px-3 text-sm font-semibold text-brand-ink hover:bg-brand-tint">
           <ds-icon name="travel_explore" [size]="18" class="shrink-0" />
           Search another area
         </button>
       }
       @if (!doctorsLoading) {
         <button (click)="closeDoctors()"
-          class="flex min-h-[44px] w-full items-center justify-center gap-1 rounded-lg border border-black/10 py-2.5 text-sm font-medium text-teal-900/70 hover:bg-white">
+          class="flex min-h-[44px] w-full items-center justify-center gap-1 rounded-lg border border-line/10 py-2.5 text-sm font-medium text-content hover:bg-surface">
           <ds-icon name="description" [size]="16" /> Back to my health summary
         </button>
       }
     </div>
-  </main>
+  </div>
 </div>
 }
 
 <!-- leave-chat confirmation (anonymous user navigating home) -->
 @if (showLeaveDialog) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+    <div class="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
       <div class="flex items-center justify-between">
-        <h3 class="font-heading text-lg font-bold text-teal-900">Leave this chat?</h3>
+        <h3 class="font-heading text-lg font-bold text-ink">Leave this chat?</h3>
         <button (click)="showLeaveDialog = false" type="button" aria-label="Stay in this chat"
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-teal-900/50 hover:bg-teal-50 hover:text-teal-900">
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-tint hover:text-ink">
           <ds-icon name="close" />
         </button>
       </div>
-      <p class="mt-2 text-sm text-teal-900/70">
+      <p class="mt-2 text-sm text-content">
         Your conversation isn't saved yet. Log in or sign up to keep it in your account —
         or continue to the home page.
       </p>
@@ -1317,7 +1389,7 @@ plain <button> fixes it with no behaviour change.
         Log in / Sign up to save
       </button>
       <button (click)="leaveWithoutSaving()"
-        class="mt-2 w-full rounded-xl border border-black/10 px-4 py-2.5 text-sm font-medium text-teal-900/70 hover:bg-gray-50 coarse:min-h-[44px]">
+        class="mt-2 w-full rounded-xl border border-line/10 px-4 py-2.5 text-sm font-medium text-content hover:bg-surface-2/60 coarse:min-h-[44px]">
         Continue without saving
       </button>
     </div>
@@ -1336,7 +1408,7 @@ plain <button> fixes it with no behaviour change.
     [triageAge]="age"
     [triageSex]="sex"
     (authSuccess)="onAuthSuccess($event)"
-    (cancel)="showAuth = false"
+    (cancel)="cancelAuth()"
   ></app-auth-gate>
 }
 

@@ -65,7 +65,7 @@ import { LegalLayoutComponent } from '../../layouts/legal-layout/legal-layout.co
         {{ appName }} disclaims liability for any loss arising from use of the service.
       </p>
 
-      <p class="mt-6 text-xs text-teal-900/50">
+      <p class="mt-6 text-xs text-muted">
         This document is a draft pending review by a qualified Indian healthcare lawyer
         and does not constitute legal advice.
       </p>

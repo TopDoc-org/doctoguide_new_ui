@@ -1,14 +1,30 @@
 /**
- * Parity diff: prerendered output vs the Phase-0 baseline.
+ * Parity diff: prerendered output vs the CURRENT design baseline.
  *
  * Compares, per route, the things that are the actual SEO/content contract:
  *   <title>, meta description, meta robots, canonical, the social card image,
  *   the <h1>, and the normalized <main> text.
  *
+ * WHAT THIS GUARDS CHANGED IN 2.0.
+ *
+ * It used to diff against ../doctoguide-baseline, the Angular 14 v1 output, and
+ * a difference meant "the port drifted". That job is DONE and the gate is
+ * retired: the 2.0 redesign deliberately rewrites copy and structure on the
+ * public routes, so v1 is no longer the thing to be equal to.
+ *
+ * What it guards now is UNINTENDED drift. The baseline is
+ * ../doctoguide-v2-baseline — a snapshot of reviewed 2.0 output — and it moves
+ * forward only when you advance it on purpose, one route at a time:
+ *
+ *   node scripts/parity-snapshot.mjs /about      # after reviewing /about
+ *
+ * So editing the landing page and silently changing five SEO pages' metadata
+ * still fails loudly, which is the whole point of keeping this script.
+ *
  * Usage:
  *   node scripts/parity-diff.mjs [distDir] [baselineDir]
  * Defaults:
- *   dist/doctoguide/browser   ../doctoguide-baseline
+ *   dist/doctoguide/browser   ../doctoguide-v2-baseline
  *
  * Exit code 1 if anything differs, so it can gate a build.
  */
@@ -16,7 +32,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const DIST = process.argv[2] || 'dist/doctoguide/browser';
-const BASE = process.argv[3] || '../doctoguide-baseline';
+const BASE = process.argv[3] || '../doctoguide-v2-baseline';
 
 const ROUTES = [
   '/', '/start', '/privacy', '/terms', '/disclaimer', '/ai-doctor', '/symptom-checker',
@@ -67,22 +83,26 @@ const read = (dir, route) => {
 };
 
 /**
- * Routes where the <main> text is KNOWN to differ from v1, with the reason.
- * Metadata is still compared strictly — only the body-text check is waived.
+ * Routes where the <main> text is KNOWN to differ from the baseline, with the
+ * reason. Metadata is still compared strictly — only the body-text check is
+ * waived.
  *
- * Keep this list at zero-or-justified. Every entry is a claim someone must be
- * able to re-verify.
+ * DELIBERATELY EMPTY. It held one entry against the v1 baseline: PrimeNG's
+ * p-carousel ran in circular mode and cloned the first and last hero slides
+ * into the DOM, so v1's `/` contained ~198 chars of duplicated slide copy that
+ * ds-carousel does not emit. That waiver described a v1-vs-v2 difference and is
+ * meaningless now that the baseline IS v2 output — worse, it would silently
+ * swallow every future change to the landing page's body text.
+ *
+ * The right way to accept a body-text change now is to review it and advance
+ * the baseline for that route:
+ *
+ *   node scripts/parity-snapshot.mjs /
+ *
+ * Only add an entry here for a difference that is genuinely UNSTABLE between
+ * builds and cannot be snapshotted — and say why, so it can be re-verified.
  */
-const KNOWN_TEXT_DIFFS = {
-  '/': [
-    'PrimeNG p-carousel ran in circular mode and cloned the first and last hero',
-    'slides into the DOM, so the baseline contains "Ask anything, free" and',
-    '"Doctors near you" TWICE (~198 chars of duplicate copy). ds-carousel keeps',
-    'every slide in the DOM exactly once. All six slides remain crawlable in both;',
-    'the new output simply has no duplicates. Verified by counting slide titles in',
-    'each index.html.',
-  ].join(' '),
-};
+const KNOWN_TEXT_DIFFS = {};
 
 let failures = 0;
 const FIELDS = ['title', 'description', 'robots', 'canonical', 'ogImage', 'h1', 'hasJsonLd'];

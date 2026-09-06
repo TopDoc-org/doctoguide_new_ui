@@ -7,13 +7,14 @@ import { OFFER_TEMPLATES } from '../../data/offer-templates';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SwitchComponent } from '../../../../design-system/switch/switch.component';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-partner-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, IconComponent],
+  imports: [RouterLink, CommonModule, FormsModule, IconComponent, SwitchComponent],
   templateUrl: './partner-dashboard.component.html',
 })
 export class PartnerDashboardComponent implements OnInit {
@@ -129,6 +130,12 @@ export class PartnerDashboardComponent implements OnInit {
 
   private afterOfferError(): void {
     this.savingOfferKey = '';
+    // The switch is bound to `isOfferChecked(o)`, which a failed save leaves
+    // unchanged — and Angular only writes an input whose value CHANGED, so the
+    // control would keep the position the user put it in and lie about what
+    // was saved. Refetching replaces the row objects, which remounts the rows
+    // (`@for … track o`) against the server's answer rather than the click's.
+    this.loadOffers();
     this.error = 'Could not update the offer. Try again.';
   }
 

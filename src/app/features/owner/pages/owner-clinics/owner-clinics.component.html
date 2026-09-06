@@ -1,77 +1,136 @@
-<!-- hero -->
-<div class="mb-4">
-  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
-    <span class="h-px w-6 bg-grass-500"></span>Facilities
-  </p>
-  <h1 class="mt-2 font-grotesk text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Every <span class="text-grass-600">clinic.</span></h1>
-</div>
+<ds-page-header eyebrow="Facilities" title="Every clinic" subtitle="Reach, leads and conversion for every clinic on the platform." />
 
 <!-- date range + export -->
-<div class="flex flex-wrap items-end gap-3 rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+<div class="console-panel flex flex-wrap items-end gap-3">
   <div class="flex-1 sm:flex-none">
-    <label for="ocl-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
-    <input id="ocl-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+    <label for="ocl-from" class="console-label">From</label>
+    <input id="ocl-from" type="date" [(ngModel)]="from" class="console-field sm:w-auto" />
   </div>
   <div class="flex-1 sm:flex-none">
-    <label for="ocl-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
-    <input id="ocl-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30 sm:w-auto" />
+    <label for="ocl-to" class="console-label">To</label>
+    <input id="ocl-to" type="date" [(ngModel)]="to" class="console-field sm:w-auto" />
   </div>
   <button (click)="load()" [disabled]="loading"
-    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    class="console-btn">
     {{ loading ? 'Loading…' : 'Apply' }}
   </button>
   <button (click)="exportCsv()" [disabled]="exporting"
-    class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+    class="ml-auto console-btn-outline">
     <ds-icon name="download" [size]="16" />
     {{ exporting ? 'Exporting…' : 'Export Excel (CSV)' }}
   </button>
 </div>
 
 @if (error) {
-  <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+  <p role="alert" class="mt-3 text-sm text-danger">{{ error }}</p>
 }
 
-<div class="mt-4 overflow-x-auto rounded-2xl bg-white ring-1 ring-sand-200">
-  <table class="w-full text-left text-sm">
-    <thead class="border-b border-sand-200 bg-sand-50 text-xs font-semibold uppercase tracking-wide text-stone-500">
-      <tr>
-        <th class="px-4 py-3">Clinic</th>
-        <th class="px-4 py-3">Location</th>
-        <th class="px-4 py-3">Status</th>
-        <th class="px-4 py-3 text-right">Campaigns</th>
-        <th class="px-4 py-3 text-right">Clicks</th>
-        <th class="px-4 py-3 text-right">Leads</th>
-        <th class="px-4 py-3 text-right">Conv.</th>
-        <th class="px-4 py-3 text-right">Rate</th>
-        <th class="px-4 py-3"></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (c of rows; track c) {
-        <tr (click)="viewCampaigns(c)" tabindex="0" (keyup.enter)="viewCampaigns(c)"
-          class="cursor-pointer border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50 focus-visible:bg-sand-50 focus-visible:outline-none">
-          <td class="px-4 py-3 font-medium text-stone-900">
-            <span class="inline-flex items-center gap-1.5"><ds-icon name="store" [size]="15" class="text-grass-600" />{{ c.name }}</span>
-          </td>
-          <td class="px-4 py-3 text-stone-700">{{ c.city || '—' }}@if (c.state) {
-            <span>, {{ c.state }}</span>
-          }</td>
-          <td class="px-4 py-3">
-            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" [ngClass]="c.status === 'active' ? 'bg-grass-100 text-grass-700' : 'bg-sand-200 text-stone-500'">{{ c.status || 'active' }}</span>
-          </td>
-          <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ c.campaigns | number }}</td>
-          <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ c.clicks | number }}</td>
-          <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ c.leads | number }}</td>
-          <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ c.conversions | number }}</td>
-          <td class="px-4 py-3 text-right"><span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold tabular-nums text-amber-700">{{ convRate(c) }}%</span></td>
-          <td class="px-4 py-3 text-right"><ds-icon name="chevron_right" [size]="18" class="text-stone-300" /></td>
-        </tr>
+<div class="mt-4">
+  <ds-table caption="Clinics" [scrollable]="true">
+    <!-- Mobile. Nine columns cannot be arranged on a 375px screen, so the phone
+         gets four fields and the row's action, not a sideways-scrolling table.
+         The card IS the control: one <button> per clinic, which is also what
+         gives keyboard and screen-reader users the action that the desktop
+         row-click is. -->
+    <ng-container cards>
+      @for (c of rows; track c.clinicId) {
+        <button type="button" (click)="viewCampaigns(c)"
+          [attr.aria-label]="'View campaigns for ' + c.name"
+          class="w-full rounded-xl border border-line/10 bg-surface p-4 text-left transition-colors duration-fast hover:bg-surface-2/60 focus-visible:focus-ring">
+          <div class="flex items-start justify-between gap-2">
+            <p class="inline-flex min-w-0 items-center gap-1.5 font-grotesk font-bold text-content-strong">
+              <ds-icon name="store" [size]="15" class="shrink-0 text-console-ink" />
+              <span class="truncate">{{ c.name }}</span>
+            </p>
+            <ds-icon name="chevron_right" [size]="18" class="shrink-0 text-muted" />
+          </div>
+
+          <p class="mt-0.5 text-xs text-muted">
+            {{ c.city || '—' }}@if (c.state) {
+              <span>, {{ c.state }}</span>
+            }
+          </p>
+
+          <!-- Three numbers, labelled. A card that repeats all eight columns as
+               "label: value" pairs is longer than the table row it replaced. -->
+          <dl class="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-lg bg-surface-2/60 py-2">
+              <dt class="text-[11px] font-semibold uppercase tracking-wide text-muted">Clicks</dt>
+              <dd class="font-grotesk text-sm font-bold tabular-nums text-content-strong">{{ c.clicks | number }}</dd>
+            </div>
+            <div class="rounded-lg bg-surface-2/60 py-2">
+              <dt class="text-[11px] font-semibold uppercase tracking-wide text-muted">Leads</dt>
+              <dd class="font-grotesk text-sm font-bold tabular-nums text-content-strong">{{ c.leads | number }}</dd>
+            </div>
+            <div class="rounded-lg bg-console-gold-tint py-2">
+              <dt class="text-[11px] font-semibold uppercase tracking-wide text-console-gold/70">Rate</dt>
+              <dd class="font-grotesk text-sm font-bold tabular-nums text-console-gold">{{ convRate(c) }}%</dd>
+            </div>
+          </dl>
+        </button>
       }
       @if (!rows.length && !loading) {
-        <tr>
-          <td colspan="9" class="px-4 py-8 text-center text-stone-400">No clinics yet.</td>
-        </tr>
+        <ds-empty-state icon="store" title="No clinics yet"
+          message="Clinics appear here once they run their first campaign." />
       }
-    </tbody>
-  </table>
+    </ng-container>
+
+    <table>
+      <caption class="sr-only">Clinics, with campaign, click, lead and conversion counts for the selected date range.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Clinic</th>
+          <th scope="col">Location</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="num">Campaigns</th>
+          <th scope="col" class="num">Clicks</th>
+          <th scope="col" class="num">Leads</th>
+          <th scope="col" class="num">Conv.</th>
+          <th scope="col" class="num">Rate</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of rows; track c.clinicId) {
+          <!-- The row-click is a pointer AFFORDANCE only. The keyboard path is
+               the real button in the last cell — a `tabindex="0"` <tr> with a
+               keyup handler is focusable but has no role, no name and no
+               announced action, so a screen reader user lands on eight cells
+               of data with no way to know the row does anything. -->
+          <tr (click)="viewCampaigns(c)" class="cursor-pointer">
+            <td class="font-medium text-content-strong">
+              <span class="inline-flex items-center gap-1.5">
+                <ds-icon name="store" [size]="15" class="text-console-ink" />{{ c.name }}
+              </span>
+            </td>
+            <td>{{ c.city || '—' }}@if (c.state) {
+              <span>, {{ c.state }}</span>
+            }</td>
+            <td>
+              <ds-badge [tone]="c.status === 'active' ? 'grass' : 'neutral'">{{ c.status || 'active' }}</ds-badge>
+            </td>
+            <td class="num">{{ c.campaigns | number }}</td>
+            <td class="num">{{ c.clicks | number }}</td>
+            <td class="num">{{ c.leads | number }}</td>
+            <td class="num">{{ c.conversions | number }}</td>
+            <td class="num">
+              <span class="rounded-full bg-console-gold-tint-strong px-2 py-0.5 text-xs font-bold tabular-nums text-console-gold">{{ convRate(c) }}%</span>
+            </td>
+            <td class="num">
+              <button type="button" (click)="$event.stopPropagation(); viewCampaigns(c)"
+                [attr.aria-label]="'View campaigns for ' + c.name"
+                class="grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors duration-fast hover:bg-surface-2 hover:text-content focus-visible:focus-ring">
+                <ds-icon name="chevron_right" [size]="18" />
+              </button>
+            </td>
+          </tr>
+        }
+        @if (!rows.length && !loading) {
+          <tr>
+            <td colspan="9" class="text-center text-muted">No clinics yet.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </ds-table>
 </div>

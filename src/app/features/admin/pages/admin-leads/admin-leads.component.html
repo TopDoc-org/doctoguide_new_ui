@@ -1,25 +1,20 @@
-<!-- hero -->
-<div class="mb-4">
-  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
-    <span class="h-px w-6 bg-grass-500"></span>Every clinic
-  </p>
-  <h1 class="mt-2 font-grotesk text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Leads, <span class="text-grass-600">everywhere.</span></h1>
-</div>
+<ds-page-header eyebrow="Every clinic" title="Leads, everywhere"
+  subtitle="Every lead captured across every clinic on the platform." />
 
 <!-- filter bar -->
-<div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+<div class="console-panel">
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
     <div>
-      <label for="f-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
-      <input id="f-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <label for="f-from" class="console-label">From</label>
+      <input id="f-from" type="date" [(ngModel)]="from" class="console-field" />
     </div>
     <div>
-      <label for="f-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
-      <input id="f-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <label for="f-to" class="console-label">To</label>
+      <input id="f-to" type="date" [(ngModel)]="to" class="console-field" />
     </div>
     <div>
-      <label for="f-clinic" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Clinic</label>
-      <select id="f-clinic" [(ngModel)]="clinicId" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="f-clinic" class="console-label">Clinic</label>
+      <select id="f-clinic" [(ngModel)]="clinicId" class="console-field">
         <option value="">All clinics</option>
         @for (c of filters.clinics; track $index) {
           <option [value]="c.clinicId">{{ c.name }}</option>
@@ -27,8 +22,8 @@
       </select>
     </div>
     <div>
-      <label for="f-state" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">State</label>
-      <select id="f-state" [(ngModel)]="state" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="f-state" class="console-label">State</label>
+      <select id="f-state" [(ngModel)]="state" class="console-field">
         <option value="">All states</option>
         @for (s of filters.states; track $index) {
           <option [value]="s">{{ s }}</option>
@@ -36,8 +31,8 @@
       </select>
     </div>
     <div>
-      <label for="f-district" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">District</label>
-      <select id="f-district" [(ngModel)]="district" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="f-district" class="console-label">District</label>
+      <select id="f-district" [(ngModel)]="district" class="console-field">
         <option value="">All districts</option>
         @for (d of filters.districts; track $index) {
           <option [value]="d">{{ d }}</option>
@@ -45,8 +40,8 @@
       </select>
     </div>
     <div>
-      <label for="f-specialty" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Specialty</label>
-      <select id="f-specialty" [(ngModel)]="specialty" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="f-specialty" class="console-label">Specialty</label>
+      <select id="f-specialty" [(ngModel)]="specialty" class="console-field">
         <option value="">All specialties</option>
         @for (sp of filters.specialties; track $index) {
           <option [value]="sp">{{ sp }}</option>
@@ -55,8 +50,8 @@
     </div>
     @if (filters.campaigns.length) {
       <div>
-        <label for="f-campaign" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Campaign</label>
-        <select id="f-campaign" [(ngModel)]="campaign" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+        <label for="f-campaign" class="console-label">Campaign</label>
+        <select id="f-campaign" [(ngModel)]="campaign" class="console-field">
           <option value="">All campaigns</option>
           @for (cp of filters.campaigns; track $index) {
             <option [value]="cp">{{ cp }}</option>
@@ -65,115 +60,113 @@
       </div>
     }
     <div class="sm:col-span-2 lg:col-span-3">
-      <label for="f-q" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Search</label>
+      <label for="f-q" class="console-label">Search</label>
       <input id="f-q" type="search" [(ngModel)]="q" (keyup.enter)="load(1)" placeholder="Name or mobile"
-        class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+        class="console-field" />
       </div>
     </div>
 
     <div class="mt-3 flex flex-wrap items-center gap-2">
       <button (click)="load(1)" [disabled]="loading"
-        class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+        class="console-btn">
         {{ loading ? 'Loading…' : 'Apply filters' }}
       </button>
       <button (click)="reset()" [disabled]="loading"
-        class="min-h-[44px] rounded-xl border border-sand-200 px-4 py-2 text-sm font-medium text-stone-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+        class="console-btn-ghost">
         Reset
       </button>
       <button (click)="exportCsv()" [disabled]="exporting" aria-label="Export filtered leads to Excel (CSV)"
-        class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+        class="ml-auto console-btn-outline">
         <ds-icon name="download" [size]="16" />
         {{ exporting ? 'Exporting…' : 'Export Excel (CSV)' }}
       </button>
     </div>
   </div>
 
-  @if (error) {
-    <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
-  }
+@if (error) {
+  <p role="alert" class="mt-3 text-sm text-danger">{{ error }}</p>
+}
 
-  <!-- mobile cards -->
-  <div class="mt-4 space-y-2 sm:hidden">
-    @for (l of leads; track l) {
-      <div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
-        <div class="flex items-start justify-between gap-2">
-          <p class="font-grotesk font-bold text-stone-900">{{ l.name }}</p>
-          <span class="shrink-0 text-xs text-stone-400">{{ l.createdAt | date:'mediumDate' }}</span>
-        </div>
-        <a [href]="'tel:' + l.mobile" class="mt-1 inline-flex items-center gap-1 text-sm font-medium tabular-nums text-grass-700">
-          <ds-icon name="call" [size]="14" />{{ l.mobile }}
-        </a>
-        <p class="mt-1 text-xs font-medium text-grass-700">{{ l.clinicName || 'No clinic' }}</p>
-        <p class="mt-0.5 text-xs text-stone-500">
-          {{ l.city || '—' }}@if (l.district) {
-          <span> · {{ l.district }}</span>
-          }@if (l.state) {
-          <span> · {{ l.state }}</span>
-        }
-      </p>
-      <p class="mt-0.5 text-xs text-stone-500">{{ l.specialty || 'No specialty' }}</p>
-      @if (l.campaign) {
-        <p class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-grass-50 px-2 py-0.5 text-[11px] font-semibold text-grass-700">
-          <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
-        </p>
-      }
-    </div>
-  }
-  @if (!leads.length && !loading) {
-    <p class="rounded-2xl bg-white p-6 text-center text-sm text-stone-400 ring-1 ring-sand-200">
-      No leads match these filters.
-    </p>
-  }
-</div>
-
-<!-- desktop table -->
-<div class="mt-4 hidden overflow-x-auto rounded-2xl bg-white ring-1 ring-sand-200 sm:block">
-  <table class="w-full text-left text-sm">
-    <thead class="border-b border-sand-200 bg-sand-50 text-xs font-semibold uppercase tracking-wide text-stone-500">
-      <tr>
-        <th scope="col" class="px-4 py-3">Name</th>
-        <th scope="col" class="px-4 py-3">Mobile</th>
-        <th scope="col" class="px-4 py-3">Clinic</th>
-        <th scope="col" class="px-4 py-3">City</th>
-        <th scope="col" class="px-4 py-3">District</th>
-        <th scope="col" class="px-4 py-3">State</th>
-        <th scope="col" class="px-4 py-3">Specialty</th>
-        <th scope="col" class="px-4 py-3">Campaign</th>
-        <th scope="col" class="px-4 py-3">Date</th>
-      </tr>
-    </thead>
-    <tbody>
+<div class="mt-4">
+  <ds-table caption="Leads" [scrollable]="true">
+    <!-- Nine columns; the phone gets the five that identify and reach the
+         lead. The mobile number is the point of this screen, so it is a
+         `tel:` link and not a string to read out over the phone. -->
+    <ng-container cards>
       @for (l of leads; track l) {
-        <tr class="border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50">
-          <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
-          <td class="px-4 py-3 tabular-nums text-stone-700">{{ l.mobile }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.clinicName || '—' }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.city || '—' }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.district || '—' }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.state || '—' }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.specialty || '—' }}</td>
-          <td class="px-4 py-3 text-stone-700">{{ l.campaign || '—' }}</td>
-          <td class="px-4 py-3 text-stone-400">{{ l.createdAt | date:'medium' }}</td>
-        </tr>
+        <article class="rounded-xl border border-line/10 bg-surface p-4">
+          <div class="flex items-start justify-between gap-2">
+            <p class="truncate font-grotesk font-bold text-content-strong">{{ l.name }}</p>
+            <span class="shrink-0 text-xs text-muted">{{ l.createdAt | date:'mediumDate' }}</span>
+          </div>
+
+          <a [href]="'tel:' + l.mobile"
+            class="mt-1 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium tabular-nums text-console-ink focus-visible:focus-ring">
+            <ds-icon name="call" [size]="14" />{{ l.mobile }}
+          </a>
+
+          <p class="text-xs font-medium text-console-ink">{{ l.clinicName || 'No clinic' }}</p>
+          <p class="mt-0.5 text-xs text-muted">
+            {{ l.city || '—' }}@if (l.district) {<span> · {{ l.district }}</span>}@if (l.state) {<span> · {{ l.state }}</span>}
+          </p>
+          <p class="mt-0.5 text-xs text-muted">{{ l.specialty || 'No specialty' }}</p>
+
+          @if (l.campaign) {
+            <ds-badge tone="grass" class="mt-2 inline-block">
+              <ds-icon name="campaign" [size]="12" />{{ l.campaign }}
+            </ds-badge>
+          }
+        </article>
       }
       @if (!leads.length && !loading) {
-        <tr>
-          <td colspan="9" class="px-4 py-8 text-center text-stone-400">No leads match these filters.</td>
-        </tr>
+        <ds-empty-state icon="group" title="No leads match these filters"
+          message="Widen the date range, or clear a filter." />
       }
-    </tbody>
-  </table>
+    </ng-container>
+
+    <table>
+      <caption class="sr-only">Leads, with clinic, location, specialty and capture date.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Mobile</th>
+          <th scope="col">Clinic</th>
+          <th scope="col">City</th>
+          <th scope="col">District</th>
+          <th scope="col">State</th>
+          <th scope="col">Specialty</th>
+          <th scope="col">Campaign</th>
+          <th scope="col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (l of leads; track l) {
+          <tr>
+            <td class="font-medium text-content-strong">{{ l.name }}</td>
+            <td class="tabular-nums">{{ l.mobile }}</td>
+            <td>{{ l.clinicName || '—' }}</td>
+            <td>{{ l.city || '—' }}</td>
+            <td>{{ l.district || '—' }}</td>
+            <td>{{ l.state || '—' }}</td>
+            <td>{{ l.specialty || '—' }}</td>
+            <td>{{ l.campaign || '—' }}</td>
+            <td class="text-muted">{{ l.createdAt | date:'medium' }}</td>
+          </tr>
+        }
+        @if (!leads.length && !loading) {
+          <tr><td colspan="9" class="text-center text-muted">No leads match these filters.</td></tr>
+        }
+      </tbody>
+    </table>
+  </ds-table>
 </div>
 
-<!-- pagination -->
 @if (total > pageSize) {
-  <div class="mt-3 flex items-center justify-between text-sm text-stone-600">
+  <nav aria-label="Lead pages" class="mt-3 flex items-center justify-between text-sm text-content">
     <span>Page {{ page }} of {{ totalPages }} · {{ total | number }} leads</span>
     <div class="flex gap-2">
-      <button (click)="prev()" [disabled]="page <= 1"
-      class="min-h-[44px] rounded-lg border border-sand-200 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Previous</button>
-      <button (click)="next()" [disabled]="page >= totalPages"
-      class="min-h-[44px] rounded-lg border border-sand-200 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
+      <button (click)="prev()" [disabled]="page <= 1" class="console-btn-ghost">Previous</button>
+      <button (click)="next()" [disabled]="page >= totalPages" class="console-btn-ghost">Next</button>
     </div>
-  </div>
+  </nav>
 }

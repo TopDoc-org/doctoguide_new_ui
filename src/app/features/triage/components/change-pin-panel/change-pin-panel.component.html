@@ -1,28 +1,28 @@
-<div class="flex min-h-[100dvh] flex-col bg-cream">
+<div class="flex min-h-[100dvh] flex-col bg-bg">
   <!-- header -->
-  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-black/5 bg-white px-3 py-3 sm:px-4">
+  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-line/5 bg-surface px-3 py-3 sm:px-4">
     <button (click)="goBack()" aria-label="Back"
-      class="flex shrink-0 items-center rounded-lg p-1.5 text-teal-700 hover:bg-teal-50 hover:text-teal-900 coarse:min-h-[44px]">
+      class="flex shrink-0 items-center rounded-lg p-1.5 text-brand-ink hover:bg-brand-tint hover:text-ink coarse:min-h-[44px]">
       <ds-icon name="arrow_back" [size]="22" />
     </button>
-    <h1 class="font-heading text-lg font-bold text-teal-900">Change PIN</h1>
+    <h1 class="font-heading text-lg font-bold text-ink">Change PIN</h1>
   </header>
 
-  <main class="flex-1 overflow-y-auto px-4 py-6">
-    <div class="mx-auto max-w-sm rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+  <main id="main" class="flex-1 overflow-y-auto px-4 py-6">
+    <div class="mx-auto max-w-sm rounded-2xl bg-surface p-6 shadow-sm ring-1 ring-line/10">
       <!-- success -->
       @if (done) {
         <div class="py-4 text-center">
-          <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-600">
+          <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-success-tint text-success-ink">
             <ds-icon name="check_circle" [size]="28" />
           </div>
-          <p class="text-sm font-semibold text-teal-900">PIN updated!</p>
+          <p class="text-sm font-semibold text-ink">PIN updated!</p>
         </div>
       }
 
       <!-- stage 1: verify current PIN -->
       @if (!done && stage === 'verify') {
-        <p class="text-center text-sm text-teal-900/60">
+        <p class="text-center text-sm text-muted">
           Enter your current PIN to confirm it's you.
         </p>
         <div class="mt-5">
@@ -34,10 +34,10 @@
           ></app-pin-input>
         </div>
         @if (verifyError) {
-          <p class="mt-3 text-center text-xs text-red-600">{{ verifyError }}</p>
+          <p class="mt-3 text-center text-xs text-danger-ink">{{ verifyError }}</p>
         }
         @if (verifying) {
-          <p class="mt-3 text-center text-xs text-teal-900/50">Verifying…</p>
+          <p class="mt-3 text-center text-xs text-muted">Verifying…</p>
         }
       }
 

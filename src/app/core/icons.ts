@@ -5,25 +5,29 @@ import {
   // directly by a ds-* component. An icon missing from this pick() list renders
   // as NOTHING at runtime — silently. IconComponent dev-warns when that happens.
   ArrowLeft, ArrowRight, ArrowUpDown, BadgeCheck, Ban, BookOpen, Calendar, Check, CheckCircle,
-  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clock, CreditCard,
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, CircleDot, Clock, Copy, CreditCard,
+  CalendarCheck, CalendarDays, Pill,
   Crosshair, Download, Eye, EyeOff, FileText, FlaskConical, GitMerge, Globe, Handshake,
-  HeartPulse, History, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
+  HeartPulse, History, Hourglass, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
   Lock, LogIn, LogOut, MapPin, MapPinOff, Megaphone, Menu, MessageCircle,
   MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, Paperclip, PenLine,
-  Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
-  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Utensils, Wallet,
+  Moon, Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
+  Star, Stethoscope, Store, Sun, Sunrise, Sunset, Tag, TrendingUp, TriangleAlert, User, UserCheck,
+  UserPlus, Users, Utensils, Wallet,
   X, Zap,
 } from 'lucide-angular';
 
 export const icons = {
   ArrowLeft, ArrowRight, ArrowUpDown, BadgeCheck, Ban, BookOpen, Calendar, Check, CheckCircle,
-  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clock, CreditCard,
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, CircleDot, Clock, Copy, CreditCard,
+  CalendarCheck, CalendarDays, Pill,
   Crosshair, Download, Eye, EyeOff, FileText, FlaskConical, GitMerge, Globe, Handshake,
-  HeartPulse, History, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
+  HeartPulse, History, Hourglass, Info, KeyRound, Languages, LayoutDashboard, Link, Loader,
   Lock, LogIn, LogOut, MapPin, MapPinOff, Megaphone, Menu, MessageCircle,
   MessagesSquare, MessageSquarePlus, Microscope, Minus, MousePointerClick, Navigation, Paperclip, PenLine,
-  Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
-  Star, Stethoscope, Store, Tag, TrendingUp, User, UserCheck, UserPlus, Users, Utensils, Wallet,
+  Moon, Phone, Plus, RefreshCw, Route, Search, Send, Share2, Shield, ShieldCheck, Siren, Sparkles,
+  Star, Stethoscope, Store, Sun, Sunrise, Sunset, Tag, TrendingUp, TriangleAlert, User, UserCheck,
+  UserPlus, Users, Utensils, Wallet,
   X, Zap,
 };
 

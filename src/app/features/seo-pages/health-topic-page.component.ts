@@ -37,10 +37,10 @@ import {
         >
         <nav aria-label="Breadcrumb" class="mb-6 text-sm">
           <a routerLink="/">Home</a>
-          <span class="mx-1.5 text-teal-900/40">/</span>
+          <span class="mx-1.5 text-muted">/</span>
           <a routerLink="/health-topics">Health topics</a>
-          <span class="mx-1.5 text-teal-900/40">/</span>
-          <span class="text-teal-900/60">{{ topic.label }}</span>
+          <span class="mx-1.5 text-muted">/</span>
+          <span class="text-muted">{{ topic.label }}</span>
         </nav>
         <h2>Get medical help immediately if any of these apply</h2>
         <ul>

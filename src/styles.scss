@@ -133,6 +133,38 @@
                  U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
+/* ---- Non-themed primitives ------------------------------------------------
+   Blur, motion and safe-area do not change between light and dark, so they sit
+   outside the themed blocks below. Anything here is a raw value that themed
+   tokens and component classes compose FROM — never a colour. */
+:root {
+  /* Glass blur ladder. Three steps, not a continuum: an inline surface, a
+     piece of app chrome, and an overlay. More steps than that and nobody can
+     tell which one a given surface is using. */
+  --blur-sm:  10px;
+  --blur-md:  18px;
+  --blur-xl:  28px;
+
+  /* Motion. Paired with the three easing curves already in tailwind.config.js
+     (standard / decelerate / accelerate).
+       fast — state flips the user already expects: hover, press, checkbox.
+       base — the default. Anything that moves or fades in place.
+       slow — something entering from off-screen: sheet, drawer, dialog.
+     Nothing in this app should animate longer than `slow`. */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* Safe area. `env()` resolves to 0px everywhere except a notched device and
+     the Capacitor WebView, so these are free to apply unconditionally. They
+     exist as tokens because the bottom nav, the sheets and the triage composer
+     all need the same inset and were each inlining `env()` by hand. */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+
 /* ---- Design tokens (RGB channels, for Tailwind's alpha modifier) ----------
    Light is the ONLY theme the v1 app had, so the light block reproduces its
    hexes exactly — that is a parity requirement, not a preference. The dark
@@ -184,11 +216,126 @@
                                   exactly the `border-black/5` v1 used everywhere */
   --text:         30  58  54;  /* #1E3A36 — v1 --color-text-body */
   --text-strong:  12  31  29;  /* #0C1F1D — v1 --color-text-dark (headings) */
-  --text-muted:  125 155 150;  /* #7D9B96 */
+  /* #55736F. Was #7D9B96, inherited from v1 — which scores 3.00:1 on white,
+     2.86:1 on the page ground and 2.67:1 on `--surface-2`, i.e. it fails WCAG
+     AA (4.5:1) on EVERY ground in the app. That was survivable while it was a
+     handful of timestamps; the console pass mapped ~80 filter labels and the
+     triage legal line onto it, which made a small pre-existing failure the
+     default for secondary text.
+
+     Darkened along its own hue so it stays the same desaturated teal-grey:
+     5.16:1 on surface, 4.92:1 on page bg, 4.60:1 on surface-2. */
+  --text-muted:   85 115 111;  /* #55736F */
   --prose-head:   19  78  74;  /* #134E4A — the literal .seo-prose used */
 
-  --glass-bg:     rgba(255, 255, 255, .72);
-  --glass-border: rgba(0, 0, 0, .06);
+  /* ---- Brand ROLE tokens (the dark-mode fix) ------------------------------
+     The teal ramp is a PALETTE, and the ported markup uses its two ends as
+     ROLES: `text-teal-900` was "ink on the page" (383 call sites) and
+     `bg-teal-50` was "a faint brand tint behind something" (67). A palette step
+     cannot be theme-swapped, because the same step is also a brand FILL
+     somewhere else — `bg-teal-700` needs to stay a dark slab under white text
+     in BOTH themes while `text-teal-700` has to brighten in dark or vanish.
+     One variable cannot do both.
+
+     So the roles get their own names. Light values are the EXACT ramp steps
+     they replace, so light mode is pixel-identical and stays an exact match for
+     doctoguide.knocdoc.in; dark gets values chosen for dark.
+
+     Mid-ramp steps (300-700) are NOT duplicated here. Those are brand fills —
+     `bg-teal-600`, `border-teal-600`, `ring-teal-500` — and they are correct
+     unchanged in dark, which is why the dark block only ever touched 300/400.
+
+       ink / ink-soft         page ink        (was text-teal-900 / -800)
+       brand-ink / -soft      accent ink      (was text-teal-700 / -600)
+       brand-tint / -strong   tint surface    (was bg-teal-50 / -100)
+       brand-line             tint hairline   (was border-teal-200) */
+  --ink:            10  51  47;  /* = teal-900 */
+  --ink-soft:       14  77  71;  /* = teal-800 */
+  --brand-ink:      15 118 110;  /* = teal-700 */
+  --brand-ink-soft: 13 148 136;  /* = teal-600 */
+  --brand-tint:    240 253 250;  /* = teal-50  */
+  --brand-tint-strong: 204 251 241;  /* = teal-100 */
+  --brand-line:    153 246 228;  /* = teal-200 */
+
+  /* ---- Console ROLE tokens ------------------------------------------------
+     The same argument as the brand roles above, applied to the console green.
+     The three console realms (admin / owner / partner) used the grass ramp's
+     ends as ROLES — `text-grass-700` was "accent ink" (49 call sites),
+     `bg-grass-50` was "a faint console tint" (28), `border-grass-200` was the
+     tint hairline — and a palette step cannot theme-swap, because the same
+     step is also a FILL elsewhere: `bg-grass-600` must stay a dark slab under
+     white text in BOTH themes while `text-grass-700` has to brighten in dark
+     or disappear against `--surface`.
+
+     Mid-ramp steps stay palette: `bg-grass-600`, `hover:bg-grass-700`,
+     `ring-grass-500`, `border-grass-600` are fills and are correct unchanged.
+
+       console-ink / -soft     accent ink     (was text-grass-700 / -600)
+       console-tint / -strong  tint surface   (was bg-grass-50 / -100)
+       console-line            tint hairline  (was border-grass-200) */
+  --console-ink:            19 106  61;  /* = grass-700 */
+  --console-ink-soft:       23 128  73;  /* = grass-600 */
+  --console-tint:          240 250 243;  /* = grass-50  */
+  --console-tint-strong:   220 243 227;  /* = grass-100 */
+  --console-line:          182 231 198;  /* = grass-200 */
+
+  --wm-knoc:  10  20 128;  /* #0A1480 — KnocDoc navy */
+  --wm-doc:   79 176 249;  /* #4FB0F9 */
+
+  /* The console's SECOND accent — the promo gold on offers, campaign bars and
+     the "limited time" chips. It was stock Tailwind amber, which is a palette
+     and so has the same dark-mode problem the grass ramp had. Same split:
+     ink + tint + hairline get roles, the mid-ramp FILLS (`bg-amber-400` on a
+     progress bar, `to-amber-400` in a gradient) stay palette because a
+     saturated fill is correct in both themes. */
+  --console-gold:          180  83   9;  /* = amber-700 */
+  --console-gold-soft:     217 119   6;  /* = amber-600 */
+  --console-gold-tint:     255 251 235;  /* = amber-50  */
+  --console-gold-tint-strong: 254 243 199;  /* = amber-100 */
+  --console-gold-line:     252 211  77;  /* = amber-300 */
+
+  /* ---- Status ROLE tokens -------------------------------------------------
+     `--success` / `--warning` / `--danger` above are SOLID fills (a red button,
+     a green dot) and are correct unchanged in dark. What /triage needs and did
+     not have is the other three roles for each: the ink, the tint surface and
+     the hairline. Its urgency ladder — emergency / urgent / caution / reassure —
+     is drawn in stock `red-*`, `amber-*` and `green-*`, none of which swaps, so
+     the whole ladder rendered as dark-on-dark under [data-theme="dark"].
+
+     Same rule as the brand and console roles: ends become roles, mid-ramp
+     fills stay palette. Light values are the exact stock steps they replace. */
+  --danger-ink:            185  28  28;  /* red-700  */
+  --danger-tint:           254 242 242;  /* red-50   */
+  --danger-tint-strong:    254 226 226;  /* red-100  */
+  --danger-line:           254 202 202;  /* red-200  */
+
+  --warning-ink:           180  83   9;  /* amber-700 */
+  --warning-ink-soft:      217 119   6;  /* amber-600 */
+  --warning-tint:          255 251 235;  /* amber-50  */
+  --warning-tint-strong:   254 243 199;  /* amber-100 */
+  --warning-line:          253 230 138;  /* amber-200 */
+
+  --success-ink:            21 128  61;  /* green-700 */
+  --success-tint:          240 253 244;  /* green-50  */
+  --success-tint-strong:   220 252 231;  /* green-100 */
+  --success-line:          187 247 208;  /* green-200 */
+
+  /* Glass ladder, ordered by ELEVATION, not by how much blur it uses.
+     Higher layer = further from the page = MORE opaque, because it carries the
+     content the user is actually reading and has more behind it to hide.
+
+       1  inline surface   — ds-card [glass], ds-button glass. Sits in the flow.
+       2  app chrome       — app bar, bottom nav, sticky headers. Content scrolls under it.
+       3  overlay          — sheet, dialog, popover, command palette, floating toolbar.
+
+     `.glass` is an alias for level 1, which is where the single flat token this
+     replaced already sat (.72) — so every existing call site renders unchanged. */
+  --glass-1-bg:     rgba(255, 255, 255, .72);
+  --glass-1-border: rgba(0, 0, 0, .06);
+  --glass-2-bg:     rgba(255, 255, 255, .80);
+  --glass-2-border: rgba(0, 0, 0, .07);
+  --glass-3-bg:     rgba(255, 255, 255, .86);
+  --glass-3-border: rgba(0, 0, 0, .08);
   --mesh: radial-gradient(60% 55% at 12% 0%, rgba(20,184,166,.07) 0%, transparent 60%),
           radial-gradient(52% 44% at 100% 0%, rgba(13,148,136,.05) 0%, transparent 62%);
 
@@ -208,11 +355,79 @@
   --border:      217 245 237;  /* teal-200, at low alpha → hairline on dark */
   --text:        240 253 250;
   --text-strong: 255 255 255;
-  --text-muted:  125 155 150;
+  /* #9BB9B4 — 6.54:1 on surface, 4.60:1 on surface-2, 8.55:1 on the page
+     ground. The old value was borrowed from light and scored 3.22:1 on
+     `--surface-2`, which is where every console table header sits. */
+  --text-muted:  155 185 180;
   --prose-head:  217 245 237;
 
-  --glass-bg:     rgba(10, 51, 47, .55);
-  --glass-border: rgba(217, 245, 237, .14);
+  /* Brand roles, inverted. The ink ends go near-white and the tint ends go to
+     lifted dark teal, so every `bg-brand-tint text-ink` pair in the app — the
+     chip, the answer card, the drawer row — flips together and keeps its
+     contrast instead of becoming dark-on-dark.
+
+     `brand-ink` lands on teal-400 rather than teal-300: teal-300 is already
+     spoken for as a decorative accent in dark, and an icon sitting next to
+     body text should not be brighter than the text it labels. */
+  --ink:           236 253 248;
+  --ink-soft:      199 246 236;
+  --brand-ink:      94 234 212;  /* = dark teal-400 */
+  --brand-ink-soft: 45 212 191;
+  --brand-tint:     14  77  71;  /* lifted off --surface (10 51 47) by one step */
+  --brand-tint-strong: 18  94  87;
+  --brand-line:     26 120 111;
+
+  /* Console roles, inverted on the same principle as the brand roles. The ink
+     ends climb the ramp so accent text clears 4.5:1 on `--surface`; the tint
+     ends drop to a green lifted off it, so a `bg-console-tint text-console-ink`
+     chip flips as a pair instead of becoming dark-on-dark.
+
+     `console-ink` lands on grass-300 rather than grass-400: at grass-400 the
+     accent reads DIMMER than the body text it labels on this surface, which
+     inverts the hierarchy the accent exists to create. */
+  --console-ink:           134 214 163;  /* = grass-300 */
+  --console-ink-soft:       79 190 124;  /* = grass-400 */
+  --console-tint:           15  83  49;  /* grass-800, lifted off --surface */
+  --console-tint-strong:    19 106  61;  /* = grass-700 */
+  --console-line:           23 128  73;  /* = grass-600, a visible hairline on dark */
+
+  --wm-knoc: 138 156 255;  /* navy is invisible on dark; lifted to keep the pair readable */
+  --wm-doc:  125 195 252;
+
+  --console-gold:          252 211  77;  /* = amber-300 */
+  --console-gold-soft:     251 191  36;  /* = amber-400 */
+  --console-gold-tint:      69  39   8;  /* amber-950, lifted off --surface */
+  --console-gold-tint-strong: 120 53  15;  /* = amber-900 */
+  --console-gold-line:     146  64  14;  /* = amber-800 */
+
+  /* Status roles, inverted. The ink ends climb to the 300 step so an urgency
+     label clears 4.5:1 on `--surface`; the tint ends drop to the 950/900 steps,
+     so a `bg-danger-tint text-danger-ink` card flips as a pair. */
+  --danger-ink:            252 165 165;  /* red-300 */
+  --danger-tint:            69  10  10;  /* red-950 */
+  --danger-tint-strong:    127  29  29;  /* red-900 */
+  --danger-line:           153  27  27;  /* red-800 */
+
+  --warning-ink:           252 211  77;  /* amber-300 */
+  --warning-ink-soft:      251 191  36;  /* amber-400 */
+  --warning-tint:           69  39   8;  /* amber-950 */
+  --warning-tint-strong:   120  53  15;  /* amber-900 */
+  --warning-line:          146  64  14;  /* amber-800 */
+
+  --success-ink:           134 239 172;  /* green-300 */
+  --success-tint:            5  46  22;  /* green-950 */
+  --success-tint-strong:    20  83  45;  /* green-900 */
+  --success-line:           22 101  52;  /* green-800 */
+
+  /* Dark runs MORE transparent than light at every level. Dark glass reads as
+     glass because the light behind it shows through; light glass reads as glass
+     because it frosts. Matching the light alphas here produces flat grey slabs. */
+  --glass-1-bg:     rgba(10, 51, 47, .55);
+  --glass-1-border: rgba(217, 245, 237, .14);
+  --glass-2-bg:     rgba(10, 51, 47, .66);
+  --glass-2-border: rgba(217, 245, 237, .16);
+  --glass-3-bg:     rgba(10, 51, 47, .78);
+  --glass-3-border: rgba(217, 245, 237, .20);
   --mesh: radial-gradient(60% 60% at 15% 0%, rgba(20,184,166,.10) 0%, transparent 60%),
           radial-gradient(50% 50% at 100% 10%, rgba(13,148,136,.10) 0%, transparent 60%);
 
@@ -221,6 +436,32 @@
   --elev-3: 0 18px 42px rgba(0,0,0,.60);
   --elev-glow: 0 0 0 1px rgba(20,184,166,.28), 0 10px 30px rgba(20,184,166,.22);
 }
+
+/* `color-scheme` was never declared, which is why every raw <input> rendered
+   as a WHITE slab under [data-theme="dark"] — the triage age field, the console
+   date pickers, every login form. The UA paints form controls, scrollbars and
+   the native date picker from this property, not from our tokens, so no amount
+   of Tailwind on the element fixes it. One declaration per theme does.
+
+   It also has to be on :root, not body: the UA reads it from the root element
+   for the canvas and for form widgets. */
+:root, :root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark']         { color-scheme: dark; }
+
+/* Belt and braces for controls that still take the UA canvas rather than
+   `color-scheme` (older WebViews, and Chrome for `<input type="date">`).
+   An ELEMENT selector on purpose: any explicit `bg-*` utility is a class and
+   still wins, so a control that opted into its own surface keeps it. */
+input, select, textarea {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--text));
+}
+
+/* The KnocDoc partner wordmark. Was two inline hexes repeated in three
+   templates; `#0a1480` is a deep navy that disappears against a dark surface.
+   Named, and lifted in dark to keep the same relationship to its ground. */
+.wm-knoc { color: rgb(var(--wm-knoc)); }
+.wm-doc  { color: rgb(var(--wm-doc)); }
 
 /* Default hairline border. .05 reproduces v1's ubiquitous `border-black/5`. */
 * { border-color: rgb(var(--border) / .05); }
@@ -278,11 +519,36 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover { background: rgb(var(--text-muted) / .5); background-clip: content-box; }
 
 @layer components {
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid var(--glass-border);
+  /* Glass ladder. See the token block for what each level is FOR.
+     Saturation climbs with elevation: an overlay is further from the page and
+     can afford to push the colour behind it harder without looking tinted.
+
+     No box-shadow here, deliberately — elevation is the caller's call
+     (`shadow-e2` / `shadow-e3`), the same way `ds-card` already decides its own.
+     Baking it in would make every glass surface un-flattenable.
+
+     `.glass` rides on level 1 rather than aliasing it through @apply: the two
+     ARE the same surface, so one selector is one rule instead of a second block
+     that can drift. `ds-card [glass]` and `ds-button variant="glass"` are inline
+     surfaces, which is level 1 — and level 1 carries the exact alpha the single
+     flat `.glass` used to, so those call sites render unchanged. */
+  .glass, .glass-1 {
+    background: var(--glass-1-bg);
+    backdrop-filter: blur(var(--blur-sm)) saturate(130%);
+    -webkit-backdrop-filter: blur(var(--blur-sm)) saturate(130%);
+    border: 1px solid var(--glass-1-border);
+  }
+  .glass-2 {
+    background: var(--glass-2-bg);
+    backdrop-filter: blur(var(--blur-md)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(140%);
+    border: 1px solid var(--glass-2-border);
+  }
+  .glass-3 {
+    background: var(--glass-3-bg);
+    backdrop-filter: blur(var(--blur-xl)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(150%);
+    border: 1px solid var(--glass-3-border);
   }
   .mesh-bg { background-image: var(--mesh); }
   .focus-ring { @apply outline-none ring-2 ring-teal-500/70 ring-offset-2 ring-offset-transparent; }
@@ -292,9 +558,88 @@ h1, h2, h3, h4, h5, h6 {
   .page-narrow { @apply w-full mx-auto max-w-3xl px-4 sm:px-6 py-5 sm:py-7 lg:py-8; }
   .page-wide   { @apply w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-8; }
 
-  /* Smooth interactive surfaces */
-  .tap   { @apply transition-all duration-150 ease-standard active:scale-[.97]; }
-  .press { @apply transition-transform duration-100 active:scale-95; }
+  /* Press feedback. Both are `fast` — this is the one class of motion the user
+     must not perceive as animation at all, only as the control responding.
+     (Was 150ms / 100ms hardcoded; the 30ms either way is imperceptible and the
+     point is that no new value gets invented next time.) */
+  .tap   { @apply transition-all duration-fast ease-standard active:scale-[.97]; }
+  .press { @apply transition-transform duration-fast ease-standard active:scale-95; }
+
+  /* ---- Console controls ---------------------------------------------------
+     The three console realms (admin / owner / partner) share one filter-bar
+     and form vocabulary that was restated INLINE on every control: a ~220
+     character class attribute, repeated about fifty times across sixteen
+     templates. That is why the date inputs, the selects and the search boxes
+     had already drifted apart on background (`bg-surface` on some, inherited
+     on others), on text colour, on radius (`rounded-lg` vs `rounded-xl`) and
+     on focus ring alpha (`/30` vs `/40`) — nothing was wrong enough to notice
+     and no two were the same.
+
+     Named here so a console form is described by what it IS.
+
+     The focus ring is the app's standard TEAL, not the console green. A focus
+     indicator is a system affordance, not brand expression — the whole point is
+     that it looks the same everywhere so a keyboard user recognises it without
+     re-learning it per section. An earlier pass made these grass, which meant
+     one console showed two different focus colours depending on whether the
+     control had opted into `.console-btn` or fallen through to the global
+     `:focus-visible` rule.
+
+     Radius follows the rule in tailwind.config.js — controls are `rounded-lg`,
+     buttons are pills, the panel around them is a surface at `rounded-xl`. */
+  .console-label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-muted;
+  }
+  .console-field {
+    @apply mt-1 min-h-[44px] w-full rounded-lg border border-line/10 bg-surface px-3 py-2
+           text-sm text-content outline-none transition-colors duration-fast
+           placeholder:text-muted
+           focus-visible:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500/30;
+  }
+  .console-panel {
+    @apply rounded-xl bg-surface p-4 ring-1 ring-line/10;
+  }
+
+  /* One button shape, three emphases. All three are >= 44px unprefixed, which
+     is the touch floor — these consoles are used on phones in clinics. */
+  .console-btn, .console-btn-outline, .console-btn-ghost {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-4
+           text-sm font-semibold transition-all duration-fast ease-standard
+           active:scale-[.97] outline-none
+           focus-visible:ring-2 focus-visible:ring-teal-500/70 focus-visible:ring-offset-2
+           focus-visible:ring-offset-transparent
+           disabled:opacity-45 disabled:pointer-events-none;
+  }
+  .console-btn        { @apply bg-grass-600 px-5 font-grotesk font-bold text-white shadow-e1 hover:bg-grass-700; }
+  .console-btn-outline{ @apply border border-grass-600 text-console-ink hover:bg-console-tint; }
+  .console-btn-ghost  { @apply border border-line/10 font-medium text-content hover:bg-surface-2; }
+}
+
+/* Glass needs a floor. Two ways it can fail:
+
+   1. No `backdrop-filter` at all. Every browser this app targets has it, but
+      the Android WebView on an old device can have it force-disabled, and when
+      it is, a `.72` alpha over arbitrary scrolling content is unreadable — the
+      blur is what was making it legible, not the alpha.
+   2. The user asked for less transparency. `prefers-reduced-transparency` is
+      the accessibility setting for exactly this, and it is not hypothetical:
+      transparent chrome over moving content is a real problem for vestibular
+      and low-vision users.
+
+   Both land in the same place — go nearly solid, drop the blur. The surface
+   loses its glassiness and keeps its job. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass, .glass-1, .glass-2, .glass-3 {
+    background: rgb(var(--surface) / .97);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .glass-1, .glass-2, .glass-3 {
+    background: rgb(var(--surface) / .98);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* NOTE: DocTribe sets `html { scroll-behavior: smooth }`. Deliberately omitted —
@@ -326,9 +671,18 @@ a, button, [role='tab'], [role='button'], label, select, summary { touch-action:
    The ds-* controls already declare `text-base`; this only lifts the raw
    `<input>` / `<select>` / `<textarea>` markup that did not go through them. */
 @media (pointer: coarse) {
+  /* SPECIFICITY IS LOAD-BEARING IN THIS RULE. A bare `select { font-size:
+     16px }` scores (0,0,1) and loses to the `text-sm` (0,1,0) that every one
+     of these controls carries — specificity beats source order, so this floor
+     silently did nothing for <select> and <textarea>. It only ever worked for
+     <input>, and by accident: its three `:not([type=…])` guards happen to
+     score (0,3,1).
+
+     `:not([data-small-ok])` lifts the other two to (0,1,1), which wins, and
+     doubles as the deliberate escape hatch for a control that really must stay
+     under 16px on touch. */
   input:not([type='checkbox']):not([type='radio']):not([type='range']),
-  select,
-  textarea {
+  :is(select, textarea):not([data-small-ok]) {
     font-size: 16px;
   }
 }
@@ -400,3 +754,30 @@ a[href], button:not(:disabled), [role='tab'], [role='button'], label[for], summa
 
 /* Breadcrumb nav sits inside the prose slot but must not inherit list styling. */
 .seo-prose nav[aria-label='Breadcrumb'] a { color: rgb(var(--teal-600)); }
+
+/* ---------------------------------------------------------------------------
+   Prose styling for the legal pages (/terms, /privacy, /disclaimer).
+
+   Same trap as `.seo-prose` above, found one layout later: `legal-layout`
+   renders its body through <ng-content>, so the projected <h2>/<h3>/<ul>/<a>
+   carry the PARENT component's encapsulation attribute — or, as with
+   terms/privacy/disclaimer (which declare no styles of their own), none at
+   all. The rules that lived in `legal-layout.component.ts` compiled to
+   `.legal-prose h2[_ngcontent-legal]` and matched nothing, so all three legal
+   pages rendered as one undifferentiated wall of text: Tailwind's preflight
+   resets h2/h3 to inherit, and nothing put the hierarchy back.
+
+   Its colours were also the last literal hexes in a prose sheet — #134e4a on
+   a dark surface is unreadable. Tokenised to the same `--prose-head` /
+   `--teal-600` pair `.seo-prose` uses, which resolves identically in light.
+
+   Numeric values are unchanged from what the dead block declared.
+   --------------------------------------------------------------------------- */
+.legal-prose :is(h2, h3) { color: rgb(var(--prose-head)); }
+.legal-prose h2 { font-weight: 700; font-size: 1.05rem; margin: 1.6rem 0 .4rem; }
+.legal-prose h3 { font-weight: 600; margin: 1rem 0 .25rem; }
+.legal-prose p  { margin-bottom: .75rem; }
+.legal-prose ul { list-style: disc; padding-left: 1.25rem; margin-bottom: .75rem; }
+.legal-prose li { margin-bottom: .35rem; }
+.legal-prose a  { color: rgb(var(--teal-600)); text-decoration: underline; }
+.legal-prose strong { color: rgb(var(--prose-head)); }

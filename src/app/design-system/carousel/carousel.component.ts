@@ -48,8 +48,8 @@ export interface CarouselSlide {
             <div
               class="flex min-h-[5.5rem] w-full shrink-0 flex-col items-center justify-center gap-1.5 px-3 text-center"
               [attr.aria-hidden]="i === index() ? null : 'true'">
-              <p class="font-heading text-lg font-bold text-teal-900 sm:text-xl">{{ slide.title }}</p>
-              <p class="font-body text-sm leading-relaxed text-teal-900/70 sm:text-base">{{ slide.text }}</p>
+              <p class="font-heading text-lg font-bold text-ink sm:text-xl">{{ slide.title }}</p>
+              <p class="font-body text-sm leading-relaxed text-content sm:text-base">{{ slide.text }}</p>
             </div>
           }
         </div>

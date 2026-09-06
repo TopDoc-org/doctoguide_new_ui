@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AiDoctorApiService } from '../../services/ai-doctor-api.service';
 import { AiDoctorStateService } from '../../services/ai-doctor-state.service';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -113,6 +113,7 @@ export class AuthGateComponent implements OnInit {
     this.api.numCheck(mobile).subscribe({
       next: (res) => {
         this.busy = false;
+        this.rendered();
         const hit = res?.hits && res.hits > 0 ? res.results?.[0] : null;
         if (hit && hit.userType !== 'unRegistered') {
           // Existing registered user -> straight to PIN login (no district here).
@@ -132,6 +133,7 @@ export class AuthGateComponent implements OnInit {
         this.isUnregisteredUpgrade = false;
         this.existingUser = null;
         this.authStep = 'details';
+        this.rendered();
       },
     });
   }
@@ -180,6 +182,7 @@ export class AuthGateComponent implements OnInit {
         this.showReset = false;
         this.authError = err?.error?.message || 'PIN updated — please log in.';
         this.pinReset++;
+        this.rendered();
       },
     });
   }
@@ -211,6 +214,7 @@ export class AuthGateComponent implements OnInit {
             err?.error?.message || 'Account locked from too many attempts. Try again later.';
         else this.authError = err?.error?.message || 'Login failed. Please try again.';
         this.pinReset++;
+        this.rendered();
       },
     });
   }
@@ -302,6 +306,7 @@ export class AuthGateComponent implements OnInit {
             this.authError = err?.error?.message || 'Could not set PIN. Try again.';
             this.backToCreate();
           }
+          this.rendered();
         },
       });
     } else {
@@ -336,6 +341,7 @@ export class AuthGateComponent implements OnInit {
             this.authError = err?.error?.message || 'Could not create account. Try again.';
             this.backToCreate();
           }
+          this.rendered();
         },
       });
     }
@@ -349,12 +355,14 @@ export class AuthGateComponent implements OnInit {
         this.authError = err?.error?.message || 'Account created — please log in.';
         this.authStep = 'login';
         this.pinReset++;
+        this.rendered();
       },
     });
   }
 
   private finishLogin(res: any): void {
     this.busy = false;
+    this.rendered();
     const ud = res?.userDetails || {};
     this.state.authToken = res?.token || null;
     this.state.userId = ud.userId || null;
@@ -399,8 +407,29 @@ export class AuthGateComponent implements OnInit {
     private api: AiDoctorApiService,
     private state: AiDoctorStateService,
     private geo: GeolocationService,
-    private analytics: FirebaseAnalyticsService
+    private analytics: FirebaseAnalyticsService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  /**
+   * Marks THIS view dirty after an async boundary.
+   *
+   * This component holds its state in plain fields and mutates them from HTTP
+   * callbacks, so it only renders when something checks its view. That is free
+   * under a Default-strategy host (`triage-shell`) and NEVER HAPPENS under an
+   * OnPush one (`report-reader`): the parent view is not dirty, so change
+   * detection stops above this component and the DOM keeps whatever it had.
+   *
+   * The symptom is not an error. The request succeeds, the fields are correct
+   * in memory, and the button sits on "Please wait…" forever.
+   *
+   * Every callback below that runs after an await or a subscribe calls this.
+   * Add one to any new one — the alternative is that the gate silently only
+   * works on some of the pages that host it.
+   */
+  private rendered(): void {
+    this.cdr.markForCheck();
+  }
 
   // Auto-prefill district from GPS on open (silent — no error noise if denied).
   ngOnInit(): void {
@@ -431,6 +460,7 @@ export class AuthGateComponent implements OnInit {
       }
     } finally {
       this.locating = false;
+      this.rendered();
     }
   }
 }

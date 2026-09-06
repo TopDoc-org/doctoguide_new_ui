@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -54,7 +55,16 @@ export class PinResetComponent implements OnInit, OnDestroy {
 
   private timerRef: any = null;
 
-  constructor(private api: AiDoctorApiService) {}
+  constructor(private api: AiDoctorApiService, private cdr: ChangeDetectorRef) {}
+
+  /** See `auth-gate`'s copy of this: plain fields mutated after an async
+   *  boundary do not render under an OnPush host (`report-reader`), only under
+   *  a Default one (`triage-shell`). The resend countdown needs it too — a
+   *  `setInterval` tick is an async boundary like any other, and without this
+   *  the timer counts down in memory while the screen shows a frozen 60. */
+  private rendered(): void {
+    this.cdr.markForCheck();
+  }
 
   ngOnInit(): void {
     const m = (this.prefillMobile || '').trim();
@@ -85,6 +95,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
     this.api.sendWhatsappOtp(phone).subscribe({
       next: (res) => {
         this.resetLoading = false;
+        this.rendered();
         this.resetOtpId = res?.otpId || '';
         this.resetStep = 'otp';
         this.otpReset++;
@@ -94,6 +105,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
         this.resetLoading = false;
         this.resetError =
           err?.error?.message || 'Could not send the code. Please try again.';
+        this.rendered();
       },
     });
   }
@@ -145,6 +157,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
           this.newPin = '';
           this.confirmPin = '';
           this.pinReset++;
+          this.rendered();
         },
         error: (err) => {
           this.resetLoading = false;
@@ -160,6 +173,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
           }
           this.resetOtp = '';
           this.otpReset++;
+          this.rendered();
         },
       });
   }
@@ -195,6 +209,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
     this.api.resetPinAfterOtp(this.resetPhone, this.newPin).subscribe({
       next: () => {
         this.resetLoading = false;
+        this.rendered();
         this.resetStep = 'success';
         this.resetSuccess.emit({ mobile: this.resetPhone, newPin: this.newPin });
       },
@@ -208,6 +223,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
           this.resetError = err?.error?.message || 'Failed to set new PIN.';
         }
         this.backToCreatePin();
+        this.rendered();
       },
     });
   }
@@ -231,6 +247,7 @@ export class PinResetComponent implements OnInit, OnDestroy {
     this.timerRef = setInterval(() => {
       this.resetResendTimer--;
       if (this.resetResendTimer <= 0) this.destroyTimer();
+      this.rendered();
     }, 1000);
   }
 

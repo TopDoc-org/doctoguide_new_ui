@@ -1,11 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerApiService } from '../../services/partner-api.service';
 import { CampaignCount, PartnerLead, PartnerMetrics, PartnerOfferRecord } from '../../models';
 import { downloadBlob } from '../../../../core/platform/download';
+import { ToastService } from '../../../../design-system/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EmptyStateComponent } from '../../../../design-system/empty-state/empty-state.component';
+import { PageHeaderComponent } from '../../../../design-system/page-header/page-header.component';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
+import { TableComponent } from '../../../../design-system/table/table.component';
+import { SwitchComponent } from '../../../../design-system/switch/switch.component';
 
 // Campaigns performance: a data-dense list of every digital campaign with its
 // clicks / leads / conversions, click-to-drill into one campaign's scoped
@@ -13,7 +18,10 @@ import { IconComponent } from '../../../../design-system/icon/icon.component';
 @Component({
   selector: 'app-partner-campaigns',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [
+    CommonModule, FormsModule,
+    IconComponent, TableComponent, EmptyStateComponent, PageHeaderComponent, SwitchComponent,
+  ],
   templateUrl: './partner-campaigns.component.html',
 })
 export class PartnerCampaignsComponent implements OnInit {
@@ -48,6 +56,13 @@ export class PartnerCampaignsComponent implements OnInit {
 
   // Campaign to auto-open on load (from Overview "Performance by campaign" click).
   private autoOpen: string | null = null;
+
+  /** Export outcomes are announced, not written into a paragraph the
+   *  user has already scrolled past. A CSV export is the one console
+   *  action with NO on-screen result: on success the only evidence is a
+   *  file in the browser's download tray, and on failure the old inline
+   *  `error` sat above a table the user was looking at the bottom of. */
+  private readonly toast = inject(ToastService);
 
   constructor(private api: PartnerApiService, private route: ActivatedRoute, private router: Router) {}
 
@@ -155,6 +170,14 @@ export class PartnerCampaignsComponent implements OnInit {
       },
       error: () => {
         this.savingOfferId = '';
+        // The switch is bound to `offerEnabled(o)`, which is derived from
+        // `o.campaigns` — unchanged by a failed save. Angular only writes an
+        // input whose value CHANGED, so without this the control keeps the
+        // position the user put it in and lies about what was saved. Replacing
+        // the object gives `@for (… ; track o)` a new identity, which remounts
+        // the row and re-reads the truth.
+        const i = this.offers.findIndex((x) => x.id === o.id);
+        if (i >= 0) this.offers[i] = { ...o };
         this.error = 'Could not update the offer. Try again.';
       },
     });
@@ -230,10 +253,13 @@ export class PartnerCampaignsComponent implements OnInit {
       next: (blob) => {
         this.exportingKey = '';
         downloadBlob(blob, `leads-${campaign}-${this.from}-to-${this.to}.csv`);
+        this.toast.success('Export ready — check your downloads.');
       },
       error: () => {
         this.exportingKey = '';
-        this.error = 'Export failed. Try again.';
+        this.toast.error('Export failed.', {
+          action: { label: 'Retry', run: () => this.exportCampaign(campaign) },
+        });
       },
     });
   }

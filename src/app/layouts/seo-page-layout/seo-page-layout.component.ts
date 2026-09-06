@@ -12,30 +12,30 @@ import { IconComponent } from '../../design-system/icon/icon.component';
   standalone: true,
   imports: [RouterLink, IconComponent],
   template: `
-    <div class="min-h-screen bg-cream">
+    <div class="min-h-screen bg-bg">
       <header class="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-        <a routerLink="/" class="flex items-center gap-1 font-heading text-xl font-extrabold text-teal-900 coarse:min-h-[44px]">
+        <a routerLink="/" class="flex items-center gap-1 font-heading text-xl font-extrabold text-ink coarse:min-h-[44px]">
           <span class="truncate">{{ appName }}</span>
           <ds-icon name="auto_awesome" [size]="18" class="shrink-0 text-teal-500" />
         </a>
         <a
           routerLink="/triage"
-          class="rounded-full bg-teal-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-700 coarse:min-h-[44px] coarse:inline-flex coarse:items-center"
+          class="rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-surface hover:bg-brand-ink coarse:min-h-[44px] coarse:inline-flex coarse:items-center"
         >Get started</a>
       </header>
 
-      <main class="mx-auto max-w-3xl px-6 pb-20">
-        <h1 class="font-display text-3xl leading-tight text-teal-900 sm:text-4xl">{{ heading }}</h1>
-        <p class="mt-3 text-[15px] leading-relaxed text-teal-900/70">{{ lede }}</p>
+      <main id="main" class="mx-auto max-w-3xl px-6 pb-20">
+        <h1 class="font-display text-3xl leading-tight text-ink sm:text-4xl">{{ heading }}</h1>
+        <p class="mt-3 text-[15px] leading-relaxed text-content">{{ lede }}</p>
 
-        <div class="seo-prose mt-8 text-[15px] leading-relaxed text-teal-900/80">
+        <div class="seo-prose mt-8 text-[15px] leading-relaxed text-content">
           <ng-content></ng-content>
         </div>
 
         <!-- CTA -->
-        <div class="mt-12 rounded-2xl border border-teal-200 bg-teal-50/80 p-6 text-center">
-          <p class="font-heading text-lg font-bold text-teal-900">{{ ctaTitle }}</p>
-          <p class="mt-1 text-sm text-teal-900/70">Free. No sign-up, no credit card. Ready in seconds.</p>
+        <div class="mt-12 rounded-2xl border border-brand-line bg-brand-tint/80 p-6 text-center">
+          <p class="font-heading text-lg font-bold text-ink">{{ ctaTitle }}</p>
+          <p class="mt-1 text-sm text-content">Free. No sign-up, no credit card. Ready in seconds.</p>
           <a
             routerLink="/triage"
             class="mt-4 inline-flex items-center gap-1 rounded-xl bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-700"
@@ -46,39 +46,39 @@ import { IconComponent } from '../../design-system/icon/icon.component';
         </div>
 
         <!-- cross-links -->
-        <nav class="mt-12 border-t border-black/5 pt-6">
-          <p class="text-xs font-semibold uppercase tracking-wide text-teal-900/50">Explore DoctoGuide</p>
+        <nav class="mt-12 border-t border-line/10 pt-6">
+          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Explore DoctoGuide</p>
           <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
             @for (l of links; track l) {
               <li>
-                <a [routerLink]="l.path" class="text-teal-700 underline hover:text-teal-900">{{ l.label }}</a>
+                <a [routerLink]="l.path" class="text-brand-ink underline hover:text-ink">{{ l.label }}</a>
               </li>
             }
           </ul>
         </nav>
 
-        <p class="mt-10 text-xs text-teal-900/50">
+        <p class="mt-10 text-xs text-muted">
           {{ appName }} is an AI health-information assistant, not a licensed physician. It does not
           provide medical advice, diagnosis, treatment, or prescriptions. In an emergency, call your
           local emergency number.
         </p>
 
-        <footer class="mt-6 border-t border-black/5 pt-4 text-center text-xs text-teal-900/50">
-          <a routerLink="/privacy" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Privacy Policy</a>
+        <footer class="mt-6 border-t border-line/10 pt-4 text-center text-xs text-muted">
+          <a routerLink="/privacy" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-brand-ink">Privacy Policy</a>
           <span class="mx-2">·</span>
-          <a routerLink="/terms" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Terms of Use</a>
+          <a routerLink="/terms" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-brand-ink">Terms of Use</a>
           <span class="mx-2">·</span>
-          <a routerLink="/disclaimer" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Medical Disclaimer</a>
+          <a routerLink="/disclaimer" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-brand-ink">Medical Disclaimer</a>
           <span class="mx-2">·</span>
-          <a routerLink="/contact" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-teal-700">Contact</a>
+          <a routerLink="/contact" class="coarse:inline-flex coarse:min-h-[44px] coarse:items-center hover:text-brand-ink">Contact</a>
 
           <!-- Who operates the site and how to reach them, on every public page. -->
           <p class="mt-3 leading-relaxed">
             {{ appName }} is operated by
-            <strong class="font-semibold text-teal-900/70">KnocDoc</strong>. Support:
-            <a href="mailto:support@knocdoc.in" class="underline hover:text-teal-700">support&#64;knocdoc.in</a>
+            <strong class="font-semibold text-content">KnocDoc</strong>. Support:
+            <a href="mailto:support@knocdoc.in" class="underline hover:text-brand-ink">support&#64;knocdoc.in</a>
             ·
-            <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-teal-700">knocdoc.in</a>
+            <a href="https://knocdoc.in/" target="_blank" rel="noopener" class="underline hover:text-brand-ink">knocdoc.in</a>
           </p>
         </footer>
       </main>

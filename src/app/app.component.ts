@@ -35,7 +35,20 @@ import { VisitService } from './core/visit/visit.service';
   // async handlers across 21 files for markForCheck, or moving the app to
   // signals. This template is a bare <router-outlet /> — OnPush saves nothing
   // here and costs the whole app its async rendering.
-  template: `<router-outlet />`,
+  // The skip link. `.skip-link` has been styled in styles.scss since the
+  // migration but NOTHING ever rendered it, so keyboard users had to tab
+  // through the whole app bar — five controls on a console, seven on /triage —
+  // on every single route to reach the content.
+  //
+  // It preventDefaults and focuses rather than letting the browser follow
+  // `#main`: a bare fragment href in a routed app is a navigation, and the
+  // router would strip it. `tabindex="-1"` is set at click time, not in every
+  // template, so the target is focusable exactly once and no <main> carries a
+  // stray tab stop for pointer users.
+  template: `
+    <a class="skip-link" href="#main" (click)="skipToMain($event)">Skip to main content</a>
+    <router-outlet />
+  `,
 })
 export class AppComponent implements OnInit {
   private router = inject(Router);
@@ -45,6 +58,16 @@ export class AppComponent implements OnInit {
   private affiliate = inject(AffiliateService);
   private visit = inject(VisitService);
   private destroyRef = inject(DestroyRef);
+
+  /** Runs only from a real click, so it never touches `document` in a prerender. */
+  skipToMain(event: Event): void {
+    event.preventDefault();
+    const el = document.getElementById('main');
+    if (!el) return;
+    el.setAttribute('tabindex', '-1');
+    el.focus();
+    el.scrollIntoView();
+  }
 
   ngOnInit(): void {
     // Capture campaign attribution (?ref=clinicId) on the first load before

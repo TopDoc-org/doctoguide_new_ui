@@ -105,7 +105,7 @@ import { LegalLayoutComponent } from '../../layouts/legal-layout/legal-layout.co
       <h2>11. Changes</h2>
       <p>We may update this policy and will post the updated version here.</p>
 
-      <p class="mt-6 text-xs text-teal-900/50">
+      <p class="mt-6 text-xs text-muted">
         This document is a draft pending review by a qualified Indian healthcare/privacy
         lawyer and does not constitute legal advice. Bracketed items must be completed
         before launch.

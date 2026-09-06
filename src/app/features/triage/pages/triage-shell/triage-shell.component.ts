@@ -3,6 +3,7 @@ import {
   ElementRef,
   Inject,
   OnDestroy,
+  inject,
   OnInit,
   PLATFORM_ID,
   ViewChild,
@@ -15,6 +16,9 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
 import { DrawerComponent } from '../../../../design-system/drawer/drawer.component';
 import { SpinnerComponent } from '../../../../design-system/spinner/spinner.component';
+import { CheckboxComponent } from '../../../../design-system/checkbox/checkbox.component';
+import { ThemeToggleComponent } from '../../../../design-system/theme-toggle/theme-toggle.component';
+import { ToastService } from '../../../../design-system/toast/toast.service';
 import { AuthGateComponent } from '../../components/auth-gate/auth-gate.component';
 import { ConsultHistoryComponent } from '../../components/consult-history/consult-history.component';
 import { environment } from '../../../../../environments/environment';
@@ -38,7 +42,10 @@ import {
   ACCEPTED_TYPES,
   MAX_FILES,
   MAX_FILE_BYTES,
+  ReportAnalysis,
   ReportAnalysisService,
+  documentsOf,
+  shrinkForUpload,
 } from '../../services/report-analysis.service';
 import { ReportAnalysisCardComponent } from '../../components/report-analysis-card/report-analysis-card.component';
 import { BackButtonService } from '../../../../core/native/back-button.service';
@@ -57,6 +64,8 @@ import { shareText } from '../../../../core/platform/share';
     ConsultHistoryComponent,
     ReportAnalysisCardComponent,
     SpinnerComponent,
+    ThemeToggleComponent,
+    CheckboxComponent,
   ],
   templateUrl: './triage-shell.component.html',
   styleUrls: ['./triage-shell.component.scss'],
@@ -154,7 +163,15 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   // consent gate (before first AI reply)
   showConsent = false;
   consentChecked = false;
-  private pendingText = '';
+  // EVERY message typed while the consent card is up, in order — not just the
+  // last one. The composer stays live behind the card, so a user who types a
+  // symptom on the landing page and then adds "hello can you help" while
+  // reading the consent text produces two user bubbles. When this was a single
+  // slot the second silently overwrote the first, the backend only ever saw
+  // the afterthought, and its opening question was "what is the main problem?"
+  // — about the symptom the user had already given it. Both bubbles are on
+  // screen, so both must reach the AI.
+  private pendingTexts: string[] = [];
 
   // age/sex quick-input
   sex: 'female' | 'male' | '' = '';
@@ -208,6 +225,8 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   showAuth = false;
   showHistory = false;
   pendingAction: 'pdf' | 'soap' | 'doctors' | 'home' | 'report' | null = null;
+
+  private readonly toast = inject(ToastService);
 
   // "leaving the chat" confirmation (anonymous users with an active chat)
   showLeaveDialog = false;
@@ -263,8 +282,9 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   // to amend, which re-opens the composer until the updated report lands.
   get consultComplete(): boolean {
     // Document mode keeps the composer mounted: a patient who uploads a report
-    // after finishing a consult still has to be able to ask about it.
-    if (this.documentContext) return false;
+    // after finishing a consult still has to be able to ask about it. Guarded,
+    // so a stale context cannot hold the composer open on a chat that has none.
+    if (this.activeDocument) return false;
     return !!this.report && !this.emergency && !this.amending;
   }
 
@@ -278,6 +298,33 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     const assistantCount = this.messages.filter((m) => m.role === 'assistant').length;
     const last = this.messages[this.messages.length - 1];
     return assistantCount === 1 && last?.role === 'assistant';
+  }
+
+  /**
+   * The report-reader door belongs to exactly one moment: AFTER the age/sex
+   * question is answered and BEFORE a symptom is described.
+   *
+   * Before: the opening screen asks one thing, and a second door beside it
+   * competes with the question the user was asked to answer.
+   *
+   * After: they are mid-consult and describing symptoms; a second door there is
+   * an invitation to abandon what they started. The account drawer still has it.
+   *
+   * Both edges fall out of the message list, so there is no flag to keep in
+   * sync. `ageSexDone` is the near edge (it is also set when a resumed session
+   * comes back with an age, which is the same state). The far edge is "at most
+   * ONE user message so far" — that one being the age/sex line `pickAgeSex()`
+   * sends. A typed symptom makes two, and the door closes on the same tick the
+   * message is appended, before any reply arrives.
+   *
+   * It also means someone who typed a symptom WITHOUT answering age/sex never
+   * sees it: `ageSexDone` is false for them, which is the correct answer for
+   * the right reason.
+   */
+  get showReportEntry(): boolean {
+    if (this.emergency || this.report || this.showUploadPanel || this.showConsent) return false;
+    if (!this.ageSexDone) return false;
+    return this.messages.filter((m) => m.role === 'user').length <= 1;
   }
 
   // Ask "self or someone else?" for a logged-in user so a someone-else consult
@@ -306,6 +353,10 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Know the allowance BEFORE the first upload of the session, not after it.
+    // Without this the chat only learns the number from an upload response,
+    // which is one upload too late to decline anything.
+    this.loadDocQuota();
     if (isPlatformBrowser(this.platformId)) {
       this.placeholderTimer = setInterval(() => {
         const i = this.PLACEHOLDERS.indexOf(this.composerPlaceholder);
@@ -332,6 +383,12 @@ export class TriageShellComponent implements OnInit, OnDestroy {
 
     const seed = this.route.snapshot.queryParamMap.get('q');
     const wantsLogin = this.route.snapshot.queryParamMap.get('login') === '1';
+    // "Explain my report or prescription" on the landing page. It used to be a
+    // link to /triage/report-reader, a separate screen with its own upload box;
+    // the same upload now lives inline in the chat (openDocPicker), and a
+    // document answered there can be asked follow-up questions in the same
+    // thread. So the landing door opens the consult with the picker already up.
+    const wantsUpload = this.route.snapshot.queryParamMap.get('upload') === '1';
     if (this.state.isLoggedIn) this.loadProfileDetails();
     // Don't create a session up front — that would persist an empty conversation
     // on every load. A session is created lazily on the first user message.
@@ -341,7 +398,7 @@ export class TriageShellComponent implements OnInit, OnDestroy {
       // when the user logs in keeps its session, because that login goes
       // through openAuth() inside the shell, not this entry point.
       this.startFreshChat();
-      this.consumeSeedParam();
+      this.consumeEntryParams();
       this.openAccount();
     }
     this.rehydrate(() => {
@@ -359,17 +416,23 @@ export class TriageShellComponent implements OnInit, OnDestroy {
       // `prevSessionId` (recoverable from the previous-chat banner) for an
       // anonymous user, and a logged-in user finds it under "My consults".
       //
-      // consumeSeedParam() runs FIRST and strips `q` with replaceUrl, so a
+      // consumeEntryParams() runs FIRST and strips `q` with replaceUrl, so a
       // later reload cannot replay the seed — which is what the old guard was
       // really protecting against.
       if (seed) {
-        this.consumeSeedParam();
+        this.consumeEntryParams();
         if (this.state.messages.length > 0) this.startFreshChat();
         this.send(seed);
         return;
       }
       if (this.state.messages.length === 0) {
         this.state.addMessage({ role: 'assistant', text: this.WELCOME });
+      }
+      // After rehydrate, so the panel lands at the bottom of whatever
+      // conversation was restored rather than above it.
+      if (wantsUpload) {
+        this.consumeEntryParams();
+        this.openDocPicker();
       }
     });
   }
@@ -422,7 +485,9 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     else this.state.stashSession();
   }
 
-  private consumeSeedParam(): void {
+  // Strip the params we arrived with (`q`, `login`, `upload`), so a reload
+  // does not replay the seed or re-open the picker.
+  private consumeEntryParams(): void {
     this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 
@@ -652,9 +717,13 @@ export class TriageShellComponent implements OnInit, OnDestroy {
       this.junkStreak = 0;
     }
     if (!this.state.consented) {
-      this.pendingText = text;
-      this.showConsent = true;
-      this.analytics.logAnalyticsEvent('consent_shown', {});
+      this.pendingTexts.push(text);
+      // Only the first queued message opens the card, so consent_shown still
+      // counts gates shown rather than messages typed behind one.
+      if (!this.showConsent) {
+        this.showConsent = true;
+        this.analytics.logAnalyticsEvent('consent_shown', {});
+      }
       return;
     }
     this.dispatch(text);
@@ -698,8 +767,11 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     // Consent is re-asked on every new chat (state.reset clears it), so this
     // counts consults started, not distinct users.
     this.analytics.logAnalyticsEvent('consent_accepted', {});
-    const t = this.pendingText;
-    this.pendingText = '';
+    // Queued messages go as ONE turn rather than several round-trips: the
+    // backend runs one interview step per message, so dispatching them
+    // separately would burn a follow-up question on the afterthought.
+    const t = this.pendingTexts.join('\n').trim();
+    this.pendingTexts = [];
     if (t) this.dispatch(t);
   }
 
@@ -748,6 +820,16 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   private dispatchToSession(text: string): void {
     // In document mode the question goes to the document endpoint, never to
     // /message - that handler folds everything into the triage interview.
+    //
+    // Checked against the messages on screen, not just the flag: "New chat"
+    // keeps this component alive, so a stale context once survived into a fresh
+    // conversation and filed "I am 28 years old, biological sex male" into a
+    // report from the previous chat, which answered it with uric acid. Every
+    // reset path now clears it, and this makes forgetting one harmless — a
+    // report the patient cannot see is never the thing they are asking about.
+    if (this.documentContext && !this.hasDocumentOnScreen(this.documentContext.id)) {
+      this.documentContext = null;
+    }
     if (this.documentContext) return this.askAboutDocument(text);
 
     const sid = this.state.sessionId!;
@@ -972,6 +1054,37 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.analytics.logAnalyticsEvent('signup_started', { trigger: action || 'direct' });
   }
 
+  /**
+   * The auth gate was DISMISSED. This used to be `showAuth = false` inline in
+   * the template, which is why "upload a prescription" read as broken:
+   *
+   *   paperclip -> pick a file -> read and agree a medical-document consent
+   *   -> "Just One Step, sign in" -> dismiss -> nothing.
+   *
+   * The consent card was gone, no message was added, no error was shown, and
+   * `pendingUpload` was still holding the file where nobody could see it. The
+   * user is back in the chat with no evidence anything happened, and the only
+   * way forward is to find the file again — which is indistinguishable from a
+   * feature that does not work.
+   *
+   * The file is KEPT (they chose it and consented; making them repeat both is
+   * the other bad option) and the toast is what makes it visible, with the way
+   * back in attached to it. Sticky, because a 4-second window is not an answer
+   * to "where did my report go".
+   */
+  cancelAuth(): void {
+    this.showAuth = false;
+    const action = this.pendingAction;
+    this.pendingAction = null;
+
+    if (action === 'report' && this.pendingUpload.length) {
+      this.toast.show('Your report is still attached — sign in and I will read it.', {
+        duration: 0,
+        action: { label: 'Sign in', run: () => this.openAuth('report') },
+      });
+    }
+  }
+
   // ---- Leaving the chat (logo -> home) ----
   // An anonymous user with a live conversation gets a heads-up first: log in to
   // save it, or continue and recover it later from the "previous chat" banner.
@@ -1063,17 +1176,20 @@ export class TriageShellComponent implements OnInit, OnDestroy {
   // Paperclip in the composer. The upload happens HERE now - the patient stays
   // in the conversation and the explanation arrives as the next message, rather
   // than being thrown onto a separate screen mid-chat.
-  onComposerAttach(event: Event): void {
+  async onComposerAttach(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const picked = Array.from(input.files || []);
+    const rawPicked = Array.from(input.files || []);
     input.value = ''; // re-picking the same file must still fire a change
-    if (!picked.length) return;
+    if (!rawPicked.length) return;
 
     // The same caps the server enforces, checked before anything leaves the phone.
-    if (picked.length > MAX_FILES) {
+    if (rawPicked.length > MAX_FILES) {
       this.uploadError = `Please choose up to ${MAX_FILES} files.`;
       return;
     }
+    // Scale photos down first, so the size check below judges what we will
+    // actually send rather than what came off the camera.
+    const picked = await shrinkForUpload(rawPicked);
     const tooBig = picked.find((f) => f.size > MAX_FILE_BYTES);
     if (tooBig) {
       this.uploadError = `${tooBig.name} is larger than ${MAX_FILE_BYTES / (1024 * 1024)}MB.`;
@@ -1092,7 +1208,61 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.startUploadFlow();
   }
 
-  /** Consent, then login, then upload - in that order, and each asked once. */
+  /**
+   * The daily document allowance, as the server last reported it.
+   *
+   * NOT the enforcement. The server decides, and the 429 branch in `runUpload`
+   * is what actually stops an over-limit analysis. This is only so the app can
+   * decline a request it already knows will be refused, instead of uploading a
+   * medical document, spending the user's data and their wait, and then
+   * telling them it was never going to work.
+   */
+  private get docQuota() {
+    return this.state.documentQuota;
+  }
+
+  /** True only when the server has TOLD us the allowance is spent. */
+  private get docLimitReached(): boolean {
+    const q = this.docQuota;
+    return !!q && q.remaining <= 0;
+  }
+
+  /** "Your 2 report explanations for today are used up. …" */
+  private docLimitMessage(): string {
+    const q = this.docQuota;
+    const n = q?.limit ?? 2;
+    const when = this.resetPhrase(q?.resetAt);
+    return (
+      `You've used all ${n} of your report explanations for today. ` +
+      `You can upload another ${when}. ` +
+      `In the meantime I can still talk through your symptoms — just tell me what's wrong.`
+    );
+  }
+
+  /** "tomorrow" / "after midnight" — never a raw ISO timestamp. */
+  private resetPhrase(iso?: string): string {
+    if (!iso) return 'tomorrow';
+    const at = new Date(iso);
+    if (isNaN(at.getTime())) return 'tomorrow';
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    return at.getTime() <= midnight.getTime() + 1000 ? 'tomorrow' : `after ${at.toLocaleDateString()}`;
+  }
+
+  /** Pull the allowance once per signed-in session so the check above can fire
+   *  BEFORE the first upload rather than only after it. */
+  private loadDocQuota(): void {
+    if (!this.state.isLoggedIn) return;
+    this.reportApi.getQuota().subscribe({
+      next: (q) => (this.state.documentQuota = q),
+      // A missing counter must never BLOCK an upload — the server is the gate,
+      // and failing closed here would deny a patient their allowance because a
+      // counter endpoint was down.
+      error: () => {},
+    });
+  }
+
+  /** Consent, then login, then allowance, then upload - each asked once. */
   private startUploadFlow(): void {
     if (!this.state.docConsent) {
       this.docConsentChecked = false;
@@ -1103,6 +1273,18 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     if (!this.state.isLoggedIn) {
       this.analytics.logAnalyticsEvent('signup_started', { trigger: 'report' });
       this.openAuth('report');
+      return;
+    }
+    // Checked after login, not before: a signed-out visitor has no allowance to
+    // have spent, and the number is per account.
+    if (this.docLimitReached) {
+      this.pendingUpload = [];
+      this.state.addMessage({ role: 'assistant', text: this.docLimitMessage() });
+      this.analytics.logAnalyticsEvent('report_limit_reached', {
+        tier: this.docQuota?.tier || 'free',
+        surface: 'chat',
+      });
+      this.scrollSoon();
       return;
     }
     this.runUpload();
@@ -1138,12 +1320,19 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.reportApi.analyze(files, true, this.state.sessionId).subscribe({
       next: (res) => {
         this.loading = false;
+        // Several documents get a line that says so. The first one's headline
+        // standing over three cards claims to sum up all of them, and doesn't.
+        const docs = documentsOf(res);
         this.replaceMessage(placeholder, {
           role: 'assistant',
-          text: res.analysis?.headline || 'Here is your report, explained.',
+          text:
+            docs.length > 1
+              ? `I've read all ${docs.length} documents — here is each one, explained.`
+              : docs[0]?.headline || 'Here is your report, explained.',
           kind: 'document',
           documentId: res.id,
           analysis: res.analysis,
+          analyses: documentsOf(res),
           documentUrgency: res.urgency,
           // So the card can offer its way back in if they switch to symptoms
           // and later want to ask about this report again.
@@ -1152,6 +1341,8 @@ export class TriageShellComponent implements OnInit, OnDestroy {
         // Everything typed from here is about the report, until they dismiss it.
         this.documentContext = { id: res.id, fileName: names };
         if (res.usage) {
+          // Shared, so /report-reader shows the same number without refetching.
+          this.state.documentQuota = res.usage;
           const left = res.usage.remaining;
           this.state.addMessage({
             role: 'assistant',
@@ -1192,6 +1383,35 @@ export class TriageShellComponent implements OnInit, OnDestroy {
           this.openAuth('report');
           return;
         }
+        // Over the daily allowance. This used to fall through to the generic
+        // branch below, which says "please try again in a moment" — an
+        // invitation to retry something that cannot succeed until tomorrow, and
+        // the reason the limit looked as though it was not being applied at
+        // all. /report-reader has always handled this; the chat did not.
+        if (e.status === 429) {
+          const body = (e.error || {}) as {
+            tier?: 'free' | 'premium';
+            limit?: number;
+            resetAt?: string;
+          };
+          this.state.documentQuota = {
+            tier: body.tier || 'free',
+            limit: body.limit ?? 2,
+            used: body.limit ?? 2,
+            remaining: 0,
+            resetAt: body.resetAt || '',
+          };
+          this.replaceMessage(placeholder, {
+            role: 'assistant',
+            text: this.docLimitMessage(),
+          });
+          this.analytics.logAnalyticsEvent('report_limit_reached', {
+            tier: this.docQuota?.tier || 'free',
+            surface: 'chat',
+          });
+          this.scrollSoon();
+          return;
+        }
         this.replaceMessage(placeholder, {
           role: 'assistant',
           text:
@@ -1218,8 +1438,23 @@ export class TriageShellComponent implements OnInit, OnDestroy {
    * skipped when signed out or if a fetch fails — the turn then reads as the
    * plain headline it was stored as, which is still true, just less rich.
    */
+  /**
+   * The cards to draw for one document turn.
+   *
+   * Both places that build such a turn already fill `analyses`; this fills it in
+   * for anything that predates them — a turn restored from an older session, or
+   * a response from a server not yet serving `documents` — so the list is
+   * resolved once per message rather than rebuilt on every change-detection
+   * pass, which is what a bare expression in the template would do.
+   */
+  cardsFor(m: ChatMessage): ReportAnalysis[] {
+    if (!m.analyses?.length) m.analyses = m.analysis ? [m.analysis] : [];
+    return m.analyses;
+  }
+
   private restoreDocumentCards(): void {
     if (!this.state.isLoggedIn) return;
+    const resumeId = this.documentToResume();
     for (const m of this.messages) {
       if (m.kind !== 'document' || !m.documentId || m.analysis) continue;
       const target = m;
@@ -1227,14 +1462,16 @@ export class TriageShellComponent implements OnInit, OnDestroy {
       this.reportApi.getDocument(docId).subscribe({
         next: (res) => {
           target.analysis = res.analysis;
+          target.analyses = documentsOf(res);
           target.documentUrgency = res.urgency;
-          // Deliberately NOT re-entering document mode here. Restoring a card is
-          // not the same act as uploading one: a patient who refreshes a consult
-          // that once contained a report, and then types "I also have chest pain
-          // since morning", was having that answered as a question about a lab
-          // report. Document mode is now only ever entered by an upload the
-          // patient just made, or by tapping "Ask about this report" on a card.
           target.canAskAbout = true;
+          // Resume document mode only for a report the patient was still
+          // sitting on — see documentToResume(). Set here rather than before
+          // the fetch so a document the server can no longer serve never
+          // becomes the target of the next thing they type.
+          if (docId === resumeId) {
+            this.documentContext = { id: docId, fileName: target.text || 'your report' };
+          }
         },
         error: () => {
           // Leave it as text: better a plain headline than a broken card.
@@ -1244,10 +1481,62 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * The report a refreshed session should still be listening about, or null.
+   *
+   * Restoring a card is not the same act as uploading one, so this used to
+   * resume nothing at all: a patient who refreshed a consult that once held a
+   * report and then typed "I also have chest pain since morning" would have had
+   * that answered as a question about a lab report.
+   *
+   * But refusing in every case was worse in the case that actually happens.
+   * A patient reads their report, refreshes or comes back later, types "what
+   * does a low uric acid mean?" — and because nothing was listening for the
+   * report, it went to the symptom interview, which answered a question about a
+   * blood test with "are you having any other symptoms?" and then "when did you
+   * first notice this?". Nonsense, and the way out of it was a button they had
+   * no reason to know they needed to press.
+   *
+   * So: resume only when the report is where the patient LEFT OFF — the last
+   * document card, with nothing of their own said since. Anything they typed
+   * after it means the conversation had already moved on, and the symptom
+   * check keeps the composer. Either way "Ask about this report" and the
+   * document-mode banner stay, so the choice is still theirs to change.
+   */
+  private documentToResume(): string | null {
+    if (this.emergency) return null;
+    const last = [...this.messages]
+      .reverse()
+      .find((m) => m.kind === 'document' && m.documentId);
+    if (!last?.documentId) return null;
+
+    const after = this.messages.slice(this.messages.indexOf(last) + 1);
+    return after.some((m) => m.role === 'user') ? null : last.documentId;
+  }
+
   /** Leave document mode and go back to talking about symptoms. */
   clearDocumentContext(): void {
     this.documentContext = null;
     setTimeout(() => this.composer?.nativeElement?.focus(), 60);
+  }
+
+  /** Is that report actually a card in the conversation on screen? */
+  private hasDocumentOnScreen(documentId: string): boolean {
+    return this.messages.some((m) => m.kind === 'document' && m.documentId === documentId);
+  }
+
+  /**
+   * The report the composer is listening about, or null — what the UI should
+   * draw, as opposed to what the field happens to hold.
+   *
+   * Read-only on purpose: a getter runs on every change-detection pass, so it
+   * reports the truth rather than writing it. `dispatchToSession` does the
+   * clearing, at the one moment it matters. Together they mean a banner can
+   * never name a report the patient cannot see on screen.
+   */
+  get activeDocument(): { id: string; fileName: string } | null {
+    const ctx = this.documentContext;
+    return ctx && this.hasDocumentOnScreen(ctx.id) ? ctx : null;
   }
 
   /** Point follow-up questions at one specific restored report. */
@@ -1289,6 +1578,10 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     lng?: number | null;
   }): void {
     this.showAuth = false;
+    // The allowance is per account, and we may have just become a different
+    // one — anything cached against the signed-out state is meaningless now.
+    this.state.documentQuota = null;
+    this.loadDocQuota();
     // Remember the district/location so the doctor search can reuse it.
     if (ev.lat != null && ev.lng != null) {
       this.state.location = {
@@ -1378,6 +1671,9 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.editingDetails = false;
     this.reportPending = false;
     this.junkStreak = 0;
+    // Belongs to the consultation being left, not the one being opened.
+    // rehydrate() decides for itself whether the incoming one resumes a report.
+    this.documentContext = null;
     this.rehydrate(() => this.scrollSoon());
   }
 
@@ -1786,6 +2082,9 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.editingDetails = false;
     this.showConsent = false;
     this.consentChecked = false;
+    // Anything typed behind an un-agreed consent card belongs to the chat being
+    // discarded, not the new one.
+    this.pendingTexts = [];
     this.showAuth = false;
     this.showHistory = false;
     this.showDrawer = false;
@@ -1793,6 +2092,11 @@ export class TriageShellComponent implements OnInit, OnDestroy {
     this.stepsLeft = 0;
     this.reportPending = false;
     this.junkStreak = 0;
+    // The report being asked about belonged to the chat just discarded. "New
+    // chat" keeps this component alive, so without this the composer opens the
+    // fresh chat still saying "Asking about prescrip2.jpg" and quietly files
+    // the first thing typed into a document that is no longer on screen.
+    this.documentContext = null;
     // Fresh start in place (no new session yet — created on the first message).
     this.state.addMessage({ role: 'assistant', text: this.WELCOME });
     this.scrollSoon();

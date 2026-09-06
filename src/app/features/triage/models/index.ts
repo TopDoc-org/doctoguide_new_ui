@@ -19,6 +19,17 @@ export interface ChatMessage {
   documentId?: string;
   /** Resolved for rendering: fetched by `documentId` when history is rehydrated. */
   analysis?: import('../services/report-analysis.service').ReportAnalysis;
+  /**
+   * Every document the upload held, when it held more than one — a lab report
+   * and the prescription written off it, photographed together. One turn, one
+   * `documentId`, several cards: they were uploaded as one act and the
+   * follow-up thread covers all of them, so splitting them into separate chat
+   * turns would misrepresent both.
+   *
+   * Always contains `analysis` as its first entry, so anything that only knows
+   * about the single field still shows the same document it always did.
+   */
+  analyses?: import('../services/report-analysis.service').ReportAnalysis[];
   /** Urgency of that analysis, so the card can colour its banner. */
   documentUrgency?: import('../services/report-analysis.service').ReportUrgency;
   /** Set while an upload is in flight, so the placeholder can show a spinner. */

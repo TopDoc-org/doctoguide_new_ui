@@ -11,11 +11,24 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../design-system/icon/icon.component';
 import { TypewriterComponent } from '../../design-system/typewriter/typewriter.component';
+import { SheetComponent } from '../../design-system/sheet/sheet.component';
+import { PopoverDirective } from '../../design-system/popover/popover.directive';
+import { DropdownMenuComponent } from '../../design-system/dropdown-menu/dropdown-menu.component';
+import { AvatarComponent } from '../../design-system/avatar/avatar.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, FormsModule, IconComponent, TypewriterComponent],
+  imports: [
+    RouterLink,
+    FormsModule,
+    IconComponent,
+    TypewriterComponent,
+    SheetComponent,
+    PopoverDirective,
+    DropdownMenuComponent,
+    AvatarComponent,
+  ],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
@@ -81,6 +94,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   // hydration for users who already have a session.
   isLoggedIn = false;
   menuOpen = false;
+  mobileNavOpen = false;
 
   constructor(
     private router: Router,
@@ -265,10 +279,6 @@ export class LandingComponent implements OnInit, OnDestroy {
   get userMobile(): string | null {
     return this.isBrowser ? this.state.userMobile : null;
   }
-  get userInitial(): string {
-    return (this.userName || '').trim().charAt(0).toUpperCase();
-  }
-
   goProfile() {
     this.menuOpen = false;
     this.router.navigate(['/triage/profile']);

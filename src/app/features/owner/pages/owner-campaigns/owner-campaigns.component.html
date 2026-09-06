@@ -1,25 +1,20 @@
-<!-- hero -->
-<div class="mb-4">
-  <p class="flex items-center gap-2 font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-600">
-    <span class="h-px w-6 bg-grass-500"></span>Every campaign, every clinic
-  </p>
-  <h1 class="mt-2 font-grotesk text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Who's running <span class="text-grass-600">what.</span></h1>
-</div>
+<ds-page-header eyebrow="Every campaign, every clinic" title="Who's running what"
+  subtitle="Clicks, leads and conversion for every campaign, across every clinic." />
 
 <!-- filter bar -->
-<div class="rounded-2xl bg-white p-4 ring-1 ring-sand-200">
+<div class="console-panel">
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
     <div>
-      <label for="oc-from" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">From</label>
-      <input id="oc-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <label for="oc-from" class="console-label">From</label>
+      <input id="oc-from" type="date" [(ngModel)]="from" class="console-field" />
     </div>
     <div>
-      <label for="oc-to" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">To</label>
-      <input id="oc-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+      <label for="oc-to" class="console-label">To</label>
+      <input id="oc-to" type="date" [(ngModel)]="to" class="console-field" />
     </div>
     <div>
-      <label for="oc-clinic" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Clinic</label>
-      <select id="oc-clinic" [(ngModel)]="clinicId" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="oc-clinic" class="console-label">Clinic</label>
+      <select id="oc-clinic" [(ngModel)]="clinicId" class="console-field">
         <option value="">All clinics</option>
         @for (c of filters.clinics; track $index) {
           <option [value]="c.clinicId">{{ c.name }}</option>
@@ -27,8 +22,8 @@
       </select>
     </div>
     <div>
-      <label for="oc-state" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">State</label>
-      <select id="oc-state" [(ngModel)]="state" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="oc-state" class="console-label">State</label>
+      <select id="oc-state" [(ngModel)]="state" class="console-field">
         <option value="">All states</option>
         @for (s of filters.states; track $index) {
           <option [value]="s">{{ s }}</option>
@@ -36,8 +31,8 @@
       </select>
     </div>
     <div>
-      <label for="oc-district" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">District</label>
-      <select id="oc-district" [(ngModel)]="district" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="oc-district" class="console-label">District</label>
+      <select id="oc-district" [(ngModel)]="district" class="console-field">
         <option value="">All districts</option>
         @for (d of filters.districts; track $index) {
           <option [value]="d">{{ d }}</option>
@@ -45,8 +40,8 @@
       </select>
     </div>
     <div>
-      <label for="oc-specialty" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Specialty</label>
-      <select id="oc-specialty" [(ngModel)]="specialty" class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30">
+      <label for="oc-specialty" class="console-label">Specialty</label>
+      <select id="oc-specialty" [(ngModel)]="specialty" class="console-field">
         <option value="">All specialties</option>
         @for (sp of filters.specialties; track $index) {
           <option [value]="sp">{{ sp }}</option>
@@ -54,21 +49,21 @@
       </select>
     </div>
     <div class="sm:col-span-2 lg:col-span-3">
-      <label for="oc-q" class="block text-xs font-semibold uppercase tracking-wide text-stone-500">Search</label>
+      <label for="oc-q" class="console-label">Search</label>
       <input id="oc-q" type="search" [(ngModel)]="q" (keyup.enter)="load()" placeholder="Campaign or clinic name"
-        class="mt-1 min-h-[44px] w-full rounded-lg border border-sand-200 px-3 py-2 text-sm outline-none focus-visible:border-grass-500 focus-visible:ring-2 focus-visible:ring-grass-500/30" />
+        class="console-field" />
       </div>
     </div>
 
     <div class="mt-3 flex flex-wrap items-center gap-2">
       <button (click)="load()" [disabled]="loading"
-        class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 font-grotesk text-sm font-bold text-white shadow-sm transition-colors hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+        class="console-btn">
         {{ loading ? 'Loading…' : 'Apply filters' }}
       </button>
       <button (click)="reset()" [disabled]="loading"
-      class="min-h-[44px] rounded-xl border border-sand-200 px-4 py-2 text-sm font-medium text-stone-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">Reset</button>
+      class="console-btn-ghost">Reset</button>
       <button (click)="exportCsv()" [disabled]="exporting"
-        class="ml-auto flex min-h-[44px] items-center gap-1 rounded-xl border border-grass-600 px-4 py-2 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+        class="ml-auto console-btn-outline">
         <ds-icon name="download" [size]="16" />
         {{ exporting ? 'Exporting…' : 'Export Excel (CSV)' }}
       </button>
@@ -76,102 +71,186 @@
   </div>
 
   @if (error) {
-    <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+    <p role="alert" class="mt-3 text-sm text-danger">{{ error }}</p>
   }
 
   <!-- ===== LIST ===== -->
   @if (!selected) {
-    <div class="mt-4 overflow-x-auto rounded-2xl bg-white ring-1 ring-sand-200">
-      <table class="w-full text-left text-sm">
-        <thead class="border-b border-sand-200 bg-sand-50 text-xs font-semibold uppercase tracking-wide text-stone-500">
-          <tr>
-            <th class="px-4 py-3">Campaign</th>
-            <th class="px-4 py-3">Run by (clinic)</th>
-            <th class="px-4 py-3 text-right">Clicks</th>
-            <th class="px-4 py-3 text-right">Leads</th>
-            <th class="px-4 py-3 text-right">Conv.</th>
-            <th class="px-4 py-3 text-right">Rate</th>
-            <th class="px-4 py-3"></th>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="mt-4">
+      <ds-table caption="Campaigns" [scrollable]="true">
+        <!-- Phone view. Seven columns do not fit 375px, and the row's job here
+             is "open this campaign" — so the card is a button, which is also
+             the only version of this row a keyboard or screen reader can use. -->
+        <ng-container cards>
           @for (r of rows; track r) {
-            <tr (click)="open(r)" tabindex="0" (keyup.enter)="open(r)"
-              class="cursor-pointer border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50 focus-visible:bg-sand-50 focus-visible:outline-none">
-              <td class="px-4 py-3 font-medium text-stone-900">
-                <span class="inline-flex items-center gap-1.5"><ds-icon name="campaign" [size]="15" class="text-grass-600" />{{ r.campaign }}</span>
-              </td>
-              <td class="px-4 py-3 text-stone-700">{{ r.clinicName }}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ r.clicks | number }}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ r.leads | number }}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-stone-700">{{ r.conversions | number }}</td>
-              <td class="px-4 py-3 text-right"><span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold tabular-nums text-amber-700">{{ convRate(r) }}%</span></td>
-              <td class="px-4 py-3 text-right"><ds-icon name="chevron_right" [size]="18" class="text-stone-300" /></td>
-            </tr>
+            <button type="button" (click)="open(r)"
+              [attr.aria-label]="'Open campaign ' + r.campaign + ' for ' + r.clinicName"
+              class="w-full rounded-xl border border-line/10 bg-surface p-4 text-left transition-colors duration-fast hover:bg-surface-2/60 focus-visible:focus-ring">
+              <div class="flex items-start justify-between gap-2">
+                <p class="inline-flex min-w-0 items-center gap-1.5 font-grotesk font-bold text-content-strong">
+                  <ds-icon name="campaign" [size]="15" class="shrink-0 text-console-ink" />
+                  <span class="truncate">{{ r.campaign }}</span>
+                </p>
+                <ds-icon name="chevron_right" [size]="18" class="shrink-0 text-muted" />
+              </div>
+              <p class="mt-0.5 truncate text-xs text-muted">{{ r.clinicName }}</p>
+
+              <dl class="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-lg bg-surface-2/60 py-2">
+                  <dt class="text-[11px] font-semibold uppercase tracking-wide text-muted">Clicks</dt>
+                  <dd class="font-grotesk text-sm font-bold tabular-nums text-content-strong">{{ r.clicks | number }}</dd>
+                </div>
+                <div class="rounded-lg bg-surface-2/60 py-2">
+                  <dt class="text-[11px] font-semibold uppercase tracking-wide text-muted">Leads</dt>
+                  <dd class="font-grotesk text-sm font-bold tabular-nums text-content-strong">{{ r.leads | number }}</dd>
+                </div>
+                <div class="rounded-lg bg-console-gold-tint py-2">
+                  <dt class="text-[11px] font-semibold uppercase tracking-wide text-console-gold/70">Rate</dt>
+                  <dd class="font-grotesk text-sm font-bold tabular-nums text-console-gold">{{ convRate(r) }}%</dd>
+                </div>
+              </dl>
+            </button>
           }
           @if (!rows.length && !loading) {
-            <tr>
-              <td colspan="7" class="px-4 py-8 text-center text-stone-400">No campaigns match these filters.</td>
-            </tr>
+            <ds-empty-state icon="campaign" title="No campaigns match these filters"
+              message="Widen the date range or clear a filter." />
           }
-        </tbody>
-      </table>
+        </ng-container>
+
+        <table>
+          <caption class="sr-only">Campaigns, with clicks, leads and conversion for the selected filters.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Campaign</th>
+              <th scope="col">Run by (clinic)</th>
+              <th scope="col" class="num">Clicks</th>
+              <th scope="col" class="num">Leads</th>
+              <th scope="col" class="num">Conv.</th>
+              <th scope="col" class="num">Rate</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of rows; track r) {
+              <!-- Row-click is the pointer affordance; the button in the last
+                   cell is the keyboard and screen-reader path. -->
+              <tr (click)="open(r)" class="cursor-pointer">
+                <td class="font-medium text-content-strong">
+                  <span class="inline-flex items-center gap-1.5">
+                    <ds-icon name="campaign" [size]="15" class="text-console-ink" />{{ r.campaign }}
+                  </span>
+                </td>
+                <td>{{ r.clinicName }}</td>
+                <td class="num">{{ r.clicks | number }}</td>
+                <td class="num">{{ r.leads | number }}</td>
+                <td class="num">{{ r.conversions | number }}</td>
+                <td class="num">
+                  <span class="rounded-full bg-console-gold-tint-strong px-2 py-0.5 text-xs font-bold tabular-nums text-console-gold">{{ convRate(r) }}%</span>
+                </td>
+                <td class="num">
+                  <button type="button" (click)="$event.stopPropagation(); open(r)"
+                    [attr.aria-label]="'Open campaign ' + r.campaign"
+                    class="grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors duration-fast hover:bg-surface-2 hover:text-content focus-visible:focus-ring">
+                    <ds-icon name="chevron_right" [size]="18" />
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (!rows.length && !loading) {
+              <tr><td colspan="7" class="text-center text-muted">No campaigns match these filters.</td></tr>
+            }
+          </tbody>
+        </table>
+      </ds-table>
     </div>
   }
 
   <!-- ===== DRILL: one campaign's leads ===== -->
   @if (selected; as s) {
     <div class="mt-4 flex items-center justify-between gap-2">
-      <button (click)="back()" class="flex min-h-[44px] items-center gap-1 rounded-xl px-2 py-1.5 text-sm font-medium text-grass-700 hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+      <button (click)="back()" class="console-btn-outline border-transparent">
         <ds-icon name="arrow_back" [size]="18" />All campaigns
       </button>
-      <button (click)="exportSelectedLeads()" class="flex min-h-[44px] items-center gap-1 rounded-xl bg-grass-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+      <button (click)="exportSelectedLeads()" class="console-btn">
         <ds-icon name="download" [size]="16" />Export CSV
       </button>
     </div>
-    <div class="mt-2 rounded-2xl bg-stone-900 p-5 text-white">
+    <div class="mt-2 rounded-2xl bg-grass-900 p-5 text-white">
       <p class="font-grotesk text-xs font-semibold uppercase tracking-[0.2em] text-grass-300">{{ s.clinicName }}</p>
       <h2 class="mt-1 flex items-center gap-1.5 font-grotesk text-2xl font-bold tracking-tight">
         <ds-icon name="campaign" [size]="22" />{{ s.campaign }}
       </h2>
       <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div class="rounded-xl bg-white/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Clicks</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.clicks | number }}</p></div>
-        <div class="rounded-xl bg-white/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Leads</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.leads | number }}</p></div>
-        <div class="rounded-xl bg-white/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Conversions</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.conversions | number }}</p></div>
+        <div class="rounded-xl bg-surface/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Clicks</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.clicks | number }}</p></div>
+        <div class="rounded-xl bg-surface/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Leads</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.leads | number }}</p></div>
+        <div class="rounded-xl bg-surface/10 p-3"><p class="text-[11px] uppercase tracking-wide text-white/70">Conversions</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ s.conversions | number }}</p></div>
         <div class="rounded-xl bg-grass-500 p-3"><p class="text-[11px] uppercase tracking-wide text-white/80">Rate</p><p class="mt-1 font-grotesk text-2xl font-bold tabular-nums">{{ convRate(s) }}%</p></div>
       </div>
     </div>
-    <div class="mt-4 overflow-x-auto rounded-2xl bg-white ring-1 ring-sand-200">
-      <table class="w-full text-left text-sm">
-        <thead class="border-b border-sand-200 bg-sand-50 text-xs font-semibold uppercase tracking-wide text-stone-500">
-          <tr>
-            <th class="px-4 py-3">Name</th><th class="px-4 py-3">Mobile</th><th class="px-4 py-3">City</th><th class="px-4 py-3">District</th><th class="px-4 py-3">Specialty</th><th class="px-4 py-3">Date</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="mt-4">
+      <ds-table caption="Leads for this campaign" [scrollable]="true">
+        <ng-container cards>
           @for (l of leads; track l) {
-            <tr class="border-b border-sand-200 transition-colors last:border-0 hover:bg-sand-50">
-              <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
-              <td class="px-4 py-3 tabular-nums text-stone-700">{{ l.mobile }}</td>
-              <td class="px-4 py-3 text-stone-700">{{ l.city || '—' }}</td>
-              <td class="px-4 py-3 text-stone-700">{{ l.district || '—' }}</td>
-              <td class="px-4 py-3 text-stone-700">{{ l.specialty || '—' }}</td>
-              <td class="px-4 py-3 text-stone-400">{{ l.createdAt | date:'medium' }}</td>
-            </tr>
+            <article class="rounded-xl border border-line/10 bg-surface p-4">
+              <div class="flex items-start justify-between gap-2">
+                <p class="truncate font-grotesk font-bold text-content-strong">{{ l.name }}</p>
+                <span class="shrink-0 text-xs text-muted">{{ l.createdAt | date:'mediumDate' }}</span>
+              </div>
+              <!-- A phone number on a phone should dial. -->
+              <a [href]="'tel:' + l.mobile"
+                class="mt-1 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium tabular-nums text-console-ink focus-visible:focus-ring">
+                <ds-icon name="call" [size]="14" />{{ l.mobile }}
+              </a>
+              <p class="text-xs text-muted">
+                {{ l.city || '—' }}@if (l.district) {<span> · {{ l.district }}</span>}
+              </p>
+              <p class="mt-0.5 text-xs text-muted">{{ l.specialty || 'No specialty' }}</p>
+            </article>
           }
           @if (!leads.length) {
-            <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">{{ detailLoading ? 'Loading…' : 'No leads yet.' }}</td></tr>
+            <ds-empty-state icon="group" [title]="detailLoading ? 'Loading…' : 'No leads yet'"
+              message="Leads from this campaign appear here." />
           }
-        </tbody>
-      </table>
+        </ng-container>
+
+        <table>
+          <caption class="sr-only">Leads captured by this campaign.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Mobile</th>
+              <th scope="col">City</th>
+              <th scope="col">District</th>
+              <th scope="col">Specialty</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of leads; track l) {
+              <tr>
+                <td class="font-medium text-content-strong">{{ l.name }}</td>
+                <td class="tabular-nums">{{ l.mobile }}</td>
+                <td>{{ l.city || '—' }}</td>
+                <td>{{ l.district || '—' }}</td>
+                <td>{{ l.specialty || '—' }}</td>
+                <td class="text-muted">{{ l.createdAt | date:'medium' }}</td>
+              </tr>
+            }
+            @if (!leads.length) {
+              <tr><td colspan="6" class="text-center text-muted">{{ detailLoading ? 'Loading…' : 'No leads yet.' }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </ds-table>
+
       @if (total > pageSize) {
-        <div class="flex items-center justify-between border-t border-sand-200 px-4 py-3 text-sm text-stone-600">
+        <nav aria-label="Leads pages" class="mt-3 flex items-center justify-between text-sm text-content">
           <span>Page {{ page }} of {{ totalPages }} · {{ total | number }} leads</span>
           <div class="flex gap-2">
-            <button (click)="prev()" [disabled]="page <= 1" class="min-h-[40px] rounded-lg border border-sand-200 px-4 py-1.5 disabled:opacity-40 coarse:min-h-[44px]">Previous</button>
-            <button (click)="next()" [disabled]="page >= totalPages" class="min-h-[40px] rounded-lg border border-sand-200 px-4 py-1.5 disabled:opacity-40">Next</button>
+            <button (click)="prev()" [disabled]="page <= 1" class="console-btn-ghost">Previous</button>
+            <button (click)="next()" [disabled]="page >= totalPages" class="console-btn-ghost">Next</button>
           </div>
-        </div>
+        </nav>
       }
     </div>
   }

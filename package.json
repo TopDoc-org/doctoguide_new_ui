@@ -16,12 +16,14 @@
     "test": "ng test",
     "serve:ssr:doctoguide": "node dist/doctoguide/server/server.mjs",
     "seo:check": "node scripts/seo-check.js",
-    "parity": "node scripts/parity-diff.mjs dist/doctoguide/browser ../doctoguide-baseline",
+    "parity": "node scripts/parity-diff.mjs dist/doctoguide/browser ../doctoguide-v2-baseline",
+    "parity:snapshot": "node scripts/parity-snapshot.mjs",
     "parity:behaviour": "node scripts/parity-behaviour.mjs ../AIDoctorFront .",
     "serve:cap": "node scripts/serve-cap.mjs",
     "prerender:check": "node scripts/check-prerender-list.mjs"
   },
   "dependencies": {
+    "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.2.0",
     "@angular/compiler": "^19.2.0",
     "@angular/core": "^19.2.0",

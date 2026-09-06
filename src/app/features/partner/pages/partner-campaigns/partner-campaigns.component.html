@@ -1,32 +1,37 @@
-<!-- date range -->
-<div class="flex flex-wrap items-end gap-3 rounded-2xl bg-white/80 p-4 ring-1 ring-black/5 backdrop-blur-sm">
+<ds-page-header eyebrow="Campaign performance" title="Campaigns"
+  subtitle="Clicks, leads and conversion for every campaign you are running." />
+
+<!-- date range. Was `bg-surface/80 backdrop-blur-sm` — glass on a static,
+     full-width panel, which is decoration that costs a compositor layer.
+     Glass belongs on small fixed surfaces (see the redesign constraints). -->
+<div class="console-panel flex flex-wrap items-end gap-3">
   <div class="flex-1 sm:flex-none">
-    <label for="camp-from" class="block text-xs font-semibold text-stone-900/70">From</label>
-    <input id="camp-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
+    <label for="camp-from" class="block text-xs font-semibold text-content">From</label>
+    <input id="camp-from" type="date" [(ngModel)]="from" class="mt-1 min-h-[44px] w-full rounded-lg border border-line/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
   </div>
   <div class="flex-1 sm:flex-none">
-    <label for="camp-to" class="block text-xs font-semibold text-stone-900/70">To</label>
-    <input id="camp-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
+    <label for="camp-to" class="block text-xs font-semibold text-content">To</label>
+    <input id="camp-to" type="date" [(ngModel)]="to" class="mt-1 min-h-[44px] w-full rounded-lg border border-line/10 px-3 py-2 text-sm outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 sm:w-auto" />
   </div>
   <button (click)="load()" [disabled]="loading"
-    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-stone-900/20 transition-colors duration-150 hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+    class="min-h-[44px] rounded-xl bg-grass-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-e1 transition-colors duration-150 hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
     {{ loading ? 'Loading…' : 'Apply' }}
   </button>
 </div>
 
 @if (error) {
-  <p role="alert" class="mt-3 text-sm text-red-600">{{ error }}</p>
+  <p role="alert" class="mt-3 text-sm text-danger">{{ error }}</p>
 }
 
 <!-- ============ LIST VIEW ============ -->
 @if (!selected) {
   <!-- empty state -->
   @if (!loading && !campaigns.length) {
-    <div class="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-grass-50 to-white p-8 text-center ring-1 ring-grass-600/10">
-      <span class="grid mx-auto h-14 w-14 place-items-center rounded-2xl bg-grass-600/10 text-grass-700"><ds-icon name="campaign" [size]="28" /></span>
-      <p class="mt-3 font-heading font-semibold text-stone-900">No campaigns yet</p>
-      <p class="mx-auto mt-1 max-w-md text-sm text-stone-900/60">
-        Add a campaign number to your shared link (e.g. <span class="font-mono text-grass-700">?ref=…&amp;utm_campaign=diwali</span>) on the Overview tab. Clicks and leads under each link show up here, split by campaign.
+    <div class="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-console-tint to-white p-8 text-center ring-1 ring-grass-600/10">
+      <span class="grid mx-auto h-14 w-14 place-items-center rounded-2xl bg-grass-600/10 text-console-ink"><ds-icon name="campaign" [size]="28" /></span>
+      <p class="mt-3 font-heading font-semibold text-content-strong">No campaigns yet</p>
+      <p class="mx-auto mt-1 max-w-md text-sm text-content">
+        Add a campaign number to your shared link (e.g. <span class="font-mono text-console-ink">?ref=…&amp;utm_campaign=diwali</span>) on the Overview tab. Clicks and leads under each link show up here, split by campaign.
       </p>
     </div>
   }
@@ -35,34 +40,34 @@
     <ul class="mt-4 space-y-2.5">
       @for (c of campaigns; track c; let i = $index) {
         <li (click)="open(c)" tabindex="0" (keyup.enter)="open(c)"
-          class="group cursor-pointer rounded-2xl bg-white p-4 ring-1 ring-black/5 transition-all duration-150 hover:ring-grass-500/30 hover:shadow-md motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+          class="group cursor-pointer rounded-2xl bg-surface p-4 ring-1 ring-line/10 transition-all duration-150 hover:ring-grass-500/30 hover:shadow-md motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
           <div class="flex items-center gap-3">
             <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-grass-600 to-grass-500 font-heading text-sm font-bold text-white shadow-sm">{{ i + 1 }}</span>
-            <p class="flex min-w-0 flex-1 items-center gap-1.5 truncate font-semibold text-stone-900">
-              <ds-icon name="campaign" [size]="16" class="text-grass-500" />{{ c.campaign }}
+            <p class="flex min-w-0 flex-1 items-center gap-1.5 truncate font-semibold text-content-strong">
+              <ds-icon name="campaign" [size]="16" class="text-console-ink-soft" />{{ c.campaign }}
             </p>
-            <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold tabular-nums text-amber-700">{{ convRate(c) }}%</span>
-            <ds-icon name="chevron_right" [size]="18" class="hidden shrink-0 text-stone-900/30 transition-transform duration-150 group-hover:translate-x-0.5 sm:inline" />
+            <span class="shrink-0 rounded-full bg-console-gold-tint-strong px-2.5 py-1 text-xs font-bold tabular-nums text-console-gold">{{ convRate(c) }}%</span>
+            <ds-icon name="chevron_right" [size]="18" class="hidden shrink-0 text-muted transition-transform duration-150 group-hover:translate-x-0.5 sm:inline" />
           </div>
           <div class="mt-3 grid grid-cols-3 gap-2">
-            <div class="rounded-xl bg-grass-50/60 px-3 py-2 text-center">
-              <p class="text-[11px] uppercase tracking-wide text-stone-900/50">Clicks</p>
-              <p class="font-heading text-lg font-bold tabular-nums text-stone-900">{{ c.clicks | number }}</p>
+            <div class="rounded-xl bg-console-tint/60 px-3 py-2 text-center">
+              <p class="text-[11px] uppercase tracking-wide text-muted">Clicks</p>
+              <p class="font-heading text-lg font-bold tabular-nums text-content-strong">{{ c.clicks | number }}</p>
             </div>
-            <div class="rounded-xl bg-grass-50/60 px-3 py-2 text-center">
-              <p class="text-[11px] uppercase tracking-wide text-stone-900/50">Leads</p>
-              <p class="font-heading text-lg font-bold tabular-nums text-stone-900">{{ c.leads | number }}</p>
+            <div class="rounded-xl bg-console-tint/60 px-3 py-2 text-center">
+              <p class="text-[11px] uppercase tracking-wide text-muted">Leads</p>
+              <p class="font-heading text-lg font-bold tabular-nums text-content-strong">{{ c.leads | number }}</p>
             </div>
-            <div class="rounded-xl bg-amber-50/70 px-3 py-2 text-center">
-              <p class="text-[11px] uppercase tracking-wide text-amber-700/70">Conversions</p>
-              <p class="font-heading text-lg font-bold tabular-nums text-stone-900">{{ (c.conversions || 0) | number }}</p>
+            <div class="rounded-xl bg-console-gold-tint/70 px-3 py-2 text-center">
+              <p class="text-[11px] uppercase tracking-wide text-console-gold/70">Conversions</p>
+              <p class="font-heading text-lg font-bold tabular-nums text-content-strong">{{ (c.conversions || 0) | number }}</p>
             </div>
           </div>
           <div class="mt-3 flex items-center justify-between">
-            <span class="text-xs font-medium text-grass-700/80">View leads</span>
+            <span class="text-xs font-medium text-console-ink/80">View leads</span>
             <button (click)="exportCampaign(c.campaign, $event)" [disabled]="exportingKey === c.campaign"
               [attr.aria-label]="'Export ' + c.campaign + ' leads as CSV'"
-              class="flex min-h-[38px] items-center gap-1 rounded-lg border border-grass-600/70 px-3 py-1 text-xs font-semibold text-grass-700 transition-colors duration-150 hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50 coarse:min-h-[44px]">
+              class="flex min-h-[38px] items-center gap-1 rounded-lg border border-grass-600/70 px-3 py-1 text-xs font-semibold text-console-ink transition-colors duration-150 hover:bg-console-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50 coarse:min-h-[44px]">
               <ds-icon name="download" [size]="14" />
               {{ exportingKey === c.campaign ? 'Exporting…' : 'Export CSV' }}
             </button>
@@ -77,37 +82,37 @@
 @if (selected; as s) {
   <div class="mt-4 flex items-center justify-between gap-2">
     <button (click)="back()"
-      class="flex min-h-[44px] items-center gap-1 rounded-xl px-2 py-1.5 text-sm font-medium text-grass-700 hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+      class="flex min-h-[44px] items-center gap-1 rounded-xl px-2 py-1.5 text-sm font-medium text-console-ink hover:bg-console-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
       <ds-icon name="arrow_back" [size]="18" />
       All campaigns
     </button>
     <button (click)="exportCampaign(s.campaign)" [disabled]="exportingKey === s.campaign"
-      class="flex min-h-[44px] items-center gap-1 rounded-xl bg-grass-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-stone-900/20 hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
+      class="flex min-h-[44px] items-center gap-1 rounded-xl bg-grass-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-e1 hover:bg-grass-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-50">
       <ds-icon name="download" [size]="16" />
       {{ exportingKey === s.campaign ? 'Exporting…' : 'Export CSV' }}
     </button>
   </div>
   <!-- campaign hero -->
-  <div class="relative mt-2 overflow-hidden rounded-3xl bg-gradient-to-br from-grass-800 via-grass-700 to-grass-600 p-5 text-white shadow-xl shadow-stone-900/20">
+  <div class="relative mt-2 overflow-hidden rounded-3xl bg-gradient-to-br from-grass-800 via-grass-700 to-grass-600 p-5 text-white shadow-xl shadow-e1">
     <div aria-hidden="true" class="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-amber-300/30 blur-3xl motion-safe:animate-blob"></div>
     <h2 class="relative flex items-center gap-1.5 font-grotesk text-xl font-bold sm:text-2xl">
       <ds-icon name="campaign" [size]="22" />{{ s.campaign }}
     </h2>
     <div class="relative mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <div class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
+      <div class="rounded-2xl bg-surface/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">Clicks</p>
         <p class="mt-1 font-heading text-2xl font-bold tabular-nums">{{ (detail?.clicks ?? s.clicks) | number }}</p>
       </div>
-      <div class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
+      <div class="rounded-2xl bg-surface/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">Leads</p>
         <p class="mt-1 font-heading text-2xl font-bold tabular-nums">{{ (detail?.leads ?? s.leads) | number }}</p>
       </div>
-      <div class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
+      <div class="rounded-2xl bg-surface/10 p-3 ring-1 ring-white/15 backdrop-blur-md">
         <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">Conversions</p>
         <p class="mt-1 font-heading text-2xl font-bold tabular-nums">{{ (detail?.conversions ?? s.conversions ?? 0) | number }}</p>
       </div>
-      <div class="rounded-2xl bg-amber-400/90 p-3 text-stone-900 ring-1 ring-white/20">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-stone-900/70">Conv. rate</p>
+      <div class="rounded-2xl bg-amber-400/90 p-3 text-content-strong ring-1 ring-white/20">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-content">Conv. rate</p>
         <p class="mt-1 font-heading text-2xl font-bold tabular-nums">{{ convRate({ clicks: detail?.clicks ?? s.clicks, leads: detail?.leads ?? s.leads }) }}%</p>
       </div>
     </div>
@@ -115,63 +120,66 @@
   <!-- offers enabled for this campaign (checkbox dropdown) -->
   <div class="relative mt-4">
     <button (click)="offersOpen = !offersOpen" [attr.aria-expanded]="offersOpen"
-      class="flex w-full items-center justify-between gap-2 rounded-2xl bg-white px-4 py-3 ring-1 ring-black/5 transition-colors hover:bg-grass-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
-      <span class="flex items-center gap-2 font-heading font-semibold text-stone-900">
-        <span class="grid h-7 w-7 place-items-center rounded-lg bg-amber-400/20 text-amber-700"><ds-icon name="local_offer" [size]="16" /></span>
+      class="flex w-full items-center justify-between gap-2 rounded-2xl bg-surface px-4 py-3 ring-1 ring-line/10 transition-colors hover:bg-console-tint/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+      <span class="flex items-center gap-2 font-heading font-semibold text-content-strong">
+        <span class="grid h-7 w-7 place-items-center rounded-lg bg-amber-400/20 text-console-gold"><ds-icon name="local_offer" [size]="16" /></span>
         Offers in this campaign
       </span>
       <span class="flex items-center gap-2">
-        <span class="rounded-full bg-grass-50 px-2.5 py-0.5 text-xs font-semibold text-grass-700">{{ enabledOffersCount }} enabled</span>
-        <ds-icon name="expand_more" class="text-stone-900/40 transition-transform" [class.rotate-180]="offersOpen" />
+        <span class="rounded-full bg-console-tint px-2.5 py-0.5 text-xs font-semibold text-console-ink">{{ enabledOffersCount }} enabled</span>
+        <ds-icon name="expand_more" class="text-muted transition-transform" [class.rotate-180]="offersOpen" />
       </span>
     </button>
     @if (offersOpen) {
-      <div class="mt-2 overflow-hidden rounded-2xl bg-white ring-1 ring-black/5">
+      <div class="mt-2 overflow-hidden rounded-2xl bg-surface ring-1 ring-line/10">
         @if (offers.length) {
-          <ul class="divide-y divide-black/5">
+          <ul class="divide-y divide-line/10">
             @for (o of offers; track o) {
-              <li>
-                <label class="flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-grass-50/40">
-                  <input type="checkbox" [checked]="offerEnabled(o)" (change)="toggleOffer(o)" [disabled]="savingOfferId === o.id"
-                    class="mt-0.5 h-5 w-5 shrink-0 rounded accent-grass-600 disabled:opacity-50" />
-                    <span class="min-w-0 flex-1">
-                      <span class="flex items-center gap-2">
-                        <span class="font-medium text-stone-900">{{ o.title }}</span>
-                        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" [ngClass]="o.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">{{ o.active ? 'Active' : 'Inactive' }}</span>
-                      </span>
-                      @if (o.discountText) {
-                        <span class="mt-0.5 block text-sm text-amber-700">{{ o.discountText }}</span>
-                      }
-                      <span class="mt-0.5 block text-[11px] text-stone-900/45">{{ o.specialty || 'All specialties' }}</span>
-                    </span>
-                    @if (savingOfferId === o.id) {
-                      <svg class="mt-0.5 h-[18px] w-[18px] shrink-0 text-grass-500 motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" /><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" /></svg>
-                    }
-                  </label>
-                </li>
+              <!-- `ds-switch`, not `ds-checkbox`: flipping this SAVES, it does not
+                   stage a value for a submit button that does not exist here.
+                   The row is a <li>, not a <label> — ds-switch renders its own,
+                   and nesting labels breaks click targeting. The spinner sits
+                   outside it for the same reason. -->
+              <li class="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-console-tint/40">
+                <ds-switch class="min-w-0 flex-1"
+                  [checked]="offerEnabled(o)" (checkedChange)="toggleOffer(o)"
+                  [disabled]="savingOfferId === o.id">
+                  <span class="flex items-center gap-2">
+                    <span class="font-medium text-content-strong">{{ o.title }}</span>
+                    <span class="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide" [ngClass]="o.active ? 'bg-success/[12%] text-success' : 'bg-surface-2 text-muted'">{{ o.active ? 'Active' : 'Inactive' }}</span>
+                  </span>
+                  @if (o.discountText) {
+                    <span class="mt-0.5 block text-sm text-console-gold">{{ o.discountText }}</span>
+                  }
+                  <span class="mt-0.5 block text-[11px] text-muted">{{ o.specialty || 'All specialties' }}</span>
+                </ds-switch>
+                @if (savingOfferId === o.id) {
+                  <svg class="mt-2 h-[18px] w-[18px] shrink-0 text-console-ink-soft motion-safe:animate-spin360" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" /><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" /></svg>
+                }
+              </li>
               }
             </ul>
           } @else {
-            <p class="px-4 py-6 text-center text-sm text-stone-900/50">No offers yet. Create one to feature it in this campaign.</p>
+            <p class="px-4 py-6 text-center text-sm text-muted">No offers yet. Create one to feature it in this campaign.</p>
           }
           <button (click)="createOffer()"
-            class="flex w-full items-center justify-center gap-1 border-t border-black/5 px-4 py-3 text-sm font-semibold text-grass-700 transition-colors hover:bg-grass-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
+            class="flex w-full items-center justify-center gap-1 border-t border-line/10 px-4 py-3 text-sm font-semibold text-console-ink transition-colors hover:bg-console-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">
             <ds-icon name="add" [size]="16" /> Create a new offer
           </button>
         </div>
       }
     </div>
     <!-- this campaign's leads -->
-    <div class="mt-4 rounded-2xl bg-white ring-1 ring-black/5">
-      <div class="flex items-center justify-between border-b border-black/5 px-4 py-3">
-        <p class="font-heading font-semibold text-stone-900">Leads from this campaign</p>
-        <span class="rounded-full bg-grass-50 px-2.5 py-0.5 text-xs font-semibold text-grass-700">{{ total | number }} total</span>
+    <div class="mt-4 rounded-2xl bg-surface ring-1 ring-line/10">
+      <div class="flex items-center justify-between border-b border-line/10 px-4 py-3">
+        <p class="font-heading font-semibold text-content-strong">Leads from this campaign</p>
+        <span class="rounded-full bg-console-tint px-2.5 py-0.5 text-xs font-semibold text-console-ink">{{ total | number }} total</span>
       </div>
       <!-- filter + sort -->
-      <div class="flex flex-wrap items-center gap-2 border-b border-black/5 px-4 py-3">
+      <div class="flex flex-wrap items-center gap-2 border-b border-line/10 px-4 py-3">
         <label class="sr-only" for="lf-specialty">Filter by specialty</label>
         <select id="lf-specialty" [(ngModel)]="leadSpecialty" (ngModelChange)="applyLeadFilters()"
-          class="min-h-[40px] rounded-lg border border-black/10 bg-white px-3 py-1.5 text-sm text-stone-900 outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
+          class="min-h-[40px] rounded-lg border border-line/10 bg-surface px-3 py-1.5 text-sm text-content-strong outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
           <option value="">All specialties</option>
           @for (s of specialtyOptions; track $index) {
             <option [value]="s">{{ s }}</option>
@@ -179,17 +187,17 @@
         </select>
         <label class="sr-only" for="lf-district">Filter by district</label>
         <select id="lf-district" [(ngModel)]="leadDistrict" (ngModelChange)="applyLeadFilters()"
-          class="min-h-[40px] rounded-lg border border-black/10 bg-white px-3 py-1.5 text-sm text-stone-900 outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
+          class="min-h-[40px] rounded-lg border border-line/10 bg-surface px-3 py-1.5 text-sm text-content-strong outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
           <option value="">All districts</option>
           @for (d of districtOptions; track $index) {
             <option [value]="d">{{ d }}</option>
           }
         </select>
         <div class="ml-auto flex items-center gap-1.5">
-          <ds-icon name="sort" [size]="18" class="text-stone-900/40" />
+          <ds-icon name="sort" [size]="18" class="text-muted" />
           <label class="sr-only" for="lf-sort">Sort leads</label>
           <select id="lf-sort" [(ngModel)]="leadSort" (ngModelChange)="applyLeadFilters()"
-            class="min-h-[40px] rounded-lg border border-black/10 bg-white px-3 py-1.5 text-sm text-stone-900 outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
+            class="min-h-[40px] rounded-lg border border-line/10 bg-surface px-3 py-1.5 text-sm text-content-strong outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40 coarse:min-h-[44px]">
             <option value="createdAt:desc">Newest first</option>
             <option value="createdAt:asc">Oldest first</option>
             <option value="name:asc">Name A–Z</option>
@@ -197,44 +205,67 @@
           </select>
         </div>
       </div>
-      @if (leads.length) {
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="border-b border-black/5 text-xs uppercase tracking-wide text-stone-900/50">
+      <div class="p-4">
+        <ds-table caption="Leads from this campaign" [scrollable]="true">
+          <ng-container cards>
+            @for (l of leads; track l) {
+              <article class="rounded-xl border border-line/10 bg-surface p-4">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="truncate font-heading font-semibold text-content-strong">{{ l.name }}</p>
+                  <span class="shrink-0 text-xs text-muted">{{ l.createdAt | date:'mediumDate' }}</span>
+                </div>
+                <a [href]="'tel:' + l.mobile"
+                  class="mt-1 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium tabular-nums text-console-ink focus-visible:focus-ring">
+                  <ds-icon name="call" [size]="14" />{{ l.mobile }}
+                </a>
+                <p class="text-xs text-content">
+                  {{ l.city || '—' }}@if (l.district) {<span> · {{ l.district }}</span>} · {{ l.specialty || 'No specialty' }}
+                </p>
+              </article>
+            }
+            @if (!leads.length) {
+              <ds-empty-state icon="group" [title]="detailLoading ? 'Loading…' : 'No leads from this campaign yet'" />
+            }
+          </ng-container>
+
+          <table>
+            <caption class="sr-only">Leads from this campaign.</caption>
+            <thead>
               <tr>
-                <th scope="col" class="px-4 py-3">Name</th>
-                <th scope="col" class="px-4 py-3">Mobile</th>
-                <th scope="col" class="px-4 py-3">City</th>
-                <th scope="col" class="px-4 py-3">District</th>
-                <th scope="col" class="px-4 py-3">Specialty</th>
-                <th scope="col" class="px-4 py-3">Date</th>
+                <th scope="col">Name</th>
+                <th scope="col">Mobile</th>
+                <th scope="col">City</th>
+                <th scope="col">District</th>
+                <th scope="col">Specialty</th>
+                <th scope="col">Date</th>
               </tr>
             </thead>
             <tbody>
               @for (l of leads; track l) {
-                <tr class="border-b border-black/5 transition-colors last:border-0 hover:bg-grass-50/40">
-                  <td class="px-4 py-3 font-medium text-stone-900">{{ l.name }}</td>
-                  <td class="px-4 py-3 tabular-nums text-stone-900/80">{{ l.mobile }}</td>
-                  <td class="px-4 py-3 text-stone-900/80">{{ l.city || '—' }}</td>
-                  <td class="px-4 py-3 text-stone-900/80">{{ l.district || '—' }}</td>
-                  <td class="px-4 py-3 text-stone-900/80">{{ l.specialty || '—' }}</td>
-                  <td class="px-4 py-3 text-stone-900/60">{{ l.createdAt | date:'medium' }}</td>
+                <tr>
+                  <td class="font-medium text-content-strong">{{ l.name }}</td>
+                  <td class="tabular-nums">{{ l.mobile }}</td>
+                  <td>{{ l.city || '—' }}</td>
+                  <td>{{ l.district || '—' }}</td>
+                  <td>{{ l.specialty || '—' }}</td>
+                  <td class="text-muted">{{ l.createdAt | date:'medium' }}</td>
                 </tr>
+              }
+              @if (!leads.length) {
+                <tr><td colspan="6" class="text-center text-muted">{{ detailLoading ? 'Loading…' : 'No leads from this campaign yet.' }}</td></tr>
               }
             </tbody>
           </table>
-        </div>
-      } @else {
-        <p class="px-4 py-8 text-center text-sm text-stone-900/50">{{ detailLoading ? 'Loading…' : 'No leads from this campaign yet.' }}</p>
-      }
+        </ds-table>
+      </div>
       @if (total > pageSize) {
-        <div class="flex items-center justify-between border-t border-black/5 px-4 py-3 text-sm text-stone-900/70">
+        <div class="flex items-center justify-between border-t border-line/10 px-4 py-3 text-sm text-content">
           <span>Page {{ page }} of {{ totalPages }}</span>
           <div class="flex gap-2">
             <button (click)="prev()" [disabled]="page <= 1"
-            class="min-h-[40px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40 coarse:min-h-[44px]">Previous</button>
+            class="min-h-[40px] rounded-lg border border-line/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40 coarse:min-h-[44px]">Previous</button>
             <button (click)="next()" [disabled]="page >= totalPages"
-            class="min-h-[40px] rounded-lg border border-black/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
+            class="min-h-[40px] rounded-lg border border-line/10 px-4 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 disabled:opacity-40">Next</button>
           </div>
         </div>
       }

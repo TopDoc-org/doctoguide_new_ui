@@ -202,6 +202,32 @@ function main() {
     console.warn('[postbuild-seo] /start was not prerendered — the Ads landing page is missing.');
   }
 
+  // --- environment check -----------------------------------------------------
+  // The production build MUST have swapped environment.ts for environment.prod.ts
+  // (angular.json -> build.configurations.production.fileReplacements).
+  //
+  // This shipped broken once: the fileReplacements block was lost in the v2
+  // migration, so every production and Capacitor bundle carried the DEV
+  // environment — serverUrl "http://localhost:3000" and siteUrl
+  // "http://localhost:4700". It fails silently and looks like an analytics bug,
+  // because the app still boots and Firebase Analytics still initialises (the
+  // firebaseConfig is identical in both files); what dies is every backend call,
+  // and with it every conversion event logged from a success callback —
+  // sign_up, login, report_generated, report_analysed, first_message_sent.
+  const devHosts = ['localhost:3000', 'localhost:4700'];
+  const bundles = fs.readdirSync(OUT_DIR).filter((f) => f.endsWith('.js'));
+  for (const host of devHosts) {
+    const bad = bundles.filter((f) =>
+      fs.readFileSync(path.join(OUT_DIR, f), 'utf8').includes(host),
+    );
+    if (bad.length) {
+      console.error(`[postbuild-seo] FAIL: production bundle contains "${host}" (${bad.join(', ')}).`);
+      console.error('[postbuild-seo] environment.prod.ts was not substituted. Check fileReplacements in angular.json.');
+      process.exit(1);
+    }
+  }
+  console.log('[postbuild-seo] Environment check passed (no dev hosts in the production bundle).');
+
   // --- sanity check ----------------------------------------------------------
   // A prerender that silently produced empty shells is the exact failure this
   // whole pipeline exists to prevent, so fail the build rather than deploy it.

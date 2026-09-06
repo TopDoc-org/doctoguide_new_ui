@@ -1,72 +1,72 @@
-<div class="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-sand-50 px-4 py-8">
+<div class="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-bg px-4 py-8">
   <!-- soft, cool tints -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0">
     <div class="absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-grass-200/40 blur-3xl motion-safe:animate-blob"></div>
-    <div class="absolute right-[-5rem] top-0 h-80 w-80 rounded-full bg-amber-100/50 blur-3xl motion-safe:animate-blob" style="animation-delay:-6s"></div>
+    <div class="absolute right-[-5rem] top-0 h-80 w-80 rounded-full bg-console-gold-tint-strong/50 blur-3xl motion-safe:animate-blob" style="animation-delay:-6s"></div>
   </div>
 
-  <div class="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-xl shadow-stone-900/5 ring-1 ring-sand-200 sm:p-7">
+  <div class="relative w-full max-w-md rounded-3xl bg-surface p-6 shadow-xl shadow-stone-900/5 ring-1 ring-line/10 sm:p-7">
     <div class="flex items-center gap-2">
       <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-grass-600 to-grass-500 text-white shadow-sm">
         <ds-icon name="storefront" [size]="22" />
       </span>
       <div>
-        <h1 class="font-grotesk text-xl font-bold leading-tight tracking-tight text-stone-900">Create a clinic account</h1>
-        <p class="text-xs text-stone-900/55">No KnocDoc partnership needed</p>
+        <h1 class="font-grotesk text-xl font-bold leading-tight tracking-tight text-content-strong">Create a clinic account</h1>
+        <p class="text-xs text-muted">No KnocDoc partnership needed</p>
       </div>
     </div>
-    <p class="mt-2 text-sm text-stone-900/60">Get a tracked campaign link, see your leads, and add offers.</p>
+    <p class="mt-2 text-sm text-content">Get a tracked campaign link, see your leads, and add offers.</p>
 
     <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div class="sm:col-span-2">
-        <label for="su-clinic" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Clinic name <span class="text-red-500">*</span></label>
+        <label for="su-clinic" class="block text-xs font-semibold uppercase tracking-wide text-content">Clinic name <span class="text-danger">*</span></label>
         <input id="su-clinic" [(ngModel)]="form.clinicName" placeholder="e.g. Ravindra Medical"
-          class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+          class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
         </div>
         <div>
-          <label for="su-city" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">City <span class="text-red-500">*</span></label>
+          <label for="su-city" class="block text-xs font-semibold uppercase tracking-wide text-content">City <span class="text-danger">*</span></label>
           <input id="su-city" [(ngModel)]="form.city" placeholder="e.g. Bhubaneswar"
-            class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+            class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
           </div>
           <div>
-            <label for="su-state" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">State</label>
+            <label for="su-state" class="block text-xs font-semibold uppercase tracking-wide text-content">State</label>
             <input id="su-state" [(ngModel)]="form.state" placeholder="e.g. Odisha"
-              class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+              class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
             </div>
             <div class="sm:col-span-2">
-              <label for="su-name" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Your name <span class="text-red-500">*</span></label>
+              <label for="su-name" class="block text-xs font-semibold uppercase tracking-wide text-content">Your name <span class="text-danger">*</span></label>
               <input id="su-name" [(ngModel)]="form.contactName" autocomplete="name" placeholder="Admin contact name"
-                class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+                class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
               </div>
               <div class="sm:col-span-2">
-                <label for="su-mobile" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Mobile number <span class="text-red-500">*</span></label>
+                <label for="su-mobile" class="block text-xs font-semibold uppercase tracking-wide text-content">Mobile number <span class="text-danger">*</span></label>
                 <input id="su-mobile" [(ngModel)]="form.mobile" type="tel" inputmode="tel" autocomplete="username" placeholder="Used to sign in"
-                  class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+                  class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
                 </div>
                 <div>
-                  <label for="su-pin" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Set a password <span class="text-red-500">*</span></label>
+                  <label for="su-pin" class="block text-xs font-semibold uppercase tracking-wide text-content">Set a password <span class="text-danger">*</span></label>
                   <input id="su-pin" [(ngModel)]="form.pin" type="password" autocomplete="new-password" placeholder="At least 4 characters"
-                    class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+                    class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
                   </div>
                   <div>
-                    <label for="su-pin2" class="block text-xs font-semibold uppercase tracking-wide text-stone-900/60">Confirm password <span class="text-red-500">*</span></label>
+                    <label for="su-pin2" class="block text-xs font-semibold uppercase tracking-wide text-content">Confirm password <span class="text-danger">*</span></label>
                     <input id="su-pin2" [(ngModel)]="confirmPin" (keyup.enter)="submit()" type="password" autocomplete="new-password" placeholder="Re-enter password"
-                      class="mt-1 min-h-[44px] w-full rounded-xl border border-black/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
+                      class="mt-1 min-h-[44px] w-full rounded-xl border border-line/10 px-3 py-2.5 text-base outline-none focus-visible:border-grass-600 focus-visible:ring-2 focus-visible:ring-grass-500/40" />
                     </div>
                   </div>
 
                   @if (error) {
-                    <p role="alert" class="mt-2 text-xs text-red-600">{{ error }}</p>
+                    <p role="alert" class="mt-2 text-xs text-danger">{{ error }}</p>
                   }
 
                   <button (click)="submit()" [disabled]="loading"
-                    class="mt-5 min-h-[48px] w-full rounded-xl bg-gradient-to-r from-grass-600 to-grass-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-stone-900/20 transition-all duration-150 hover:from-grass-700 hover:to-grass-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
+                    class="mt-5 min-h-[48px] w-full rounded-xl bg-gradient-to-r from-grass-600 to-grass-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-e1 transition-all duration-150 hover:from-grass-700 hover:to-grass-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500 focus-visible:ring-offset-2 disabled:opacity-50">
                     {{ loading ? 'Creating account…' : 'Create account' }}
                   </button>
 
-                  <p class="mt-4 text-center text-sm text-stone-900/60">
+                  <p class="mt-4 text-center text-sm text-content">
                     Already have an account?
-                    <a routerLink="/partner/login" class="font-semibold text-grass-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">Sign in</a>
+                    <a routerLink="/partner/login" class="font-semibold text-console-ink underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grass-500">Sign in</a>
                   </p>
                 </div>
               </div>

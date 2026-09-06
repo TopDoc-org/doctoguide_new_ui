@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div class="min-w-0">
           @if (eyebrow()) {
-            <p class="text-xs font-semibold uppercase tracking-tighter text-teal-600">{{ eyebrow() }}</p>
+            <p class="text-xs font-semibold uppercase tracking-tighter text-brand-ink-soft">{{ eyebrow() }}</p>
           }
           <h1 class="mt-1 text-2xl sm:text-3xl font-semibold text-content-strong">{{ title() }}</h1>
           @if (subtitle()) {

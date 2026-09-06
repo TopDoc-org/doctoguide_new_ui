@@ -1,15 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AdminApiService } from '../../services/admin-api.service';
 import { AdminFilters, AdminLead, AdminLeadQuery } from '../../models';
 import { downloadBlob } from '../../../../core/platform/download';
+import { ToastService } from '../../../../design-system/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BadgeComponent } from '../../../../design-system/badge/badge.component';
+import { EmptyStateComponent } from '../../../../design-system/empty-state/empty-state.component';
 import { IconComponent } from '../../../../design-system/icon/icon.component';
+import { PageHeaderComponent } from '../../../../design-system/page-header/page-header.component';
+import { TableComponent } from '../../../../design-system/table/table.component';
 
 @Component({
   selector: 'app-admin-leads',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [
+    CommonModule, FormsModule,
+    IconComponent, PageHeaderComponent, TableComponent, BadgeComponent, EmptyStateComponent,
+  ],
   templateUrl: './admin-leads.component.html',
 })
 export class AdminLeadsComponent implements OnInit {
@@ -34,6 +42,13 @@ export class AdminLeadsComponent implements OnInit {
   loading = false;
   exporting = false;
   error = '';
+
+  /** Export outcomes are announced, not written into a paragraph the
+   *  user has already scrolled past. A CSV export is the one console
+   *  action with NO on-screen result: on success the only evidence is a
+   *  file in the browser's download tray, and on failure the old inline
+   *  `error` sat above a table the user was looking at the bottom of. */
+  private readonly toast = inject(ToastService);
 
   constructor(private api: AdminApiService) {}
 
@@ -122,10 +137,11 @@ export class AdminLeadsComponent implements OnInit {
       next: (blob) => {
         this.exporting = false;
         downloadBlob(blob, `leads-all-${this.from}-to-${this.to}.csv`);
+        this.toast.success('Export ready — check your downloads.');
       },
       error: () => {
         this.exporting = false;
-        this.error = 'Export failed. Try again.';
+        this.toast.error('Export failed.', { action: { label: 'Retry', run: () => this.exportCsv() } });
       },
     });
   }

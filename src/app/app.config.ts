@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { sessionExpiryInterceptor } from './core/http/session-expiry.interceptor';
 import { ThemeService } from './core/theme/theme.service';
 import { BackButtonService } from './core/native/back-button.service';
+import { DeepLinkService } from './core/native/deep-link.service';
 import { provideIcons } from './core/icons';
 
 export const appConfig: ApplicationConfig = {
@@ -41,6 +42,8 @@ export const appConfig: ApplicationConfig = {
       inject(ThemeService).init();
       // Android hardware back. Inert in a browser (no Capacitor global).
       inject(BackButtonService).start();
+      // Android App Links (https://doctoguide.knocdoc.in/...). Inert in a browser.
+      inject(DeepLinkService).start();
     }),
 
     // provideClientHydration() is DELIBERATELY ABSENT.

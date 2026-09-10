@@ -18,6 +18,25 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+                Android App Links: a tap on any https://doctoguide.knocdoc.in link
+                (WhatsApp, Gmail, a Google result, another site in Chrome) opens
+                this app instead of the browser when it is installed.
+
+                autoVerify only succeeds if the site serves
+                /.well-known/assetlinks.json (public/.well-known/) listing the
+                SHA-256 of the certificate that signed THIS build. Unverified, the
+                link still opens Chrome — nothing breaks, it just is not a deep link.
+
+                DeepLinkService routes the URL once the app is open.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="doctoguide.knocdoc.in" />
+            </intent-filter>
         </activity>
 
         <provider

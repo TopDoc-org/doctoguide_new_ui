@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.knocdoc.app.doctoguide",
+      "sha256_cert_fingerprints": [
+        "0E:93:4A:EC:5E:57:B3:76:BE:27:50:64:B1:09:DD:A2:BC:D7:2B:F5:E9:5E:EB:CE:24:EF:28:0C:0F:AD:95:DB"
+      ]
+    }
+  }
+]
